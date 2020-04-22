@@ -1,0 +1,36 @@
+$primarlyBtn: #E53935;
+
+.Main {
+    display: flex;
+    .content {
+        display: flex;
+        justify-content: center;
+        width: 50%;
+        height: 553px;
+        padding-top: 98px;
+        &.left {
+            background-color: #FDD835;
+        }
+        &.right {
+            background-color: #FB8C00;  
+        }
+    }
+    button {
+        color: $primarlyBtn;
+        height: 63px;
+        width: 317px;
+        font-size: 36px;
+        font-family: Source Sans Pro;
+        font-style: normal;
+        font-weight: bold;
+        border: 4px solid $primarlyBtn;
+        border-radius: 50px;
+            &:hover {
+                color: white;
+                background-color: $primarlyBtn;
+            }
+            &:focus {
+                outline:0;
+            }
+    }
+}
