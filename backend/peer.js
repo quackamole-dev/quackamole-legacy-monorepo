@@ -1,11 +1,13 @@
-const {ExpressPeerServer} = require('peer');
+const { ExpressPeerServer } = require('peer');
+
+const options = {
+    allow_discovery: true,
+    debug: true,
+    path: '/signal'
+};
 
 const initPeerServer = server => {
-    return ExpressPeerServer(server, {
-        allow_discovery: true,
-        debug: true,
-        path: '/myapp'
-    });
+    return ExpressPeerServer(server, options);
 };
 
 module.exports = initPeerServer;

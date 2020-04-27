@@ -8,7 +8,7 @@ class roomManager {
         this.rooms = {
             'dummy-room-id': {
                 id: 'dummy-room-id',
-                password: '123',
+                password: 'dummy123',
                 name: 'dummy room name',
                 joinedUsers: [],
                 maxUsers: 4
@@ -17,6 +17,8 @@ class roomManager {
     }
 
     createRoom = roomData => {
+        console.log('create');
+
         const sanitizedRoomData = this._createSanitizedRoomData(roomData);
         this.rooms[sanitizedRoomData.id] = sanitizedRoomData;
         return this.getRoom(sanitizedRoomData.id);
@@ -24,6 +26,7 @@ class roomManager {
 
     userJoinRoom = (roomId, joiningUser, password) => {
         const roomRef = this.rooms[roomId];
+        console.log('join');
 
         if (roomRef) {
             if (!roomRef.joinedUsers) { roomRef.joinedUsers = [] }

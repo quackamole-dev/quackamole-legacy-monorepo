@@ -2,6 +2,11 @@ const IOServer = require('socket.io');
 const roomManager = require('./rooms');
 
 
+// const serverSocketIO = http.createServer(app1);
+// const io = require('socket.io').listen(serverSocketIO);
+// const io = require('socket.io')(server);
+
+
 const initSocketIO = (server) => {
     const io = IOServer.listen(server);
 
@@ -13,13 +18,14 @@ const initSocketIO = (server) => {
     // });
 
     io.on('connection', function (socket) {
-        // console.log('connection', socket.handshake.query);
+        console.log('connection');
         const nickname = socket.handshake.query['nickname'];
         const peerId = socket.handshake.query['peerId'];
         io.emit('peer-connect', `${nickname} has joined, his peerId is ${peerId}`);
 
         // creates a room without joining it.
         socket.on('create', roomData => {
+            console.log('on create');
             roomManager.createRoom(roomData);
         });
 
