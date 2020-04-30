@@ -68,9 +68,9 @@ const Home = () => {
                             color='primary'
                             className={classes.buttonStyle}
                             >
-                        Create
+                            Create
                         </Button>
-                    </Link>  
+                    </Link> 
                 </Box>
 
                 {/* right box */}

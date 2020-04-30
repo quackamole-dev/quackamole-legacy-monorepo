@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import theme from '../../style/theme/MainTheme';
 import Box from '@material-ui/core/Box';
@@ -10,6 +11,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -42,6 +45,11 @@ const useStyles = makeStyles({
         width: '616px',
         marginLeft: '16px',
     },
+    textfieldLink: {
+        width: '506px',
+        marginRight: '16px',
+        marginLeft: '16px',
+    },
     alignButton: {
         display: 'flex',
         justifyContent: 'flex-end',
@@ -50,12 +58,36 @@ const useStyles = makeStyles({
     myButton: {
         color: 'white',
         boxShadow: 'none'
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+      },
+    copyLink: {
+        display: 'flex',
+        alignItems: 'center',
+        marginTop: '16px'
+    },
+    nextButton: {
+        color: 'white',
+        boxShadow: 'none',
+        margin: '32px',
+        width: '576px'
+    },
+    subtitle: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: '16px'
     }
 })
 
 const RoomCreateForm = () => {
     const [status, setStatus] = React.useState('');
-    const [name, setName] = React.useState('')
+    const [name, setName] = React.useState('');
+    const [link, setLink] = React.useState('https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0');
+    const [active, setActive ] = React.useState(true);
+    const classes = useStyles()
 
     const handleChange = (event) => {
         setStatus(event.target.value);
@@ -67,27 +99,40 @@ const RoomCreateForm = () => {
 
     const createRoom = () => {
         if(name.length > 0 && status.length > 0) {
+            setActive(false)
             console.log(status, name)
         } else {
             console.log('error')
         }
     }
-
-    const classes = useStyles()
-        
+    
+    const copyToClipboard = () =>{
+        let mylink = link
+        mylink.select()
+        document.execCommand('copy');
+    }
 
     return (
         <ThemeProvider theme={theme}>
             {/* Header */}
             <Box 
+                display='flex'
                 height={63}
                 bgcolor='#E53935'
-            ></Box>
+                alignItems='center'
+                paddingLeft='36px'
+            >
+               <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
+                    <ArrowBackIosIcon/>
+               </Link> 
+            </Box>
 
             {/* Body */}
             <Container
                 className={classes.containerStyle}
             >
+                {/* create a new room */}
+                {active?
                 <Box
                     display='flex'
                     flexDirection='column'
@@ -127,18 +172,69 @@ const RoomCreateForm = () => {
                         onChange={handleChangeTexfield}
                         className={classes.textfield}
                     />
-                    <div className={classes.alignButton}>
-                        <Button
-                            size="large"
-                            color="secondary"
-                            variant="contained"
-                            className={classes.myButton}
-                            onClick={createRoom}                       
-                        >
-                            next
-                        </Button>
+                    <div className={classes.alignButton}> 
+                            <Button
+                                size="large"
+                                color="secondary"
+                                variant="contained"
+                                className={classes.myButton}
+                                onClick={createRoom}                       
+                            >
+                                create
+                            </Button>
                     </div>
-                </Box>
+                </Box>:
+                
+                // share your room
+                <Box
+                display='flex'
+                flexDirection='column'
+                width={648}
+                height={307}
+                borderRadius='5px'
+                bgcolor='white'
+                >
+                <Typography
+                    variant='h4'
+                    className={classes.titleStyle}
+                >Room was created
+                </Typography>
+                
+                <div className={classes.copyLink}>
+                    <TextField
+                        variant="outlined"
+                        value={link}
+                        onChange={handleChangeTexfield}
+                        className={classes.textfieldLink}
+                    />
+                    <Button
+                        size="large"
+                        color="secondary"
+                        variant="contained"
+                        className={classes.myButton}
+                        onClick={() => {navigator.clipboard.writeText(link)}}                  
+                    >
+                        copy
+                    </Button>
+                </div> 
+                <Typography
+                        variant='h6'
+                        className={classes.subtitle}
+                    > Share your link and invite someone to your room
+                </Typography>
+                
+                <Link to="/room-lobby/1" style={{ textDecoration: 'none',}}>
+                 <Button
+                    size="large"
+                    color="secondary"
+                    variant="contained"
+                    className={classes.nextButton}                     
+                   >
+                        next
+                </Button>
+                </Link>
+               </Box>
+            }
             </Container>
         </ThemeProvider>
     )
