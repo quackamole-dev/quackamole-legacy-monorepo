@@ -13,10 +13,10 @@ const App = () => {
             <Router>
                 <Switch>
                     <Route exact path='/' component={Home} />
-                    <Route exact path='/create-roomReducer' component={RoomCreateForm} />
-                    <Route exact path='/roomReducer-lobby/:roomId' component={RoomLobby} />
+                    <Route exact path='/create-room' component={RoomCreateForm} />
+                    <Route exact path='/room-lobby/:roomId' component={RoomLobby} />
                     <Route path='/rooms/:roomId' component={Room} />
-                    <Route path='/test-roomReducer' component={TestRoom} />
+                    <Route path='/test-room' component={TestRoom} />
                 </Switch>
             </Router>
         </CssBaseline>
