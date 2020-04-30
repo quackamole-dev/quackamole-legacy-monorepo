@@ -1,7 +1,11 @@
-// ROOMS
-export const ADD_ROOMS = 'ADD_ROOMS';
-export const CLEAR_ROOMS = 'ADD_ROOMS';
+export const SET_CURRENT_ROOM = 'SET_CURRENT_ROOM';
+export const SET_CURRENT_ROOM_ERROR = 'SET_CURRENT_ROOM_ERROR';
 
-// PEERS
-export const ADD_PEERS = 'ADD_PEERS';
-export const CLEAR_PEERS = 'CLEAR_PEERS';
+export const SET_PEERS = 'SET_PEERS';
+export const SET_PEERS_ERROR = 'SET_PEERS_ERROR';
+
+export const SET_CONNECTIONS = 'ADD_CONNECTIONS';
+export const SET_CONNECTIONS_ERROR = 'ADD_CONNECTIONS_ERROR';
+
+export const SET_CALLS = 'SET_CALLS';
+export const SET_CALLS_ERROR = 'SET_CALLS_ERROR';

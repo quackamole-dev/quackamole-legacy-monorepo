@@ -3,8 +3,8 @@ const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const {createProxyMiddleware} = require('http-proxy-middleware');  // temporary proxy. Will be replaced with nginx
-const proxy = require('http-proxy-middleware');
+// const {createProxyMiddleware} = require('http-proxy-middleware');  // temporary proxy. Will be replaced with nginx
+// const proxy = require('http-proxy-middleware');
 
 
 ///////////////////

@@ -2,20 +2,8 @@ const IOServer = require('socket.io');
 const roomManager = require('./rooms');
 
 
-// const serverSocketIO = http.createServer(app1);
-// const io = require('socket.io').listen(serverSocketIO);
-// const io = require('socket.io')(server);
-
-
 const initSocketIO = (server) => {
     const io = IOServer.listen(server);
-
-    // io.origins((origin, callback) => {
-    //     if (origin !== 'https://foo.example.com') {
-    //         return callback('origin not allowed', false);
-    //     }
-    //     callback(null, true);
-    // });
 
     io.on('connection', function (socket) {
         console.log('connection');
@@ -31,15 +19,14 @@ const initSocketIO = (server) => {
 
         // Join a room.
         socket.on('join', ({room, peerId}, callback) => {
-            // const roomRef = roomManager.rooms[room.id];
             if (roomManager.doesRoomExist(room.id)) {
-                roomManager.userJoinRoom(room.id, {peerId, socket}, room.password);
+                const roomRef = roomManager.userJoinRoom(room.id, {peerId, socket}, room.password);
                 callback({room: roomRef});
             } else {
                 console.log('room does not exist');
             }
 
-            callback('hello callback');
+            callback(false);
         });
 
         socket.on('leave', (roomId, callback) => {
@@ -50,7 +37,7 @@ const initSocketIO = (server) => {
         });
 
         socket.on('disconnect', () => {
-            // console.log('disconnected', socket);
+            console.log('disconnected', socket);
         })
     });
     return io;

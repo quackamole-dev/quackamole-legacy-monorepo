@@ -1,10 +1,14 @@
 import { combineReducers } from 'redux';
-import rooms from './rooms';
-import peers from './peers';
+import roomReducer from './room.reducer';
+import peersReducer from './peers.reducer';
+import connectionsReducer from './connections.reducer';
+import callsReducer from './calls.reducer';
 
 const reducer = combineReducers({
-    rooms,
-    peers
+    room: roomReducer,
+    peers: peersReducer,
+    calls: callsReducer,
+    connections: connectionsReducer
 });
 
 export default reducer;
