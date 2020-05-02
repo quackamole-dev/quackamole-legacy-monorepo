@@ -4,6 +4,8 @@ import {connect} from "react-redux";
 const TestStreamManager = ({localPeer, connections}) => {
     const [streams, setStreams] = useState([]);
 
+    // TODO replace individual refs with method in link:  https://stackoverflow.com/questions/54940399/how-target-dom-with-react-useref-in-map
+    //  This is stupid but react makes it kinda hard to use refs dynamically, so this has to do for now... (╯°□°)╯︵ ┻━┻
     let videoRef1 = useRef(null);
     let videoRef2 = useRef(null);
     let videoRef3 = useRef(null);
@@ -12,7 +14,6 @@ const TestStreamManager = ({localPeer, connections}) => {
     const startLocalStream = async () => {
         try {
             let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-            // TODO replace with method in link:  https://stackoverflow.com/questions/54940399/how-target-dom-with-react-useref-in-map
             setStreams(streams.concat(mediaStream));
 
             console.log('local stream started', streams);
@@ -26,7 +27,9 @@ const TestStreamManager = ({localPeer, connections}) => {
             localPeer.on('call', remoteCall => {
                 console.log('incoming call. Answering automatically');
                 remoteCall.on('stream', remoteMediaStream => {
-                    // setStre
+                    console.log('-------------------remote stream after call available', remoteMediaStream);
+                    setStreams(streams.concat(remoteMediaStream));
+
                 });
             });
         }
@@ -51,7 +54,7 @@ const TestStreamManager = ({localPeer, connections}) => {
                 video.current.srcObject = stream;
                 video.current.oncanplay = () => {
                     video.current.play();
-                    video.current.muted = true; // set to false to hear/test your own audio
+                    video.current.muted = false; // set to false to hear/test your own audio
                 };
             }
         });
@@ -59,8 +62,22 @@ const TestStreamManager = ({localPeer, connections}) => {
 
     }, [streams]);
 
+    const startCall = () => {
+        if (localPeer && streams[0]) {
+            connections.forEach(connection => {
+                console.log('calling', connection.peer, 'stream', streams[0]);
+                localPeer.call(connection.peer, streams[0]);
+            })
+        }
+    };
+
+    const handleStartCall = e => {
+        startCall();
+    };
+
     return (
         <div>
+            <button onClick={handleStartCall}>CALL all connections</button>
             <video ref={videoRef1} />
             <video ref={videoRef2} />
             <video ref={videoRef3} />
