@@ -1,5 +1,5 @@
-require('dotenv').config();
-var debug = require('debug')('http');
+// require('dotenv').config();
+const debug = require('debug')('http');
 const express = require('express');
 const http = require('http');
 const cors = require('cors');

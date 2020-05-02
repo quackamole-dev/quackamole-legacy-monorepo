@@ -4,19 +4,21 @@ import Peer from "peerjs";
 import io from 'socket.io-client';
 import {serializeQueryString} from "../../utils";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET} from "../../constants";
-import {joinRoom, setCurrentRoom} from "../../store/actions/room.actions";
 import {addConnection} from "../../store/actions/connections.actions";
+import {Link} from "react-router-dom";
+import TestStreamManager from "./TestStreamManager/TestStreamManager";
 
 
-// const connTest = [];
-const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addConnection}) => {
+const calls = [];
+const TestRoom = ({connections, addConnection}) => {
     const [socket, setSocket] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
+    const [remoteStreams, setRemoteStreams] = useState([]);
+
     const [inputState, setInputState] = useState({
-        RemotePeerId: '',
         message: '',
-        currentRoomId: 'dummy-room-id',
-        currentRoomPassword: 'dummy123'
+        roomId: 'dummy-room-id',
+        password: 'dummy123'
     });
 
     const initPeer = () => {
@@ -44,19 +46,30 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
 
         setSocket(socket);
 
-        socket.on('user-join', () => {
-            console.log('-----on join');
-        })
+        // Init Listeners
+        socket.on('user-join', (room) => {
+            console.log('new user joined room, he will connect to you shortly');
+        });
+
+        socket.on('user-leave', (data) => {
+            const connectionWithLeavingUser = connections[data.peerId];
+            console.log('user left room', data.peerId, connectionWithLeavingUser);
+
+            if (connectionWithLeavingUser) {
+                connectionWithLeavingUser.close();
+            }
+        });
     };
 
     const initConnectionListeners = (connection) => {
+        console.log('connection listeners', connection);
         connection.on('data', data => {
             const parsedData = JSON.parse(data);
             console.log('parsed', parsedData);
 
-            if (parsedData.message) {
+            if (parsedData.textMessage) {
                 console.log(
-                    `%c MESSAGE - ${parsedData.message.author}: "${parsedData.message.text}"`,
+                    `%c MESSAGE - ${parsedData.textMessage.author}: "${parsedData.textMessage.text}"`,
                     'background: black; color: white; padding: 1rem'
                 );
             }
@@ -64,13 +77,12 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
     };
 
     useEffect(() => {
-        // initPeer();
-        initSocket()
+        initSocket();
     }, []);
 
     useEffect(() => {
         if (localPeer) {
-            console.log('peer initialized: ', localPeer.id);
+            console.log('peer initialized: ', localPeer);
 
             localPeer.on('open', id => {
                 console.log('My peer ID is: ' + localPeer.id, localPeer);
@@ -82,17 +94,27 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
                 addConnection(connection);
                 initConnectionListeners(connection);
             });
+
+            // localPeer.on('call', remoteCall => {
+            //     console.log('incoming call. Answering automatically');
+            //     remoteCall.on('stream', remoteMediaStream => {
+            //         setRemoteStreams(remoteMediaStream);
+            //     });
+            // });
         }
     }, [localPeer]);
 
     useEffect(() => {
         if (socket) {
-            console.log('socket initialized');
             initPeer();
+        }
 
-            socket.on('user-join', (room) => {
-                console.log('new user joined room', room);
-            });
+        // On unmount: notify other people that you left before actually disconnecting
+        return () => {
+            console.log('unmount', socket);
+            if (socket) {
+                socket.emit('leave', inputState.roomId); // TODO change id for real rooms.
+            }
         }
     }, [socket]);
 
@@ -101,30 +123,27 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
         socket.emit('create', {
             // id: 'test-room-id',
             name: 'test room name',
-            password: '123',
+            password: inputState.password,
             maxConnections: 4
         }, (data) => {
             if (data) {
                 console.log('room created', data);
-                setInputState({...inputState, currentRoomId: 'dummy-room-id'});
+                setInputState({...inputState, roomId: 'dummy-room-id'});
             }
         });
     };
 
     const handleJoinRoom = (e) => {
         console.log('join room handler');
-        socket.emit('join', {
-            roomId: 'dummy-room-id',
-            password: 'dummy123',
-            peerId: localPeer.id
-            // callback
-        }, (data) => {
-            console.log('data', data);
+        const {roomId, password } = inputState;
+        socket.emit('join', { roomId, password, peerId: localPeer.id },
+            // callback: the joining user himself is responsible to establish connections with other users
+            (data) => {
             if (data) {
-                data.room.joinedUsers.forEach((user) => {
-                    if (user.peerId !== localPeer.id) {
-                        console.log('connecting to', user.peerId);
-                        connectWithPeer(user.peerId);
+                console.log('roomRef CB', data);
+                data.room.joinedUsers.forEach((peerId) => {
+                    if (peerId !== localPeer.id) {
+                        connectWithPeer(peerId);
                     }
                 });
             }
@@ -138,26 +157,32 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
     };
 
     const sendMessage = () => {
-        console.log('send try ', localPeer);
         if (localPeer) {
-            const message = {author: 'derp', text: inputState.message};
+            console.log('send message try');
+            const message = {textMessage: {author: 'derp', text: inputState.message} };
             Object.values(connections).forEach(connection => {
+                console.log('connection');
                 connection.send(JSON.stringify(message));
-                console.log('sending message to: ', connection.peer);
             });
         }
     };
 
     const connectWithPeer = async (remotePeerId) => {
+        console.log('connect with peer called', remotePeerId);
         const connection = await localPeer.connect(remotePeerId);
         addConnection(connection);
-
         initConnectionListeners(connection);
     };
 
     const startCallWithPeer = (remotePeerId, localStream) => {
         localPeer.call(remotePeerId, localStream);
     };
+
+    // const startCall = destinationPeerId => {
+    //     if (peer && connection && stream) {
+    //         setCall(peer.call(destinationPeerId, stream));
+    //     }
+    // };
 
     //////////////////
     //// HANDLERS ////
@@ -176,6 +201,7 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
                 <button onClick={handleCreateRoom}>create room</button>
                 <button onClick={handleJoinRoom}>join room</button>
                 <button onClick={handleListAllPeers}>listAllPeers room</button>
+                <Link to={'/'}>HOME</Link>
             </div>
             <div>
                 <form onSubmit={handleSendMessage}>
@@ -193,16 +219,14 @@ const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addCo
                     </fieldset>
                 </form>
             </div>
+            <TestStreamManager localPeer={localPeer} />
         </>
     );
 };
 
 const mapStateToProps = (state) => ({
-    currentRoom: state.room.data,
-    peers: state.peers.data,
     connections: state.connections.data,
-    calls: state.calls.data
 });
 
-export default connect(mapStateToProps, {joinRoom, setCurrentRoom, addConnection})(TestRoom);
+export default connect(mapStateToProps, {addConnection})(TestRoom);
 

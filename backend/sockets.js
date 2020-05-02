@@ -2,29 +2,35 @@ const IOServer = require('socket.io');
 const roomManager = require('./rooms');
 
 const util = {
-    // Kind of hacky way to get data of other sockets: https://stackoverflow.com/a/47096361
     getSocketCustomData: (io, socketId) => {
-        return io.nsps['/'].connected[socketId].customData;
+        const socket = io.nsps['/'].sockets[socketId];
+        // const socket = io.nsps['/'].connected[socketId]; // https://stackoverflow.com/a/47096361
+        if (socket) {
+            return socket.customData;
+        } else {
+            return false;
+        }
     },
     addCustomSocketData: (io, socketId, addedCustomData) => {
         let customDataRef =  io.nsps['/'].connected[socketId].customData;
         return io.nsps['/'].connected[socketId].customData = {...customDataRef, ...addedCustomData};
     },
+    getSocketIdsInRoom: (io, roomId) => {
+        const room = io.sockets.adapter.rooms[roomId];
+        return room ? Object.keys(room.sockets) : false;
+    }
 };
 
 const initSocketIO = (server) => {
     const io = IOServer.listen(server);
 
     io.on('connection', function (socket) {
-        console.log('connection');
         const nickname = socket.handshake.query['nickname'];
         socket.customData = {nickname: nickname, peerId: socket.id};
-
-        io.emit('peer-connect', `${socket.customData.nickname} has joined, his peerId is ${socket.customData.peerId}`);
+        console.log('User with nickname:', nickname, 'connected. PeerId:', socket.customData.peerId);
 
         // creates a room without joining it.
         socket.on('create', roomData => {
-            console.log('on create');
             roomManager.createRoom(roomData);
         });
 
@@ -44,25 +50,29 @@ const initSocketIO = (server) => {
                     //     })
                     // });
                 }
+
+                roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
+                console.log('wtf joined user ids', roomRef.joinedUsers);
                 callback({room: roomRef});
             } else {
                 console.log('room does not exist');
             }
-
             callback(false);
         });
 
-        socket.on('leave', (roomId, callback) => {
-            console.log('leaving room');
-            socket.leave(roomId);
-            io.emit('peer-left', 'peer has left');
-            callback(' you left room: ' + roomId);
+        socket.on('leave', (roomId) => {
+            console.log('user left', roomId);
+            socket.to(roomId).emit('user-leave', {roomId, peerId: socket.id});
+
         });
 
-        socket.on('disconnect', () => {
-            if (socket.currentRoomId) {
-                socket.to(socket.currentRoomId).emit('user-disconnect', socket.peerId);
-                socket.currentRoomId = null;
+        socket.on('disconnect', (what) => {
+            console.log('disconnect', what, socket.id);
+            const customData = util.getSocketCustomData(io, socket.id);
+            if (customData && customData.currentRoomId) {
+                socket.to(customData.currentRoomId).emit('user-leave', socket.id);
+                // roomManager
+                util.addCustomSocketData(io, socket.id, {currentRoomId: null});
                 console.log(`User ${socket.nickname} with peerId: ${socket.peerId} disconnected from roomId ${socket.currentRoomId} `);
             }
         })

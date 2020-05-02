@@ -10,7 +10,7 @@ class roomManager {
                 id: 'dummy-room-id',
                 password: 'dummy123',
                 name: 'dummy room name',
-                joinedUsers: [],
+                // joinedUsers: [],
                 maxUsers: 4
             }
         }
@@ -29,20 +29,32 @@ class roomManager {
         console.debug('join');
 
         if (roomRef) {
-            if (!roomRef.joinedUsers) { roomRef.joinedUsers = [] }
+            // if (!roomRef.joinedUsers) { roomRef.joinedUsers = [] }
 
             if (this._checkRoomPassword(roomId, password)) {
-                if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
-                    console.log(`user ${peerId} has already joined the room: ${roomRef.id}`);
-                    return false;
-                }
-                roomRef.joinedUsers.push({peerId: peerId});
-                console.log(`user ${peerId} successfully joined the room: ${roomRef.id}`);
+                // if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
+                //     console.log(`user ${peerId} has already joined the room: ${roomRef.id}`);
+                //     return false;
+                // }
+                // roomRef.joinedUsers.push({peerId: peerId});
+                // console.log(`user ${peerId} successfully joined the room: ${roomRef.id}`);
                 return roomRef;
             } else {
                 console.log('user provided wrong password');
                 return false;
             }
+        }
+    };
+
+    leaveRoom = (roomId, peerId) => {
+        const roomRef = this.rooms[roomId];
+
+        if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
+            roomRef.joinedUsers.filter(user => user !== peerId);
+            return roomRef;
+        } else {
+            console.log(`The user: ${peerId} is not in this room, therefore cannot leave`);
+            return false;
         }
     };
 
@@ -57,7 +69,7 @@ class roomManager {
                 id: roomRef.id,
                 name: roomRef.name,
                 maxUsers: roomRef.maxUsers,
-                joinedUsers: roomRef.joinedUsers,
+                // joinedUsers: roomRef.joinedUsers,
             }
         }
     };
