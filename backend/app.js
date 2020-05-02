@@ -1,13 +1,18 @@
 // require('dotenv').config();
-const debug = require('debug')('http');
+// const debug = require('debug')('http');
 const express = require('express');
-const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 // const {createProxyMiddleware} = require('http-proxy-middleware');  // temporary proxy. Will be replaced with nginx
 // const proxy = require('http-proxy-middleware');
 
+let sslOptions = {
+    key: fs.readFileSync('localhost.key'),
+    cert: fs.readFileSync('localhost.crt'),
+};
 
 ///////////////////
 // PeerJS Server //
@@ -16,13 +21,13 @@ const initPeerServer = require('./peer.js');
 const initSocketIO = require('./sockets');
 
 const app1 = express();
-const server1 = http.createServer(app1);
+const server1 = https.createServer(sslOptions, app1);
 
 app1.get('/test', function (req, res) {
     res.json({msg: 'peerjs server test route'})
 });
 
-const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'localhost:3000'];
+const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
 const corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
@@ -52,8 +57,9 @@ app2.get('/test', function (req, res) {
 
 app2.use(morgan("combined"));
 app2.use(helmet());
-app2.use(cors(corsOptions));
-const server2 = http.createServer(app2);
+app2.use(cors());
+const server2 = https.createServer(sslOptions, app2);
+
 initSocketIO(server2);
 server2.listen(5002, () => console.log('server2 listening on port: ',  5002));
 
@@ -86,3 +92,13 @@ server2.listen(5002, () => console.log('server2 listening on port: ',  5002));
 // }));
 //
 // app.listen(80);
+
+
+const app3 = express();
+const server3 = https.createServer(sslOptions, app3);
+
+app3.get('/', function (req, res) {
+    res.json({msg: 'peerjs server test route'})
+});
+
+app3.listen(443);

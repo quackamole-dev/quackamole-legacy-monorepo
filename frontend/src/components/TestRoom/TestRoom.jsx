@@ -40,8 +40,9 @@ const TestRoom = ({connections, addConnection}) => {
     };
 
     const initSocket = () => {
-        const socket = io(`${API_BASE_URL}:${PORT_SOCKET}`, {
+        const socket = io(`https://${API_BASE_URL}:${PORT_SOCKET}`, {
             // transports: ['websocket'],
+            secure: true,
             query: serializeQueryString({
                 nickname: 'andi'
             })
