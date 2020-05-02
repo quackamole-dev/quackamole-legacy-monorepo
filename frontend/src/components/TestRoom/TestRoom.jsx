@@ -5,10 +5,11 @@ import io from 'socket.io-client';
 import {serializeQueryString} from "../../utils";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET} from "../../constants";
 import {joinRoom, setCurrentRoom} from "../../store/actions/room.actions";
+import {addConnection} from "../../store/actions/connections.actions";
 
 
 // const connTest = [];
-const TestRoom = ({currentConnections, joinRoom}) => {
+const TestRoom = ({currentRoom, peers, connections, calls, setCurrentRoom, addConnection}) => {
     const [socket, setSocket] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [inputState, setInputState] = useState({
@@ -19,31 +20,33 @@ const TestRoom = ({currentConnections, joinRoom}) => {
     });
 
     const initPeer = () => {
-        // const peer = new Peer({ debug: true, config: { iceServers: [{ url: 'stun:stun.l.google.com:19302' }] } });
-
-        const peer = new Peer({
-            host: API_BASE_URL,
-            port: PORT_SIGNALING,
-            path: '/peer/signal',
-            config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
-        });
-        setLocalPeer(peer);
+        if (socket) {
+            const customPeerId = socket.id;
+            const peer = new Peer(customPeerId, {
+                host: API_BASE_URL,
+                port: PORT_SIGNALING,
+                path: '/peer/signal',
+                config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
+            });
+            setLocalPeer(peer);
+        } else {
+            console.log('could not create new Peer because the socket.io connection is not established yet');
+        }
     };
 
     const initSocket = () => {
         const socket = io(`${API_BASE_URL}:${PORT_SOCKET}`, {
             // transports: ['websocket'],
             query: serializeQueryString({
-                nickname: 'andi',
-                peerId: 'cwscwc',
-                // peerId: localPeer.id,
+                nickname: 'andi'
             })
         });
 
-        // if (socket.connected) {
-        console.log('socket --------', socket);
         setSocket(socket);
-        // }
+
+        socket.on('user-join', () => {
+            console.log('-----on join');
+        })
     };
 
     const initConnectionListeners = (connection) => {
@@ -61,14 +64,9 @@ const TestRoom = ({currentConnections, joinRoom}) => {
     };
 
     useEffect(() => {
-        initPeer();
-        // initSocket()
-
+        // initPeer();
+        initSocket()
     }, []);
-
-    // useEffect(() => {
-    //     console.log("connections ---------------------------", connections);
-    // }, [connections]);
 
     useEffect(() => {
         if (localPeer) {
@@ -76,12 +74,12 @@ const TestRoom = ({currentConnections, joinRoom}) => {
 
             localPeer.on('open', id => {
                 console.log('My peer ID is: ' + localPeer.id, localPeer);
-                initSocket();
+                // initSocket();
             });
 
             localPeer.on('connection', connection => {
                 console.log('on connection with', connection);
-                // setCurrentRoom({connections: currentConnections.concat(connection)});
+                addConnection(connection);
                 initConnectionListeners(connection);
             });
         }
@@ -90,6 +88,7 @@ const TestRoom = ({currentConnections, joinRoom}) => {
     useEffect(() => {
         if (socket) {
             console.log('socket initialized');
+            initPeer();
 
             socket.on('user-join', (room) => {
                 console.log('new user joined room', room);
@@ -115,12 +114,8 @@ const TestRoom = ({currentConnections, joinRoom}) => {
     const handleJoinRoom = (e) => {
         console.log('join room handler');
         socket.emit('join', {
-            room: {
-                id: 'dummy-room-id',
-                name: 'test room name',
-                password: 'dummy123',
-                // maxConnections: 4
-            },
+            roomId: 'dummy-room-id',
+            password: 'dummy123',
             peerId: localPeer.id
             // callback
         }, (data) => {
@@ -143,10 +138,10 @@ const TestRoom = ({currentConnections, joinRoom}) => {
     };
 
     const sendMessage = () => {
+        console.log('send try ', localPeer);
         if (localPeer) {
             const message = {author: 'derp', text: inputState.message};
-
-            currentConnections.forEach(connection => {
+            Object.values(connections).forEach(connection => {
                 connection.send(JSON.stringify(message));
                 console.log('sending message to: ', connection.peer);
             });
@@ -155,9 +150,7 @@ const TestRoom = ({currentConnections, joinRoom}) => {
 
     const connectWithPeer = async (remotePeerId) => {
         const connection = await localPeer.connect(remotePeerId);
-        // setConnections([...connections, connection]);
-        // connTest.push(connection);
-        // setCurrentRoom({connections: currentConnections.concat(connection)});
+        addConnection(connection);
 
         initConnectionListeners(connection);
     };
@@ -180,7 +173,7 @@ const TestRoom = ({currentConnections, joinRoom}) => {
         <>
             <div>
                 Hello world
-                {/*<button onClick={handleCreateRoom}>create room</button>*/}
+                <button onClick={handleCreateRoom}>create room</button>
                 <button onClick={handleJoinRoom}>join room</button>
                 <button onClick={handleListAllPeers}>listAllPeers room</button>
             </div>
@@ -205,8 +198,11 @@ const TestRoom = ({currentConnections, joinRoom}) => {
 };
 
 const mapStateToProps = (state) => ({
-   currentConnections: state.current.connections
+    currentRoom: state.room.data,
+    peers: state.peers.data,
+    connections: state.connections.data,
+    calls: state.calls.data
 });
 
-export default connect(mapStateToProps, {joinRoom, setCurrentRoom})(TestRoom);
+export default connect(mapStateToProps, {joinRoom, setCurrentRoom, addConnection})(TestRoom);
 

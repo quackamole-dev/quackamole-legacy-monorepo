@@ -1,4 +1,4 @@
-import {SET_CALLS, SET_CONNECTIONS, SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR, SET_PEERS} from '../actionTypes';
+import {SET_CALLS, ADD_CONNECTION, SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR, SET_PEERS} from '../actionTypes';
 
 const initialState = {
     data: {
@@ -32,9 +32,10 @@ const roomReducer = (room = initialState, action) => {
             const peers = Object.keys(action.payload.peers);
             return {data: room.data, peers, error: null};
         }
-        case SET_CONNECTIONS: {
-            const connections = Object.keys(action.payload.connections);
-            return {data: room.data, connections, error: null};
+        case ADD_CONNECTION: {
+            // const connections = Object.keys(action.payload.connections);
+            // return {data: room.data, connections, error: null};
+            return room;
         }
         case SET_CALLS: {
             const calls = Object.keys(action.payload.calls);

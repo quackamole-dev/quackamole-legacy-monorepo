@@ -1,3 +1,5 @@
+require('dotenv').config();
+var debug = require('debug')('http');
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
@@ -17,10 +19,10 @@ const app1 = express();
 const server1 = http.createServer(app1);
 
 app1.get('/test', function (req, res) {
-    res.json({msg: 'app1 test route'})
+    res.json({msg: 'peerjs server test route'})
 });
 
-const whitelist = ['http://localhost:3000', 'null', 'none', 'http://localhost:63342', '', 'localhost:3000'];
+const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'localhost:3000'];
 const corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
@@ -33,7 +35,7 @@ const corsOptions = {
 };
 
 app1.use('/peer', initPeerServer(server1));
-app1.use(morgan("common"));
+app1.use(morgan("combined"));
 app1.use(helmet());
 app1.use(cors());
 server1.listen(5001, () => console.log('server1 listening on port: ', 5001));
@@ -45,15 +47,15 @@ server1.listen(5001, () => console.log('server1 listening on port: ', 5001));
 const app2 = express();
 
 app2.get('/test', function (req, res) {
-    res.json({msg: 'app2 test route'})
+    res.json({msg: 'socketIO server test route'})
 });
 
-app2.use(morgan("common"));
+app2.use(morgan("combined"));
 app2.use(helmet());
 app2.use(cors(corsOptions));
 const server2 = http.createServer(app2);
 initSocketIO(server2);
-server2.listen(5002, () => console.log('server2 listening on port: ', 5002));
+server2.listen(5002, () => console.log('server2 listening on port: ',  5002));
 
 
 //////////////////

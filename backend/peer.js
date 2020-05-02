@@ -3,7 +3,8 @@ const { ExpressPeerServer } = require('peer');
 const options = {
     allow_discovery: true,
     debug: true,
-    path: '/signal'
+    path: '/signal',
+    // proxied: true
 };
 
 const initPeerServer = server => {

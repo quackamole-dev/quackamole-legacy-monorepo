@@ -1,4 +1,4 @@
-import {SET_CONNECTIONS, SET_CONNECTIONS_ERROR} from '../actionTypes';
+import {ADD_CONNECTION, REMOVE_CONNECTION, SET_CONNECTIONS_ERROR} from '../actionTypes';
 
 const initialState = {
     data: {},
@@ -7,11 +7,16 @@ const initialState = {
 
 const connectionsReducer = (connections = initialState, action) => {
     switch (action.type) {
-        case SET_CONNECTIONS: {
-            return {connections: action.payload.connections, error: null};
+        case ADD_CONNECTION: {
+            const connection = action.payload.connection;
+            return {data: {...connections.data, [connection.connectionId]: connection}, error: null};
+        }
+        case REMOVE_CONNECTION: {
+            const newData = Object.entries(connections.data).filter(conn => conn.connectionId !== action.payload.connectionId);
+            return {data: newData, error: null};
         }
         case SET_CONNECTIONS_ERROR: {
-            return {data: connections.data, error: action.payload.error};
+            return {...connections, error: action.payload.error};
         }
         default: {
             return connections;

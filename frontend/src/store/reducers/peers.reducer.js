@@ -1,4 +1,4 @@
-import {SET_CALLS, SET_CONNECTIONS, SET_PEERS, SET_PEERS_ERROR} from '../actionTypes';
+import {ADD_CONNECTION, SET_CALLS, SET_PEERS, SET_PEERS_ERROR} from '../actionTypes';
 
 const initialState = {
     data: {
@@ -16,7 +16,7 @@ const peersReducer = (peers = initialState, action) => {
         case SET_PEERS_ERROR: {
             return {data: peers.data, error: action.payload.error};
         }
-        case SET_CONNECTIONS: {
+        case ADD_CONNECTION: {
             // TODO iterate through peers and reference their connection id
             return peers;
         }

@@ -24,21 +24,20 @@ class roomManager {
         return this.getRoom(sanitizedRoomData.id);
     };
 
-    userJoinRoom = (roomId, joiningUser, password) => {
+    joinRoom = (roomId, peerId, password) => {
         const roomRef = this.rooms[roomId];
-        console.log('join');
+        console.debug('join');
 
         if (roomRef) {
             if (!roomRef.joinedUsers) { roomRef.joinedUsers = [] }
 
             if (this._checkRoomPassword(roomId, password)) {
-                if (roomRef.joinedUsers.includes(user => user.peerId === joiningUser.peerId)) {
-                    console.log(`user ${joiningUser.peerId} has already joined the room: ${roomRef.id}`);
+                if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
+                    console.log(`user ${peerId} has already joined the room: ${roomRef.id}`);
                     return false;
                 }
-                roomRef.joinedUsers.push({peerId: joiningUser.peerId});
-                console.log(`user ${joiningUser.peerId} successfully joined the room: ${roomRef.id}`);
-                joiningUser.socket.to(roomRef.id).emit('user-join', roomRef);
+                roomRef.joinedUsers.push({peerId: peerId});
+                console.log(`user ${peerId} successfully joined the room: ${roomRef.id}`);
                 return roomRef;
             } else {
                 console.log('user provided wrong password');
