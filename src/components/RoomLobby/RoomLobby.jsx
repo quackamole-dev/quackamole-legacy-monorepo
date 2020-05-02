@@ -5,10 +5,6 @@ import theme from '../../style/theme/MainTheme';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
@@ -54,6 +50,13 @@ const RoomLobby = () => {
     const [link, setLink] = React.useState('');
     const classes = useStyles()
 
+    const handleChangeName = (e) => {
+        setName(e.target.value)
+    }
+
+    const handleChangeLink = (e) => {
+        setLink(e.target.value)
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -92,14 +95,16 @@ const RoomLobby = () => {
                     variant="outlined"
                     value={name}
                     className={classes.nicknameStyle}
+                    onChange={handleChangeName}
                  />
                 <TextField
                     required
                     id="outlined-required"
                     label="Room ID"
                     variant="outlined"
-                    value={name}
+                    value={link}
                     className={classes.textfieldLink}
+                    onChange={handleChangeLink}
                  />
                  <div className={classes.alignbutton}>
                     <Button
@@ -118,3 +123,6 @@ const RoomLobby = () => {
 };
 
 export default RoomLobby;
+
+
+
