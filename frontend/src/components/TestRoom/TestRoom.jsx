@@ -24,12 +24,15 @@ const TestRoom = ({connections, addConnection}) => {
     const initPeer = () => {
         if (socket) {
             const customPeerId = socket.id;
+            console.log('init peer. peerId:', customPeerId);
             const peer = new Peer(customPeerId, {
                 host: API_BASE_URL,
                 port: PORT_SIGNALING,
                 path: '/peer/signal',
                 config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
             });
+
+            console.log('peer', peer);
             setLocalPeer(peer);
         } else {
             console.log('could not create new Peer because the socket.io connection is not established yet');
@@ -44,7 +47,13 @@ const TestRoom = ({connections, addConnection}) => {
             })
         });
 
+        socket.on('ready', (socketId) => {
+            console.log('socket is ready', socketId);
+        })
+
         setSocket(socket);
+
+
 
         // Init Listeners
         socket.on('user-join', (room) => {
@@ -105,7 +114,7 @@ const TestRoom = ({connections, addConnection}) => {
     }, [localPeer]);
 
     useEffect(() => {
-        if (socket) {
+        if (socket && socket.id) {
             initPeer();
         }
 

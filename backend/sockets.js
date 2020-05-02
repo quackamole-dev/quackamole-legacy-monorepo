@@ -34,6 +34,9 @@ const initSocketIO = (server) => {
             roomManager.createRoom(roomData);
         });
 
+        socket.broadcast.to(socket.id).emit('ready', socket.id);
+
+
         // Join a room.
         socket.on('join', ({roomId, password, peerId}, callback) => {
             if (roomManager.doesRoomExist(roomId)) {
