@@ -98,7 +98,7 @@ const app3 = express();
 const server3 = https.createServer(sslOptions, app3);
 
 app3.get('/', function (req, res) {
-    res.json({msg: 'peerjs server test route'})
+    res.json({msg: 'base server test route'});
 });
 
-app3.listen(443);
+server3.listen(443);
