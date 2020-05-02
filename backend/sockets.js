@@ -34,7 +34,9 @@ const initSocketIO = (server) => {
             roomManager.createRoom(roomData);
         });
 
-        socket.broadcast.to(socket.id).emit('ready', socket.id);
+        console.log('broadcast ready', socket.id);
+        // socket.broadcast.to(socket.id).emit('ready', socket.id);
+        io.to(socket.id).emit('ready', socket.id);
 
 
         // Join a room.

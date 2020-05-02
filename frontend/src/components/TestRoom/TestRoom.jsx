@@ -47,11 +47,15 @@ const TestRoom = ({connections, addConnection}) => {
             })
         });
 
+        console.log('socket--------------', socket);
         socket.on('ready', (socketId) => {
-            console.log('socket is ready', socketId);
-        })
+            console.log('socket is ready-------------------------------------', socketId);
+            setSocket(socket);
 
-        setSocket(socket);
+            // initPeer();
+        });
+
+        // setSocket(socket);
 
 
 
@@ -228,7 +232,7 @@ const TestRoom = ({connections, addConnection}) => {
                     </fieldset>
                 </form>
             </div>
-            <TestStreamManager localPeer={localPeer} />
+            {/*<TestStreamManager localPeer={localPeer} />*/}
         </>
     );
 };
