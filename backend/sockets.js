@@ -30,8 +30,16 @@ const initSocketIO = (server) => {
         console.log('User with nickname:', nickname, 'connected. PeerId:', socket.customData.peerId);
 
         // creates a room without joining it.
-        socket.on('create', roomData => {
-            roomManager.createRoom(roomData);
+        socket.on('create', (roomData, callback) => {
+            const roomRef = roomManager.createRoom(roomData);
+
+            // sending callback to client
+            if (roomRef && roomRef.id) {
+                callback(roomRef.id);
+            } else {
+                callback(false);
+            }
+
         });
 
         console.log('broadcast ready', socket.id);
