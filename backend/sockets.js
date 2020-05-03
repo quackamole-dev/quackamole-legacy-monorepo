@@ -17,7 +17,7 @@ const util = {
 };
 
 // Actions that the client can emit himself to trigger some actions (instead of having a REST API)
-const initSocketActions = (socket) => {
+const initSocketActions = (io, socket) => {
     // create room
     socket.on('create', (roomData, callback) => {
         const roomRef = roomManager.createRoom(roomData);
@@ -65,7 +65,7 @@ const initSocketIO = (server) => {
         console.log('User with nickname:', nickname, 'connected. PeerId:', socket.customData.peerId);
 
         // Init user triggered actions
-        initSocketActions(socket);
+        initSocketActions(io, socket);
 
         // Cleanup when client disconnects
         socket.on('disconnect', (what) => {
