@@ -27,8 +27,8 @@ const TestStreamManager = ({localPeer, connections}) => {
             localPeer.on('call', remoteCall => {
                 console.log('incoming call. Answering automatically');
                 remoteCall.on('stream', remoteMediaStream => {
-                    console.log('-------------------remote stream after call available', remoteMediaStream);
                     setStreams(streams.concat(remoteMediaStream));
+                    console.log('-------------------remote stream after call available', remoteMediaStream, 'streams', streams);
 
                 });
             });
