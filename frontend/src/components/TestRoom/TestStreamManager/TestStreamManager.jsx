@@ -26,10 +26,11 @@ const TestStreamManager = ({localPeer, connections}) => {
         if (localPeer) {
             localPeer.on('call', remoteCall => {
                 console.log('incoming call. Answering automatically');
+                remoteCall.answer(streams[0]);
+
                 remoteCall.on('stream', remoteMediaStream => {
                     setStreams(streams.concat(remoteMediaStream));
                     console.log('-------------------remote stream after call available', remoteMediaStream, 'streams', streams);
-
                 });
             });
         }
@@ -66,8 +67,11 @@ const TestStreamManager = ({localPeer, connections}) => {
         if (localPeer && streams[0]) {
             connections.forEach(connection => {
                 console.log('calling', connection.peer, 'stream', streams[0]);
-                localPeer.call(connection.peer, streams[0]);
-            })
+                const call = localPeer.call(connection.peer, streams[0]);
+                call.on('stream', remoteMediaStream => {
+                    setStreams(streams.concat(remoteMediaStream));
+                    console.log('-------------------remote stream after call available', remoteMediaStream, 'streams', streams);
+                });            })
         }
     };
 
