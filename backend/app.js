@@ -1,31 +1,20 @@
 // require('dotenv').config();
-// const debug = require('debug')('http');
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const initPeerServer = require('./peer.js');
+const initSocketIO = require('./sockets');
 // const {createProxyMiddleware} = require('http-proxy-middleware');  // temporary proxy. Will be replaced with nginx
 // const proxy = require('http-proxy-middleware');
+
 
 let sslOptions = {
     key: fs.readFileSync('localhost.key'),
     cert: fs.readFileSync('localhost.crt'),
 };
-
-///////////////////
-// PeerJS Server //
-///////////////////
-const initPeerServer = require('./peer.js');
-const initSocketIO = require('./sockets');
-
-const app1 = express();
-const server1 = https.createServer(sslOptions, app1);
-
-app1.get('/test', function (req, res) {
-    res.json({msg: 'peerjs server test route'})
-});
 
 const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
 const corsOptions = {
@@ -38,6 +27,18 @@ const corsOptions = {
         }
     },
 };
+
+
+///////////////////
+// PeerJS Server //
+///////////////////
+
+const app1 = express();
+const server1 = https.createServer(sslOptions, app1);
+
+app1.get('/test', function (req, res) {
+    res.json({msg: 'peerjs server test route'})
+});
 
 app1.use('/peer', initPeerServer(server1));
 app1.use(morgan("combined"));
@@ -94,6 +95,7 @@ server2.listen(5002, () => console.log('server2 listening on port: ',  5002));
 // app.listen(80);
 
 
+// Just for testing purposes
 const app3 = express();
 const server3 = https.createServer(sslOptions, app3);
 

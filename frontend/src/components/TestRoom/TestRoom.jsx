@@ -29,6 +29,7 @@ const TestRoom = ({connections, addConnection}) => {
                 host: API_BASE_URL,
                 port: PORT_SIGNALING,
                 path: '/peer/signal',
+                debug: 3,
                 config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
             });
 
@@ -233,7 +234,7 @@ const TestRoom = ({connections, addConnection}) => {
                     </fieldset>
                 </form>
             </div>
-            {/*<TestStreamManager localPeer={localPeer} />*/}
+            <TestStreamManager localPeer={localPeer} />
         </>
     );
 };
