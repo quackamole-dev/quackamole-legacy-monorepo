@@ -9,7 +9,7 @@ import {Link} from "react-router-dom";
 import TestStreamManager from "./TestStreamManager/TestStreamManager";
 
 
-const calls = [];
+// const calls = [];
 const TestRoom = ({connections, addConnection}) => {
     const [socket, setSocket] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
@@ -24,7 +24,6 @@ const TestRoom = ({connections, addConnection}) => {
     const initPeer = () => {
         if (socket) {
             const customPeerId = socket.id;
-            console.log('init peer. peerId:', customPeerId);
             const peer = new Peer(customPeerId, {
                 host: API_BASE_URL,
                 port: PORT_SIGNALING,
@@ -33,7 +32,7 @@ const TestRoom = ({connections, addConnection}) => {
                 config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
             });
 
-            console.log('peer', peer);
+            console.log('peer', customPeerId, peer);
             setLocalPeer(peer);
         } else {
             console.log('could not create new Peer because the socket.io connection is not established yet');
@@ -49,17 +48,9 @@ const TestRoom = ({connections, addConnection}) => {
             })
         });
 
-        console.log('socket--------------', socket);
         socket.on('ready', (socketId) => {
-            console.log('socket is ready-------------------------------------', socketId);
             setSocket(socket);
-
-            // initPeer();
         });
-
-        // setSocket(socket);
-
-
 
         // Init Listeners
         socket.on('user-join', (room) => {
@@ -77,10 +68,8 @@ const TestRoom = ({connections, addConnection}) => {
     };
 
     const initConnectionListeners = (connection) => {
-        console.log('connection listeners', connection);
         connection.on('data', data => {
             const parsedData = JSON.parse(data);
-            console.log('parsed', parsedData);
 
             if (parsedData.textMessage) {
                 console.log(
@@ -101,7 +90,6 @@ const TestRoom = ({connections, addConnection}) => {
 
             localPeer.on('open', id => {
                 console.log('My peer ID is: ' + localPeer.id, localPeer);
-                // initSocket();
             });
 
             localPeer.on('connection', connection => {
@@ -109,13 +97,6 @@ const TestRoom = ({connections, addConnection}) => {
                 addConnection(connection);
                 initConnectionListeners(connection);
             });
-
-            // localPeer.on('call', remoteCall => {
-            //     console.log('incoming call. Answering automatically');
-            //     remoteCall.on('stream', remoteMediaStream => {
-            //         setRemoteStreams(remoteMediaStream);
-            //     });
-            // });
         }
     }, [localPeer]);
 
@@ -126,7 +107,6 @@ const TestRoom = ({connections, addConnection}) => {
 
         // On unmount: notify other people that you left before actually disconnecting
         return () => {
-            console.log('unmount', socket);
             if (socket) {
                 socket.emit('leave', inputState.roomId); // TODO change id for real rooms.
             }
@@ -142,20 +122,18 @@ const TestRoom = ({connections, addConnection}) => {
             maxConnections: 4
         }, (data) => {
             if (data) {
-                console.log('room created', data);
                 setInputState({...inputState, roomId: 'dummy-room-id'});
             }
         });
     };
 
     const handleJoinRoom = (e) => {
-        console.log('join room handler');
         const {roomId, password } = inputState;
         socket.emit('join', { roomId, password, peerId: localPeer.id },
             // callback: the joining user himself is responsible to establish connections with other users
             (data) => {
             if (data) {
-                console.log('roomRef CB', data);
+                console.log('joined room', data);
                 data.room.joinedUsers.forEach((peerId) => {
                     if (peerId !== localPeer.id) {
                         connectWithPeer(peerId);
@@ -173,31 +151,19 @@ const TestRoom = ({connections, addConnection}) => {
 
     const sendMessage = () => {
         if (localPeer) {
-            console.log('send message try');
             const message = {textMessage: {author: 'derp', text: inputState.message} };
             Object.values(connections).forEach(connection => {
-                console.log('connection');
+                console.log('send message to', connection.peer);
                 connection.send(JSON.stringify(message));
             });
         }
     };
 
     const connectWithPeer = async (remotePeerId) => {
-        console.log('connect with peer called', remotePeerId);
         const connection = await localPeer.connect(remotePeerId);
         addConnection(connection);
         initConnectionListeners(connection);
     };
-
-    const startCallWithPeer = (remotePeerId, localStream) => {
-        localPeer.call(remotePeerId, localStream);
-    };
-
-    // const startCall = destinationPeerId => {
-    //     if (peer && connection && stream) {
-    //         setCall(peer.call(destinationPeerId, stream));
-    //     }
-    // };
 
     //////////////////
     //// HANDLERS ////

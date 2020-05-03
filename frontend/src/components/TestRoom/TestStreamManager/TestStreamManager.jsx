@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
 
+const streamsTest = [];
 const TestStreamManager = ({localPeer, connections}) => {
     const [streams, setStreams] = useState([]);
 
@@ -15,22 +16,21 @@ const TestStreamManager = ({localPeer, connections}) => {
         try {
             let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
             setStreams(streams.concat(mediaStream));
-
-            console.log('local stream started', streams);
+            streamsTest.push(mediaStream);
         } catch (error) {
-            console.error('stream couldnt be started via "startStream()"', error);
+            console.error('local stream couldnt be started via "startStream()"', error);
         }
     };
 
     const initCallListeners = () => {
         if (localPeer) {
             localPeer.on('call', remoteCall => {
-                console.log('incoming call. Answering automatically');
                 remoteCall.answer(streams[0]);
 
-                remoteCall.on('stream', remoteMediaStream => {
-                    setStreams(streams.concat(remoteMediaStream));
-                    console.log('-------------------remote stream after call available', remoteMediaStream, 'streams', streams);
+                remoteCall.on('remote-----------------------------stream', remoteMediaStream => {
+                    const newStreams = [...streams, remoteMediaStream];
+                    setStreams(newStreams);
+                    streamsTest.push(remoteMediaStream);
                 });
             });
         }
@@ -45,11 +45,9 @@ const TestStreamManager = ({localPeer, connections}) => {
 
     // set src of <video> to remote stream when available
     useEffect(() => {
-        console.log('useEffect streams', streams, videoRef1);
         const refs = [videoRef1, videoRef2, videoRef3, videoRef4];
 
-
-        streams.forEach((stream, i) => {
+        streamsTest.forEach((stream, i) => {
             const video = refs[i];
             if (video.current && stream) {
                 video.current.srcObject = stream;
@@ -59,19 +57,18 @@ const TestStreamManager = ({localPeer, connections}) => {
                 };
             }
         });
-
-
     }, [streams]);
 
     const startCall = () => {
         if (localPeer && streams[0]) {
             connections.forEach(connection => {
-                console.log('calling', connection.peer, 'stream', streams[0]);
                 const call = localPeer.call(connection.peer, streams[0]);
                 call.on('stream', remoteMediaStream => {
-                    setStreams(streams.concat(remoteMediaStream));
-                    console.log('-------------------remote stream after call available', remoteMediaStream, 'streams', streams);
-                });            })
+                    const newStreams = [...streams, remoteMediaStream];
+                    setStreams(newStreams);
+                    streamsTest.push(remoteMediaStream);
+                });
+            })
         }
     };
 
