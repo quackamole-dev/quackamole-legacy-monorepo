@@ -1,8 +1,7 @@
 const {v4: uuid} = require('uuid');
 
-// Stores the rooms in memory that were created while the the server is running.
-// Rooms are NOT persisted yet. The are gone once the server restarts.
-// This roomManager is temporary. The room data will be persisted with mongoDB later on.
+// Stores the rooms in memory that were created while the the server is running (rooms are lost when server restarts)
+// Redis could be used to store this data later on. That might allow multiple server instances with load balancing
 class roomManager {
     constructor() {
         this.rooms = {
@@ -10,37 +9,30 @@ class roomManager {
                 id: 'dummy-room-id',
                 password: 'dummy123',
                 name: 'dummy room name',
-                // joinedUsers: [],
+                // joinedUsers: [], // not stored in here. Taken dynamically out of socketIOs internal state
                 maxUsers: 4
             }
         }
     }
 
     createRoom = roomData => {
-        console.log('create');
-
         const sanitizedRoomData = this._createSanitizedRoomData(roomData);
         this.rooms[sanitizedRoomData.id] = sanitizedRoomData;
+
+        console.log(`Room: ${sanitizedRoomData.name} was created. RoomId: ${sanitizedRoomData.id}`);
         return this.getRoom(sanitizedRoomData.id);
     };
 
     joinRoom = (roomId, peerId, password) => {
         const roomRef = this.rooms[roomId];
-        console.debug('join');
+        console.log(`User: ${peerId} is attempting to join the roomId: ${roomId}`);
 
         if (roomRef) {
-            // if (!roomRef.joinedUsers) { roomRef.joinedUsers = [] }
-
             if (this._checkRoomPassword(roomId, password)) {
-                // if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
-                //     console.log(`user ${peerId} has already joined the room: ${roomRef.id}`);
-                //     return false;
-                // }
-                // roomRef.joinedUsers.push({peerId: peerId});
-                // console.log(`user ${peerId} successfully joined the room: ${roomRef.id}`);
+                console.log(`User: ${peerId} provided the correct password for room: ${roomId}`);
                 return roomRef;
             } else {
-                console.log('user provided wrong password');
+                console.log(`User: ${peerId} provided the wrong password for room: ${roomId}`);
                 return false;
             }
         }
@@ -69,7 +61,6 @@ class roomManager {
                 id: roomRef.id,
                 name: roomRef.name,
                 maxUsers: roomRef.maxUsers,
-                // joinedUsers: roomRef.joinedUsers,
             }
         }
     };
