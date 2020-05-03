@@ -27,7 +27,7 @@ const TestStreamManager = ({localPeer, connections}) => {
             localPeer.on('call', remoteCall => {
                 remoteCall.answer(streams[0]);
 
-                remoteCall.on('remote-----------------------------stream', remoteMediaStream => {
+                remoteCall.on('stream', remoteMediaStream => {
                     const newStreams = [...streams, remoteMediaStream];
                     setStreams(newStreams);
                     streamsTest.push(remoteMediaStream);
