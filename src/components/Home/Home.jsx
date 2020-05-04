@@ -27,12 +27,12 @@ const useStyles = makeStyles({
             outline:0,
         }
     }
-})
+});
 
 
 const Home = () => {
 
-    const classes = useStyles()
+    const classes = useStyles();
 
     return (
         <ThemeProvider theme={theme}>
@@ -40,7 +40,7 @@ const Home = () => {
             <Box 
                 height={63}
                 bgcolor='#E53935'
-            ></Box>
+            > </Box>
 
             {/* Body */}
             <Box

@@ -43,20 +43,20 @@ const useStyles = makeStyles ({
         justifyContent: 'center',
         marginTop: '24px',
     }
-})
+});
 
 const RoomLobby = () => {
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
-    const classes = useStyles()
+    const classes = useStyles();
 
     const handleChangeName = (e) => {
         setName(e.target.value)
-    }
+    };
 
     const handleChangeLink = (e) => {
         setLink(e.target.value)
-    }
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -123,6 +123,3 @@ const RoomLobby = () => {
 };
 
 export default RoomLobby;
-
-
-

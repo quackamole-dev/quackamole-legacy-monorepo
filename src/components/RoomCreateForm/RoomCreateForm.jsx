@@ -80,14 +80,14 @@ const useStyles = makeStyles({
         justifyContent: 'center',
         marginTop: '16px'
     }
-})
+});
 
 const RoomCreateForm = () => {
     const [status, setStatus] = React.useState('');
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0');
     const [active, setActive ] = React.useState(true);
-    const classes = useStyles()
+    const classes = useStyles();
 
     const handleChange = (event) => {
         setStatus(event.target.value);
@@ -95,22 +95,22 @@ const RoomCreateForm = () => {
 
     const handleChangeTexfield = (event) => {
         setName(event.target.value)
-    }
+    };
 
     const createRoom = () => {
         if(name.length > 0 && status.length > 0) {
-            setActive(false)
+            setActive(false);
             console.log(status, name)
         } else {
             console.log('error')
         }
-    }
+    };
     
     const copyToClipboard = () =>{
-        let mylink = link
-        mylink.select()
+        let mylink = link;
+        mylink.select();
         document.execCommand('copy');
-    }
+    };
 
     return (
         <ThemeProvider theme={theme}>

@@ -26,7 +26,7 @@ const useStyles = makeStyles({
 
 const Room = () => {
     const classes = useStyles();
-    const [state, setState] = React.useState(false)  
+    const [state, setState] = React.useState(false);
 
     const toggleDrawer = (event) => {    
         if (event.type === 'keydown') {
