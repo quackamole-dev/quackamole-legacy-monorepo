@@ -72,3 +72,10 @@ app2.use('/api', router);
 
 server2.listen(5002, () => console.log('SocketIO server listening on port: ',  5002));
 
+// JIMMY TASK:
+// search for all comments prefixed with "JIMMY" it should give you some hints
+// Even though it could be done via socket.io, I added a rest api to create rooms. This means you can completely ignore socket.io for this task
+// 1. Make a GET request (search for the endpoint ;) ) to get a list of all rooms inside the CreateRoomForm components useEffect(). Just console log the response (visit the endpoint in the browser first to see if backend is working)
+// 2. Refactor the previous get request with a POST to the same endpoint. Figure out what you need to send in the body from the frontend to create a room (use postman to experiment, in postman goto setting->general->disable ssl cert verification)
+// 3. The response of the previous POST request will be the roomId. Use it to generate the link to the room and display it in the frontend
+// Feel free to ask questions if you are stuck on something =)
