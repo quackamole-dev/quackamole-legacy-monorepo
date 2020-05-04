@@ -9,3 +9,19 @@
 export const serializeQueryString = object => {
     return Object.entries(object).map(([key, value]) => `${key}=${value}`).join('&');
 };
+
+/**
+ * Set the src of a html5 <video> element and start playing
+ * @param videoRef The reference to the video element
+ * @param stream The stream that should be played by the referenced video element
+ * @param muted Whether or not the audio of the stream should be muted
+ */
+export const setVideoSrc = (videoRef, stream, muted= true) => {
+    if (videoRef.current && stream) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.oncanplay = () => {
+            videoRef.current.play();
+            videoRef.current.muted = muted;
+        };
+    }
+};

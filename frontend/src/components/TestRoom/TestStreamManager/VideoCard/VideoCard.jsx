@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {setVideoSrc} from "../../../../utils";
 
 const VideoCard = ({localPeer, localStream, connection}) => {
     const [remoteStream, setRemoteStream] = useState(null);
@@ -26,14 +27,7 @@ const VideoCard = ({localPeer, localStream, connection}) => {
 
     // set src of <video> to remote stream when available
     useEffect(() => {
-        if (videoRef.current && remoteStream) {
-            console.log('useEFECT srcset, remote stream', remoteStream);
-            videoRef.current.srcObject = remoteStream;
-            videoRef.current.oncanplay = () => {
-                videoRef.current.play();
-                videoRef.current.muted = false; // set to false to hear/test your own audio
-            };
-        }
+        setVideoSrc(videoRef, remoteStream, false);
     }, [remoteStream]);
 
     const handleStartCall = () => {

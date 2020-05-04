@@ -1,9 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
 import VideoCard from "./VideoCard/VideoCard";
+import {setVideoSrc} from "../../../utils";
 
 const TestStreamManager = ({localPeer, connections}) => {
     const [localStream, setLocalStream] = useState(null);
+    const localVideoRef = useRef(null);
 
     const startLocalStream = async () => {
         try {
@@ -20,8 +22,16 @@ const TestStreamManager = ({localPeer, connections}) => {
         }
     }, [localPeer]);
 
+    // set src of <video> to remote stream when available
+    useEffect(() => {
+        if (localStream) {
+            setVideoSrc(localVideoRef, localStream, true);
+        }
+    }, [localStream]);
+
     return (
         <div>
+            <video ref={localVideoRef}/>
             {localStream && connections && connections.map(connection => <VideoCard localPeer={localPeer} localStream={localStream} connection={connection}/>)}
         </div>
     );
