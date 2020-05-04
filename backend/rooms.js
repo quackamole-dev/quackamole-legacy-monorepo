@@ -20,7 +20,7 @@ class roomManager {
         this.rooms[sanitizedRoomData.id] = sanitizedRoomData;
 
         console.log(`Room: ${sanitizedRoomData.name} was created. RoomId: ${sanitizedRoomData.id}`);
-        return this.getRoom(sanitizedRoomData.id);
+        return this.getRoomById(sanitizedRoomData.id);
     };
 
     joinRoom = (roomId, peerId, password) => {
@@ -54,7 +54,7 @@ class roomManager {
         return !!this.rooms[roomId];
     };
 
-    getRoom = roomId => {
+    getRoomById = roomId => {
         const roomRef = this.rooms[roomId];
         if (roomRef) {
             return {
@@ -63,6 +63,11 @@ class roomManager {
                 maxUsers: roomRef.maxUsers,
             }
         }
+    };
+
+    getAllRooms = () => {
+        // Note: passwords of the rooms are returned as well but right now it does not matter
+        return this.rooms;
     };
 
     _checkRoomPassword = (roomId, password) => {
