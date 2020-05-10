@@ -15,10 +15,10 @@ const initSocketIO = require('./sockets');
 // and remove the sslOptions argument from all https.createServer methods
 let sslOptions = {
     // socket communication from the frontend doesn't work correctly on localhost atm. Need to self-sign certificates. Might use https://github.com/jsha/minica
-    key: fs.readFileSync('localhost.key'),
-    cert: fs.readFileSync('localhost.crt'),
-    // key: fs.readFileSync('/etc/letsencrypt/live/derpmasters.online/privkey.pem'),
-    // cert: fs.readFileSync('/etc/letsencrypt/live/derpmasters.online/fullchain.pem'),
+    // key: fs.readFileSync('localhost.key'),
+    // cert: fs.readFileSync('localhost.crt'),
+    key: fs.readFileSync('/etc/letsencrypt/live/derpmasters.online/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/derpmasters.online/fullchain.pem'),
 };
 
 const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
