@@ -14,14 +14,20 @@ const VideoCard = ({localPeer, localStream, connection}) => {
 
     const initCallListeners = () => {
         localPeer.on('call', call => {
-            call.answer(localStream);
-            handleOnStream(call);
+            console.log('-----------------ONCALL', call);
+            if (call.peer === connection.peer) {
+                call.answer(localStream);
+                handleOnStream(call);
+            } else {
+                console.log('call doesnt match connectionId, call:', call,'connection:', connection)
+            }
         });
     };
 
     useEffect(() => {
         if (localPeer && localPeer.id) {
             initCallListeners();
+            handleStartCall();
         }
     }, [localPeer]);
 
@@ -39,7 +45,7 @@ const VideoCard = ({localPeer, localStream, connection}) => {
 
     return (
         <div>
-            <button onClick={handleStartCall}>CALL this connection {connection.peer}</button>
+            {console.log('videoCard rerender, connection', connection)}
             <video ref={videoRef}/>
         </div>
     );

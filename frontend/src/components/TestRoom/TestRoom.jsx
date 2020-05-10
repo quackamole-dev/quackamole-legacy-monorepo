@@ -4,13 +4,13 @@ import Peer from "peerjs";
 import io from 'socket.io-client';
 import {serializeQueryString} from "../../utils";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET} from "../../constants";
-import {addConnection} from "../../store/actions/connections.actions";
+import {addConnection, removeConnection} from "../../store/actions/connections.actions";
 import {Link} from "react-router-dom";
 import TestStreamManager from "./TestStreamManager/TestStreamManager";
 
 
 // const calls = [];
-const TestRoom = ({connections, addConnection}) => {
+const TestRoom = ({connections, addConnection, removeConnection}) => {
     const [socket, setSocket] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
@@ -79,6 +79,8 @@ const TestRoom = ({connections, addConnection}) => {
                 );
             }
         });
+
+        connection.on('close', () => removeConnection(connection));
     };
 
     useEffect(() => {
@@ -116,6 +118,10 @@ const TestRoom = ({connections, addConnection}) => {
         return () => {
             if (socket) {
                 socket.emit('leave', inputState.roomId); // TODO change id for real rooms.
+            }
+
+            if (connections) {
+                Object.values(connections).forEach(conn => conn.close());
             }
         }
     }, [socket]);
@@ -227,5 +233,5 @@ const mapStateToProps = (state) => ({
     connections: state.connections.data,
 });
 
-export default connect(mapStateToProps, {addConnection})(TestRoom);
+export default connect(mapStateToProps, {addConnection, removeConnection})(TestRoom);
 

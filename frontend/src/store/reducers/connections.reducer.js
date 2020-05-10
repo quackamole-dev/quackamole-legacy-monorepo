@@ -12,7 +12,11 @@ const connectionsReducer = (connections = initialState, action) => {
             return {data: {...connections.data, [connection.connectionId]: connection}, error: null};
         }
         case REMOVE_CONNECTION: {
-            const newData = Object.entries(connections.data).filter(conn => conn.connectionId !== action.payload.connectionId);
+            const newData = {...connections.data};
+            const connection = action.payload.connection;
+
+            delete newData[connection.connectionId];
+
             return {data: newData, error: null};
         }
         case SET_CONNECTIONS_ERROR: {

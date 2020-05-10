@@ -11,10 +11,24 @@ const TestStreamManager = ({localPeer, connections}) => {
         try {
             let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
             setLocalStream(mediaStream);
+            // monkey patching reference to localStream to be able to disable camera use on unmount, as the reference in the localstate is already gone
+            window.localStream = mediaStream;
         } catch (error) {
             console.error('local stream couldnt be started via "startStream()"', error);
         }
     };
+
+    useEffect(() => {
+        // unmount
+        console.log('mount TestStreamManager');
+        return () => {
+            // stop browser from using the users camera & microphone
+            console.log('unmount TestStreamManager, disable localStream:', localStream, window.localStream);
+            if (window.localStream) {
+                window.localStream.getTracks().forEach((track) => track.stop());
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (localPeer && localPeer.id) {
@@ -32,7 +46,7 @@ const TestStreamManager = ({localPeer, connections}) => {
     return (
         <div>
             <video ref={localVideoRef}/>
-            {localStream && connections && connections.map(connection => <VideoCard localPeer={localPeer} localStream={localStream} connection={connection}/>)}
+            {localStream && connections && connections.map(connection => <VideoCard key={connection.connectionId} localPeer={localPeer} localStream={localStream} connection={connection}/>)}
         </div>
     );
 };
