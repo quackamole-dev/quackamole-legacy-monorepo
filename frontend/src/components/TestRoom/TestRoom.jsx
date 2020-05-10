@@ -18,7 +18,8 @@ const TestRoom = ({connections, addConnection}) => {
     const [inputState, setInputState] = useState({
         message: '',
         roomId: 'dummy-room-id',
-        password: 'dummy123'
+        password: 'dummy123',
+        nickname: ''
     });
 
     const initPeer = () => {
@@ -28,7 +29,7 @@ const TestRoom = ({connections, addConnection}) => {
                 host: API_BASE_URL,
                 port: PORT_SIGNALING,
                 path: '/peer/signal',
-                debug: 3,
+                // debug: 3,
                 config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
             });
 
@@ -44,7 +45,7 @@ const TestRoom = ({connections, addConnection}) => {
             // transports: ['websocket'],
             secure: true,
             query: serializeQueryString({
-                nickname: 'andi'
+                nickname: inputState.nickname || 'default nickname'
             })
         });
 
@@ -93,7 +94,13 @@ const TestRoom = ({connections, addConnection}) => {
             });
 
             localPeer.on('connection', connection => {
-                console.log('on connection with', connection);
+                console.log('on connection with', connection, 'metadata: ', connection.metaData, connection.metadata);
+                addConnection(connection);
+                initConnectionListeners(connection);
+            });
+
+            localPeer.on('disconnected', connection => {
+                console.log('-------DISCONNECTED', connection);
                 addConnection(connection);
                 initConnectionListeners(connection);
             });
@@ -160,7 +167,9 @@ const TestRoom = ({connections, addConnection}) => {
     };
 
     const connectWithPeer = async (remotePeerId) => {
-        const connection = await localPeer.connect(remotePeerId);
+        const connection = await localPeer.connect(remotePeerId, {metadata: {
+            nickname: 'test-metadata'
+            }});
         addConnection(connection);
         initConnectionListeners(connection);
     };
@@ -199,6 +208,15 @@ const TestRoom = ({connections, addConnection}) => {
                         <button type='submit'>send</button>
                     </fieldset>
                 </form>
+
+                <input
+                    type='text'
+                    aria-label='chat input'
+                    name='nickname'
+                    value={inputState.nickname}
+                    onChange={handleChange}
+                    placeholder='Enter your nickname'
+                />
             </div>
             <TestStreamManager localPeer={localPeer} />
         </>

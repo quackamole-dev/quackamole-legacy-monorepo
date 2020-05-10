@@ -13,6 +13,9 @@ const util = {
     getSocketIdsInRoom: (io, roomId) => {
         const room = io.sockets.adapter.rooms[roomId];
         return room ? Object.keys(room.sockets) : false;
+    },
+    socketAlreadyInRoom: (socket, roomId) => {
+        return Object.keys(socket.rooms).includes(roomId);
     }
 };
 
@@ -29,6 +32,13 @@ const initSocketActions = (io, socket) => {
     socket.on('join', ({roomId, password, peerId}, callback) => {
         if (!roomManager.doesRoomExist(roomId)) {
             console.log(`Room with the id: ${roomId} does not exist`);
+            callback(false);
+            return;
+        }
+
+        if (util.socketAlreadyInRoom(socket, roomId)) {
+            const socketData = util.getSocketCustomData(io, socket);
+            console.log(`Socket with nickname: ${socketData.nickname} is already in room: ${roomId}`);
             callback(false);
             return;
         }
