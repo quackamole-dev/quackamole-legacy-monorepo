@@ -33,7 +33,7 @@ const Room = ({connections, addConnection, removeConnection, match}) => {
     };
 
     const initSocket = (queryParams = {}) => {
-        const socket = io(`http://${API_BASE_URL}:${PORT_SOCKET}`, {
+        const socket = io(`https://${API_BASE_URL}:${PORT_SOCKET}`, {
             // transports: ['websocket'],
             secure: true,
             query: serializeQueryString(queryParams)
@@ -147,19 +147,20 @@ const Room = ({connections, addConnection, removeConnection, match}) => {
         initConnectionListeners(connection);
     };
 
-    // const handleJoinRoom = (e) => {
-    //     const roomId = match.params.roomId;
-    //     joinRoom(roomId, 'dummy123');
-    // };
 
     return (
         <>
             <RoomSidebar />
-            {/*<button onClick={handleJoinRoom}>join room</button>*/}
 
-            <Box display='flex' flexDirection='row' width={1} height={'100%'} border={1} justifyContent={'space-between'} >
-                <RoomPluginContent/>
-                <RoomMediaManager localPeer={localPeer}/>
+            <Box display='flex' flexDirection='column' width={1} height={'calc(100% - 60px)'} justifyContent={'space-between'} >
+                <Box display='flex' flexDirection='row' width={1} height={'90%'} justifyContent={'space-between'}>
+                    <RoomPluginContent/>
+                    <RoomMediaManager localPeer={localPeer}/>
+                </Box>
+
+                {/* space for some easy access actions like mute, enable camera, chat etc*/}
+                <Box bgcolor={'wheat'} height={'10%'}> </Box>
+
             </Box>
 
         </>

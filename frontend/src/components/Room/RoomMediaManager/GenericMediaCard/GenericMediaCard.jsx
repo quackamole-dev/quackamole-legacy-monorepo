@@ -6,8 +6,13 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
     },
+    cardWrapper: {
+        marginBottom: '5px',
+    },
     media: {
-        width: '100%'
+        width: '100%',
+        height: '120px',
+        objectFit: 'cover'
     }
 }));
 
@@ -21,7 +26,7 @@ const GenericMediaCard = ({stream, muted = false, user}) => {
     }, [stream]);
 
     return (
-        <Card>
+        <Card className={classes.cardWrapper}>
             <video ref={videoRef} className={classes.media}/>
             {nickname}
         </Card>

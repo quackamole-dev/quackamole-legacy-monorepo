@@ -5,7 +5,6 @@ import Room from "../Room/Room";
 import Home from "../Home/Home";
 import RoomCreateForm from "../RoomCreateForm/RoomCreateForm";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import TestRoom from "../TestRoom/TestRoom";
 
 const App = () => {
     return (
@@ -16,7 +15,6 @@ const App = () => {
                     <Route exact path='/create-room' component={RoomCreateForm} />
                     <Route exact path='/room-lobby/:roomId' component={RoomLobby} />
                     <Route path='/rooms/:roomId' component={Room} />
-                    <Route path='/test-room' component={TestRoom} />
                 </Switch>
             </Router>
         </CssBaseline>

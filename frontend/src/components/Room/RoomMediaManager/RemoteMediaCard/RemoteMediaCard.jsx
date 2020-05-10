@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {connect} from "react-redux";
 import GenericMediaCard from "../GenericMediaCard/GenericMediaCard";
 import {setVideoSrc} from "../../../../utils";
 

@@ -5,8 +5,14 @@ import {Box, Card, makeStyles} from "@material-ui/core";
 import {setVideoSrc} from "../../../utils";
 import RemoteMediaManager from "./RemoteMediaManager/RemoteMediaManager";
 
+const useStyles = makeStyles((theme) => ({
+    roomMediaManager: {
+        padding: '5px',
+    },
+}));
 
 const RoomMediaManager = ({localPeer}) => {
+    const classes = useStyles();
     const [localStream, setLocalStream] = useState(null);
     const localVideoRef = useRef(null);
 
@@ -43,7 +49,7 @@ const RoomMediaManager = ({localPeer}) => {
     }, [localStream]);
 
     return (
-        <Box bgcolor='lightblue' width={'20%'} minWidth={'150px'}>
+        <Box bgcolor='lightblue' width={'200px'} minWidth={'150px'} className={classes.roomMediaManager}>
             <GenericMediaCard stream={localStream} muted={true} user={{nickname: 'local'}}/>
             <RemoteMediaManager localPeer={localPeer} localStream={localStream} />
         </Box>
