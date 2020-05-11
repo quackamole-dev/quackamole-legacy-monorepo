@@ -5,9 +5,9 @@ import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
 import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
 import {connect} from "react-redux";
 import {addConnection, removeConnection} from "../../store/actions/connections.actions";
-import {initLocalUserPeer, initLocalUserSocket} from "../../store/actions/localUser.actions";
+import {initLocalUser} from "../../store/actions/localUser.actions";
 
-const Room = ({socket, localPeer, connections, addConnection, removeConnection, match, initLocalUserSocket, initLocalUserPeer}) => {
+const Room = ({socket, localPeer, connections, addConnection, removeConnection, match, initLocalUser}) => {
     const initConnectionListeners = (connection) => {
         connection.on('data', data => {
             const parsedData = JSON.parse(data);
@@ -24,7 +24,7 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
 
     useEffect(() => {
         // initSocket({nickname: 'andi'});
-        initLocalUserSocket({nickname: 'andiiii'});
+        initLocalUser({nickname: 'andiiii'});
     }, []);
 
     useEffect(() => {
@@ -55,7 +55,7 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
     useEffect(() => {
         if (socket && socket.id) {
             console.log('socket', socket);
-            initLocalUserPeer(socket.id);
+            // initLocalUserPeer(socket.id);
         }
 
         // On unmount: notify other people that you left before actually disconnecting
@@ -124,5 +124,4 @@ const mapStateToProps = (state) => ({
     connections: state.connections.data,
 });
 
-export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUserSocket, initLocalUserPeer})(Room);
-
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser})(Room);

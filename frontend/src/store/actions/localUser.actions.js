@@ -4,7 +4,7 @@ import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../cons
 import io from "socket.io-client";
 import {serializeQueryString} from "../../utils";
 
-export const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
+const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
         host: API_BASE_URL,
         port: PORT_SIGNALING,
@@ -19,7 +19,14 @@ export const initLocalUserPeer = (customPeerId) => async (dispatch, getState) =>
     })
 };
 
-export const initLocalUserSocket = (queryParams) => async (dispatch, getState) => {
+
+/**
+ * Init the socket.io client. Once socket is ready, init the peerJS Peer and store them in the store.
+ * @param queryParams
+ * @returns {function(...[*]=)}
+ */
+export const initLocalUser = (queryParams) => async (dispatch, getState) => {
+    // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though
     const protocol = SSL_ENABLED ? 'https' : 'http';
     const socket = io(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}`, {
         // transports: ['websocket'],
@@ -28,9 +35,12 @@ export const initLocalUserSocket = (queryParams) => async (dispatch, getState) =
     });
 
     socket.on('ready', (socketId) => {
-        return dispatch({
+        dispatch({
             type: INIT_LOCAL_USER_SOCKET,
             payload: {socket}
-        })
+        });
+
+        dispatch(initLocalUserPeer(socket.id));
     });
 };
+
