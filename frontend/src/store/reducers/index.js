@@ -6,7 +6,7 @@ import connectionsReducer from './connections.reducer';
 import callsReducer from './calls.reducer';
 
 const reducer = combineReducers({
-    room: roomReducer,
+    // room: roomReducer,
     localUser: localUserReducer,
     peers: peersReducer,
     calls: callsReducer,

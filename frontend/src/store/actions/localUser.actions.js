@@ -3,7 +3,8 @@ import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
 import {serializeQueryString} from "../../utils";
-import {addConnection} from "./connections.actions";
+import {addConnection, initConnectionListeners, removeConnection} from "./connections.actions";
+import {addCall} from "./calls.actions";
 
 const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
@@ -63,5 +64,27 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
         localPeer.on('connection', connection => {
             dispatch(addConnection(connection));
         });
+
+        localPeer.on('call', call => {
+            call.answer(); // TODO get reference of local stream from redux acces the streamMap that cannot be stored in redux (blob data)
+            dispatch(addCall(call));
+        })
     }
+//
+//
+//             localPeer.on('call', call => {
+//                 console.log('-----------------ONCALL', call);
+//                 if (call.peer === connection.peer) {
+//                     // call.answer(localStream); // TODO get reference of local stream from redux acces the streamMap that cannot be stored in redux (blob data)
+//
+//
+//                 } else {
+//                     console.log('call doesnt match connectionId, call:', call, 'connection:', connection)
+//                 }
+//             });
+//
+//
+//
+//         });
+//     }
 };

@@ -14,9 +14,7 @@ const connectionsReducer = (connections = initialState, action) => {
         case REMOVE_CONNECTION: {
             const newData = {...connections.data};
             const connection = action.payload.connection;
-
             delete newData[connection.connectionId];
-
             return {data: newData, error: null};
         }
         case SET_CONNECTIONS_ERROR: {

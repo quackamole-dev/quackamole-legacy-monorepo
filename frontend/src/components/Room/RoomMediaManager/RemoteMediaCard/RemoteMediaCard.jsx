@@ -1,48 +1,43 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect} from 'react';
 import GenericMediaCard from "../GenericMediaCard/GenericMediaCard";
-import {setVideoSrc} from "../../../../utils";
+import {connect} from "react-redux";
 
-const RemoteMediaCard = ({localPeer, localStream, connection}) => {
-    const [remoteStream, setRemoteStream] = useState(null);
-    const videoRef = useRef(null);
+const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection}) => {
 
-    const handleOnStream = (call) => {
-        call.on('stream', remoteMediaStream => {
-            console.log('ONSTREAM', remoteMediaStream);
-            setRemoteStream(remoteMediaStream);
-        });
-    };
+    // const handleOnStream = (call) => {
+    //     call.on('stream', remoteMediaStream => {
+    //         console.log('ONSTREAM', remoteMediaStream);
+    //         setRemoteStream(remoteMediaStream);
+    //     });
+    // };
 
-    const initCallListeners = () => {
-        // FIXME add localPeer and calls to redux to prevent prop drilling
-        localPeer.on('call', call => {
-            console.log('-----------------ONCALL', call);
-            if (call.peer === connection.peer) {
-                call.answer(localStream);
-                handleOnStream(call);
-            } else {
-                console.log('call doesnt match connectionId, call:', call, 'connection:', connection)
-            }
-        });
-    };
+    // const initCallListeners = () => {
+    //     // FIXME add localPeer and calls to redux to prevent prop drilling
+        // localPeer.on('call', call => {
+        //     console.log('-----------------ONCALL', call);
+        //     if (call.peer === connection.peer) {
+        //         call.answer(localStream);
+        //         // handleOnStream(call);
+        //     } else {
+        //         console.log('call doesnt match connectionId, call:', call, 'connection:', connection)
+        //     }
+        // });
+    // };
 
     useEffect(() => {
         if (localPeer && localPeer.id) {
-            initCallListeners();
+            // initCallListeners();
             handleStartCall();
             console.log('UE handlestartcall');
         }
     }, [localPeer]);
 
-    // set src of <video> to remote stream when available
-    useEffect(() => {
-        setVideoSrc(videoRef, remoteStream, false);
-    }, [remoteStream]);
 
     const handleStartCall = () => {
         if (localPeer) {
-            const call = localPeer.call(connection.peer, localStream);
-            handleOnStream(call);
+            // const call = localPeer.call(connection.peer, localStream);
+
+            // handleOnStream(call); // TODO add call to redux init listeners inside thunk
         }
     };
 
@@ -52,4 +47,11 @@ const RemoteMediaCard = ({localPeer, localStream, connection}) => {
     );
 };
 
-export default RemoteMediaCard;
+const mapStateToProps = (state, ownProps) => {
+    // const peerId = ownProps;
+    return {
+        remoteStream: null
+    };
+};
+
+export default connect(mapStateToProps)(RemoteMediaCard);

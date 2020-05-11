@@ -8,22 +8,7 @@ import {addConnection, removeConnection} from "../../store/actions/connections.a
 import {initLocalUser} from "../../store/actions/localUser.actions";
 
 const Room = ({socket, localPeer, connections, addConnection, removeConnection, match, initLocalUser}) => {
-    const initConnectionListeners = (connection) => {
-        connection.on('data', data => {
-            const parsedData = JSON.parse(data);
-
-            if (parsedData.textMessage) {
-                console.log(
-                    `%c MESSAGE - ${parsedData.textMessage.author}: "${parsedData.textMessage.text}"`,
-                    'background: black; color: white; padding: 1rem'
-                );
-            }
-        });
-        connection.on('close', () => removeConnection(connection));
-    };
-
     useEffect(() => {
-        // initSocket({nickname: 'andi'});
         initLocalUser({nickname: 'andiiii'});
     }, []);
 
@@ -54,6 +39,7 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
         }
     }, [socket]);
 
+    // TODO make this into a thunk as well
     const joinRoom = (roomId, password) => {
         console.log('join room', roomId);
         socket.emit('join', {roomId, password, peerId: localPeer.id},
@@ -77,7 +63,6 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
             }
         });
         addConnection(connection);
-        initConnectionListeners(connection);
     };
 
 
@@ -107,3 +92,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser})(Room);
+
+
+
+
