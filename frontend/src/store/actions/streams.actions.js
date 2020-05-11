@@ -1,30 +1,23 @@
-import {ADD_LOCAL_STREAM, ADD_REMOTE_STREAM, REMOVE_REMOTE_STREAM} from "../actionTypes";
+import {SET_STREAM} from "../actionTypes";
+import streamStore from "../streamStore";
 
-export const addLocalStream = stream => (dispatch, getState) => {
-    if (stream) {
-        // TODO store the stream blob in some sort of hashmap, reference the id in redux
-        dispatch({
-            type: ADD_LOCAL_STREAM,
-            payload: {stream}
-        });
-    }
+export const setStream = (peerId, isActive) => (dispatch, getState) => {
+    dispatch({
+        type: SET_STREAM,
+        payload: {peerId, isActive}
+    });
 };
 
-export const addRemoteStream = stream => (dispatch, getState) => {
-    if (stream) {
-        // TODO store the stream blob in some sort of hashmap, reference the id in redux
-        dispatch({
-            type: ADD_REMOTE_STREAM,
-            payload: {stream}
-        });
-    }
+export const startLocalStream = () => async (dispatch, getState) => {
+    const localPeer = getState().localUser.peer;
+     try {
+         let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+         streamStore.setStream(localPeer.id, mediaStream);
+         dispatch(setStream(localPeer.id, true));
+
+         window.localStream = mediaStream;
+     } catch (error) {
+         console.error('local stream couldnt be started via "startStream()"', error);
+     }
 };
 
-export const removeStream = stream => (dispatch, getState) => {
-    if (stream) {
-        dispatch({
-            type: REMOVE_REMOTE_STREAM,
-            payload: {stream}
-        });
-    }
-};

@@ -40,3 +40,24 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
         });
     }
 };
+
+
+export const joinRoom = (roomId, password) => (dispatch, getState) => {
+    const {socket, peer} = getState().localUser;
+
+    if (socket && peer) {
+        socket.emit('join', {roomId, password, peerId: peer.id},
+            // callback: the joining user himself is responsible to establish connections with other users
+            (data) => {
+                if (data) {
+                    console.log('joined room', data);
+                    data.room.joinedUsers.forEach((remotePeerId) => {
+                        if (remotePeerId !== peer.id) {
+                            const connection = peer.connect(remotePeerId, { metadata: { nickname: 'test-metadata'}});
+                            dispatch(addConnection(connection));
+                        }
+                    });
+                }
+            });
+    }
+};

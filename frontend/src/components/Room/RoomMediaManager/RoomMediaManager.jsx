@@ -4,6 +4,8 @@ import GenericMediaCard from "./GenericMediaCard/GenericMediaCard";
 import {Box, Card, makeStyles} from "@material-ui/core";
 import {setVideoSrc} from "../../../utils";
 import RemoteMediaManager from "./RemoteMediaManager/RemoteMediaManager";
+import streamStore from "../../../store/streamStore";
+import {startLocalStream} from "../../../store/actions/streams.actions";
 
 const useStyles = makeStyles((theme) => ({
     roomMediaManager: {
@@ -11,27 +13,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const RoomMediaManager = ({localPeer}) => {
+const RoomMediaManager = ({localPeer, localStream, startLocalStream}) => {
     const classes = useStyles();
-    const [localStream, setLocalStream] = useState(null);
     const localVideoRef = useRef(null);
 
-    const startLocalStream = async () => {
-        try {
-            let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-            setLocalStream(mediaStream);
-            window.localStream = mediaStream;
-        } catch (error) {
-            console.error('local stream couldnt be started via "startStream()"', error);
-        }
-    };
-
     useEffect(() => {
-        // unmount
         return () => {
-            if (window.localStream) {
-                window.localStream.getTracks().forEach((track) => track.stop());
-            }
+            // unmount
+            streamStore.clearAllStreams();
         }
     }, []);
 
@@ -50,11 +39,22 @@ const RoomMediaManager = ({localPeer}) => {
 
     return (
         <Box bgcolor='lightblue' width={'200px'} minWidth={'150px'} className={classes.roomMediaManager}>
+            {console.log('localStream--', localStream)}
             <GenericMediaCard stream={localStream} muted={true} user={{nickname: 'local'}}/>
             <RemoteMediaManager localPeer={localPeer} localStream={localStream} />
         </Box>
     );
 };
 
+const mapStateToProps = (state) => {
+    const localPeer = state.localUser.peer;
+    // const localStreamActive = state.streams.data[localPeer];
+    const localStream = localPeer ? streamStore.getStream(localPeer.id) : null;
+    return {
+        localPeer: state.localUser.peer,
+        // localStreamActive: localStreamActive,
+        localStream: localStream
+    }
+};
 
-export default RoomMediaManager;
+export default connect(mapStateToProps, {startLocalStream})(RoomMediaManager);

@@ -12,9 +12,23 @@ class StreamStore {
 
     getStream = peerId => {
         return this.streams[peerId];
-    }
+    };
+
+    clearStream = peerId => {
+        const stream = this.streams[peerId];
+        if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+        }
+    };
+
+    clearAllStreams = () => {
+        Object.keys(this.streams).forEach(peerId => {
+            this.clearStream(peerId);
+        })
+    };
 }
 
 const streamStore = new StreamStore();
+window.streamStore = streamStore; // for debugging
 
 export default streamStore;

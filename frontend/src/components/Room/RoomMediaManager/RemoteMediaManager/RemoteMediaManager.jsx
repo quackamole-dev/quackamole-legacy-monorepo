@@ -6,7 +6,7 @@ const RemoteMediaManager = ({localPeer, localStream, connections}) => {
     return (
         <>
             {localPeer && localStream && connections && connections.map(connection => {
-                return <RemoteMediaCard key={connection.connectionId} localPeer={localPeer} localStream={localStream} connection={connection} />
+                return <RemoteMediaCard key={connection.connectionId} connection={connection} />
             })
             }
         </>

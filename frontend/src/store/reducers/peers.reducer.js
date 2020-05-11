@@ -6,8 +6,7 @@ import {
     REMOVE_CONNECTION,
     ADD_CALL,
     REMOVE_CALL,
-    ADD_REMOTE_STREAM,
-    REMOVE_REMOTE_STREAM,
+    SET_STREAM,
 } from '../actionTypes';
 
 const initialState = {
@@ -45,13 +44,9 @@ const peersReducer = (peers = initialState, action) => {
         case REMOVE_CALL: {
             return peers;
         }
-        case ADD_REMOTE_STREAM: {
+        case SET_STREAM: {
             return peers;
         }
-        case REMOVE_REMOTE_STREAM: {
-            return peers;
-        }
-
         default: {
             return peers;
         }

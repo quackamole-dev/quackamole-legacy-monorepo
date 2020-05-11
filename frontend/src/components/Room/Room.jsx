@@ -4,10 +4,10 @@ import RoomSidebar from "./RoomSidebar/RoomSidebar";
 import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
 import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
 import {connect} from "react-redux";
-import {addConnection, removeConnection} from "../../store/actions/connections.actions";
+import {addConnection, removeConnection, joinRoom} from "../../store/actions/connections.actions";
 import {initLocalUser} from "../../store/actions/localUser.actions";
 
-const Room = ({socket, localPeer, connections, addConnection, removeConnection, match, initLocalUser}) => {
+const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom}) => {
     useEffect(() => {
         initLocalUser({nickname: 'andiiii'});
     }, []);
@@ -20,17 +20,12 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
     }, [localPeer]);
 
     useEffect(() => {
-        if (socket && socket.id) {
-            console.log('socket', socket);
-            // initLocalUserPeer(socket.id);
-        }
-
         // On unmount: notify other people that you left before actually disconnecting
         return () => {
             const roomId = match.params.roomId;
 
             if (socket) {
-                socket.emit('leave', roomId); // TODO change id for real rooms.
+                socket.emit('leave', roomId);
             }
 
             if (connections) {
@@ -39,33 +34,6 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
         }
     }, [socket]);
 
-    // TODO make this into a thunk as well
-    const joinRoom = (roomId, password) => {
-        console.log('join room', roomId);
-        socket.emit('join', {roomId, password, peerId: localPeer.id},
-            // callback: the joining user himself is responsible to establish connections with other users
-            (data) => {
-                if (data) {
-                    console.log('joined room', data);
-                    data.room.joinedUsers.forEach((peerId) => {
-                        if (peerId !== localPeer.id) {
-                            connectWithPeer(peerId);
-                        }
-                    });
-                }
-            });
-    };
-
-    const connectWithPeer = async (remotePeerId) => {
-        const connection = await localPeer.connect(remotePeerId, {
-            metadata: {
-                nickname: 'test-metadata'
-            }
-        });
-        addConnection(connection);
-    };
-
-
     return (
         <>
             <RoomSidebar />
@@ -73,7 +41,7 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
             <Box display='flex' flexDirection='column' width={1} height={'calc(100% - 60px)'} justifyContent={'space-between'} >
                 <Box display='flex' flexDirection='row' width={1} height={'90%'} justifyContent={'space-between'}>
                     <RoomPluginContent/>
-                    <RoomMediaManager localPeer={localPeer}/>
+                    <RoomMediaManager />
                 </Box>
 
                 {/* space for some easy access actions like mute, enable camera, chat etc*/}
@@ -91,8 +59,4 @@ const mapStateToProps = (state) => ({
     connections: state.connections.data,
 });
 
-export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser})(Room);
-
-
-
-
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom})(Room);

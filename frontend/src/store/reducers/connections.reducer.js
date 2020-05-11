@@ -9,12 +9,12 @@ const connectionsReducer = (connections = initialState, action) => {
     switch (action.type) {
         case ADD_CONNECTION: {
             const connection = action.payload.connection;
-            return {data: {...connections.data, [connection.connectionId]: connection}, error: null};
+            return {data: {...connections.data, [connection.peer]: connection}, error: null};
         }
         case REMOVE_CONNECTION: {
             const newData = {...connections.data};
             const connection = action.payload.connection;
-            delete newData[connection.connectionId];
+            delete newData[connection.peer];
             return {data: newData, error: null};
         }
         case SET_CONNECTIONS_ERROR: {

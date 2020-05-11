@@ -5,6 +5,7 @@ import io from "socket.io-client";
 import {serializeQueryString} from "../../utils";
 import {addConnection, initConnectionListeners, removeConnection} from "./connections.actions";
 import {addCall} from "./calls.actions";
+import streamStore from "../streamStore";
 
 const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
@@ -66,6 +67,8 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
         });
 
         localPeer.on('call', call => {
+            const localStreamActive = getState().streams.data[localPeer.id];
+            console.log('ONCALL action, local stream active: ', localStreamActive, streamStore.getStream(localPeer.id));
             call.answer(); // TODO get reference of local stream from redux acces the streamMap that cannot be stored in redux (blob data)
             dispatch(addCall(call));
         })
