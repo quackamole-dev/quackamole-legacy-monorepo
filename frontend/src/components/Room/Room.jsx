@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Box} from "@material-ui/core";
 import RoomSidebar from "./RoomSidebar/RoomSidebar";
 import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
@@ -29,24 +29,6 @@ const Room = ({socket, localPeer, connections, addConnection, removeConnection, 
 
     useEffect(() => {
         if (localPeer) {
-            console.log('peer initialized: ', localPeer);
-
-            localPeer.on('open', id => {
-                console.log('My peer ID is: ' + localPeer.id, localPeer);
-            });
-
-            localPeer.on('connection', connection => {
-                console.log('on connection with', connection, 'metadata: ', connection.metaData, connection.metadata);
-                addConnection(connection);
-                initConnectionListeners(connection);
-            });
-
-            localPeer.on('disconnected', connection => {
-                console.log('-------DISCONNECTED', connection);
-                addConnection(connection);
-                initConnectionListeners(connection);
-            });
-
             const roomId = match.params.roomId;
             joinRoom(roomId, 'dummy123');
         }

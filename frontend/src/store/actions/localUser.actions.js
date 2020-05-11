@@ -1,8 +1,9 @@
-import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET} from "../actionTypes";
+import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, SET_LOCAL_USER_METADATA} from "../actionTypes";
 import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
 import {serializeQueryString} from "../../utils";
+import {addConnection} from "./connections.actions";
 
 const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
@@ -16,7 +17,9 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     dispatch({
         type: INIT_LOCAL_USER_PEER,
         payload: {peer}
-    })
+    });
+
+    dispatch(initLocalUserPeerListeners(peer));
 };
 
 
@@ -36,11 +39,29 @@ export const initLocalUser = (queryParams) => async (dispatch, getState) => {
 
     socket.on('ready', (socketId) => {
         dispatch({
+            type: SET_LOCAL_USER_METADATA,
+            payload: {metadata: queryParams}
+        });
+
+        dispatch({
             type: INIT_LOCAL_USER_SOCKET,
             payload: {socket}
         });
 
-        dispatch(initLocalUserPeer(socket.id));
+        dispatch(initLocalUserPeer(socketId));
     });
 };
 
+const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
+    const localPeer = peer || getState().localUser.peer;
+
+    if (localPeer) {
+        localPeer.on('open', id => {
+            console.log('------------------------My peer ID is: ' + localPeer.id, localPeer);
+        });
+
+        localPeer.on('connection', connection => {
+            dispatch(addConnection(connection));
+        });
+    }
+};
