@@ -3,61 +3,11 @@ import {Box} from "@material-ui/core";
 import RoomSidebar from "./RoomSidebar/RoomSidebar";
 import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
 import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
-import Peer from "peerjs";
-import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET} from "../../constants";
-import io from "socket.io-client";
-import {serializeQueryString} from "../../utils";
 import {connect} from "react-redux";
 import {addConnection, removeConnection} from "../../store/actions/connections.actions";
+import {initLocalUserPeer, initLocalUserSocket} from "../../store/actions/localUser.actions";
 
-const Room = ({connections, addConnection, removeConnection, match}) => {
-    const [socket, setSocket] = useState(null);
-    const [localPeer, setLocalPeer] = useState(null);
-
-    const initPeer = (_socket) => {
-        if (_socket) {
-            const customPeerId = _socket.id;
-            const peer = new Peer(customPeerId, {
-                host: API_BASE_URL,
-                port: PORT_SIGNALING,
-                path: '/peer/signal',
-                // debug: 3,
-                config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
-            });
-
-            console.log('peer', customPeerId, peer);
-            setLocalPeer(peer);
-        } else {
-            console.log('could not create new Peer because the socket.io connection is not established yet');
-        }
-    };
-
-    const initSocket = (queryParams = {}) => {
-        const socket = io(`https://${API_BASE_URL}:${PORT_SOCKET}`, {
-            // transports: ['websocket'],
-            secure: true,
-            query: serializeQueryString(queryParams)
-        });
-
-        socket.on('ready', (socketId) => {
-            setSocket(socket);
-        });
-
-        // Init Listeners
-        socket.on('user-join', (room) => {
-            console.log('new user joined room, he will connect to you shortly');
-        });
-
-        // socket.on('user-leave', (data) => {
-        //     const connectionWithLeavingUser = connections[data.peerId];
-        //     console.log('user left room', data.peerId, connectionWithLeavingUser);
-        //
-        //     if (connectionWithLeavingUser) {
-        //         connectionWithLeavingUser.close();
-        //     }
-        // });
-    };
-
+const Room = ({socket, localPeer, connections, addConnection, removeConnection, match, initLocalUserSocket, initLocalUserPeer}) => {
     const initConnectionListeners = (connection) => {
         connection.on('data', data => {
             const parsedData = JSON.parse(data);
@@ -73,7 +23,8 @@ const Room = ({connections, addConnection, removeConnection, match}) => {
     };
 
     useEffect(() => {
-        initSocket({nickname: 'andi'});
+        // initSocket({nickname: 'andi'});
+        initLocalUserSocket({nickname: 'andiiii'});
     }, []);
 
     useEffect(() => {
@@ -104,7 +55,7 @@ const Room = ({connections, addConnection, removeConnection, match}) => {
     useEffect(() => {
         if (socket && socket.id) {
             console.log('socket', socket);
-            initPeer(socket);
+            initLocalUserPeer(socket.id);
         }
 
         // On unmount: notify other people that you left before actually disconnecting
@@ -168,8 +119,10 @@ const Room = ({connections, addConnection, removeConnection, match}) => {
 };
 
 const mapStateToProps = (state) => ({
+    socket: state.localUser.socket,
+    localPeer: state.localUser.peer,
     connections: state.connections.data,
 });
 
-export default connect(mapStateToProps, {addConnection, removeConnection})(Room);
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUserSocket, initLocalUserPeer})(Room);
 
