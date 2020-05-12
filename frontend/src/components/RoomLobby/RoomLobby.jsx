@@ -45,9 +45,9 @@ const useStyles = makeStyles ({
     }
 });
 
-const RoomLobby = () => {
+const RoomLobby = ({match}) => {
     const [name, setName] = React.useState('');
-    const [link, setLink] = React.useState('');
+    const [link, setLink] = React.useState(match.params.roomId);
     const classes = useStyles();
 
     const handleChangeName = (e) => {
@@ -107,6 +107,7 @@ const RoomLobby = () => {
                     onChange={handleChangeLink}
                  />
                  <div className={classes.alignbutton}>
+                 <Link to={`/rooms/${match.params.roomId}`} style={{ textDecoration: 'none',}}>
                     <Button
                         size="large"
                         color="secondary"
@@ -115,6 +116,7 @@ const RoomLobby = () => {
                     >
                             join
                     </Button>
+                </Link>
                 </div>
                 </Box>
             </Container>

@@ -85,7 +85,8 @@ const useStyles = makeStyles({
 const RoomCreateForm = () => {
     const [status, setStatus] = React.useState('');
     const [name, setName] = React.useState('');
-    const [link, setLink] = React.useState('https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0 https://www.figma.com/file/By2kgyeP0jIK0txwX2ZF0');
+    const [link, setLink] = React.useState('');
+    const [roomId, setRoomId] = React.useState('')
     const [active, setActive ] = React.useState(true);
     const classes = useStyles();
 
@@ -98,9 +99,26 @@ const RoomCreateForm = () => {
     };
 
     const createRoom = () => {
+        let data = {
+            name: name,
+            password: 'Test123.',
+            maxUsers: 4,
+            status: status
+        }
         if(name.length > 0 && status.length > 0) {
-            setActive(false);
-            console.log(status, name)
+            fetch('http://localhost:5002/api/rooms', {
+                method: 'post',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+            }).then(response => response.json()
+            ).then( data => {
+                setLink(`http://localhost:3000/#/room-lobby/${data}`)
+                setRoomId(data)
+                setActive(false)
+            });
         } else {
             console.log('error')
         }
@@ -223,7 +241,7 @@ const RoomCreateForm = () => {
                     > Share your link and invite someone to your room
                 </Typography>
                 
-                <Link to="/room-lobby/1" style={{ textDecoration: 'none',}}>
+                <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none',}}>
                  <Button
                     size="large"
                     color="secondary"
