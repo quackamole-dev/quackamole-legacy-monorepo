@@ -1,38 +1,49 @@
 import React, {useEffect} from 'react';
-import GenericMediaCard from "../GenericMediaCard/GenericMediaCard";
+import {CircularProgress} from "@material-ui/core";
+import GenericMediaCard from "../../GenericMediaCard/GenericMediaCard";
 import {connect} from "react-redux";
-import streamStore from "../../../../store/streamStore";
 import {addCall} from "../../../../store/actions/calls.actions";
 
-const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection, addCall}) => {
+const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection, call, addCall}) => {
 
     useEffect(() => {
         if (localPeer && connection && !remoteStream) {
-            handleStartCall();
+            // setTimeout(handleStartCall, Math.random() * 1500 + 1500); //
+            // handleStartCall();
         }
     }, [localPeer, connection]);
 
 
     const handleStartCall = () => {
-        if (localPeer) {
+        if (localPeer && !call) {
+            // FIXME adjust to only make one of the peers make the call and the other answer it on connection.
+
+            console.log('CAAAAAALLLLLLL, local stream', localStream, connection);
             const call = localPeer.call(connection.peer, localStream);
             addCall(call);
         }
     };
 
     return (
-        <GenericMediaCard stream={remoteStream} user={{nickname: 'remote'}} />
+        <>
+            { call
+                ? <GenericMediaCard stream={remoteStream} user={{nickname: 'remote'}} />
+                : <CircularProgress color="inherit"/>
+
+            }
+        </>
     );
 };
 
 const mapStateToProps = (state, ownProps) => {
     const localPeer = state.localUser.peer;
     const remotePeerId = ownProps.connection.peer;
-    const remoteStream = remotePeerId ? streamStore.getStream(remotePeerId) : null;
+    const remoteStream = remotePeerId ? state.streams.data[remotePeerId] : null;
     return {
         localPeer: localPeer,
-        localStream: localPeer ? streamStore.getStream(localPeer.id) : null,
+        localStream: localPeer ? state.streams.data[localPeer.id] : null,
         remoteStream: remoteStream,
+        call: state.calls.data[remotePeerId]
     }
 };
 

@@ -1,54 +1,57 @@
 import React, {useEffect} from 'react';
 import {Box} from "@material-ui/core";
-import RoomSidebar from "./RoomSidebar/RoomSidebar";
 import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
 import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
 import {connect} from "react-redux";
 import {addConnection, removeConnection, joinRoom} from "../../store/actions/connections.actions";
 import {initLocalUser} from "../../store/actions/localUser.actions";
+import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
+import RoomActionbar from "./RoomActionbar/RoomActionbar";
 
-const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom}) => {
+const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, startLocalStream, clearAllStreams}) => {
     useEffect(() => {
         initLocalUser({nickname: 'andiiii'});
     }, []);
 
     useEffect(() => {
         if (localPeer) {
-            const roomId = match.params.roomId;
-            joinRoom(roomId, 'dummy123');
+            startLocalStream();
+            joinRoom(match.params.roomId, 'dummy123');
         }
     }, [localPeer]);
 
     useEffect(() => {
-        // On unmount: notify other people that you left before actually disconnecting
+        // unmount
         return () => {
-            const roomId = match.params.roomId;
-
             if (socket) {
-                socket.emit('leave', roomId);
+                console.log('EMIT LEAVEEEEEEEEEEEE', socket);
+                socket.emit('leave', match.params.roomId);
+                socket.disconnect();
             }
 
             if (connections) {
                 Object.values(connections).forEach(conn => conn.close());
             }
+
+            if (window.localStream) {
+                console.log('clear tracks local');
+                window.localStream.getTracks().forEach(track => track.stop());
+            }
+            clearAllStreams();
         }
     }, [socket]);
 
     return (
         <>
-            <RoomSidebar />
-
-            <Box display='flex' flexDirection='column' width={1} height={'calc(100% - 60px)'} justifyContent={'space-between'} >
+            <Box display='flex' flexDirection='column' width={1} height={'100%'} justifyContent={'space-between'} >
                 <Box display='flex' flexDirection='row' width={1} height={'90%'} justifyContent={'space-between'}>
                     <RoomPluginContent/>
                     <RoomMediaManager />
                 </Box>
 
-                {/* space for some easy access actions like mute, enable camera, chat etc*/}
-                <Box bgcolor={'wheat'} height={'10%'}> </Box>
+                <RoomActionbar />
 
             </Box>
-
         </>
     );
 };
@@ -59,4 +62,4 @@ const mapStateToProps = (state) => ({
     connections: state.connections.data,
 });
 
-export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom})(Room);
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams})(Room);

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {Card, makeStyles} from "@material-ui/core";
-import {setVideoSrc} from "../../../../utils";
+import {setVideoSrc} from "../../../utils";
 
 const useStyles = makeStyles((theme) => ({
     root: {

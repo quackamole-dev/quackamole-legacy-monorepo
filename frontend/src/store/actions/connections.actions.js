@@ -1,25 +1,18 @@
-import {ADD_CONNECTION, REMOVE_CONNECTION} from "../actionTypes";
+import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM} from "../actionTypes";
+import {callConnection} from "./calls.actions";
 
 export const addConnection = connection => (dispatch, getState) => {
-    if (connection.peer && connection.connectionId) {
-        dispatch({
-            type: ADD_CONNECTION,
-            payload: {connection}
-        });
-
+    if (connection && connection.peer) {
+        dispatch({type: ADD_CONNECTION, payload: {connection}});
         dispatch(initConnectionListeners(connection));
     }
 };
 
 export const removeConnection = connection => (dispatch, getState) => {
-    if (connection.connectionId) {
-        dispatch({
-            type: REMOVE_CONNECTION,
-            payload: {connection}
-        });
+    if (connection && connection.peer) {
+        dispatch({type: REMOVE_CONNECTION, payload: {connection}});
     }
 };
-
 
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
@@ -41,8 +34,18 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     }
 };
 
+export const connectWithPeer = remotePeerId => (dispatch, getState) => {
+    const {peer} = getState().localUser;
 
-export const joinRoom = (roomId, password) => (dispatch, getState) => {
+    if (remotePeerId !== peer.id) {
+        const connection = peer.connect(remotePeerId, {metadata: {nickname: 'test-metadata'}});
+        dispatch(addConnection(connection));
+        dispatch(callConnection(connection));
+    }
+};
+
+
+export const joinRoom = (roomId, password) => async (dispatch, getState) => {
     const {socket, peer} = getState().localUser;
 
     if (socket && peer) {
@@ -50,13 +53,7 @@ export const joinRoom = (roomId, password) => (dispatch, getState) => {
             // callback: the joining user himself is responsible to establish connections with other users
             (data) => {
                 if (data) {
-                    console.log('joined room', data);
-                    data.room.joinedUsers.forEach((remotePeerId) => {
-                        if (remotePeerId !== peer.id) {
-                            const connection = peer.connect(remotePeerId, { metadata: { nickname: 'test-metadata'}});
-                            dispatch(addConnection(connection));
-                        }
-                    });
+                    data.room.joinedUsers.forEach((remotePeerId) => dispatch(connectWithPeer(remotePeerId)));
                 }
             });
     }

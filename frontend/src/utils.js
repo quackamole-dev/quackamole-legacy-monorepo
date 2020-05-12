@@ -45,3 +45,11 @@ export const useStream = (muted = false) => {
 
     return [videoRef, setStream];
 };
+
+export const clearStreamTracks = stream => {
+    if (stream) {
+        console.log('clear tracks', stream);
+        stream.getTracks().forEach(track => track.stop());
+    }
+};
+

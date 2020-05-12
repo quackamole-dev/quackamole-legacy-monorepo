@@ -6,13 +6,12 @@ import {
     REMOVE_CONNECTION,
     ADD_CALL,
     REMOVE_CALL,
-    SET_STREAM,
 } from '../actionTypes';
 
 const initialState = {
     data: {
-        'd7f7saim3': {nickname: 'Andi', peerId: 'dscdsv-csdvsdv-dvewvew-btrbrb3', connection: 'efewfgrger', call: 'fewfewfwef'},
-        '32mfdnmio': {nickname: 'Jimmy', peerId: 'ztjzt-ckhjgvv-dvewvew-b3cddrv', connection: 'vverberberb', call: 'vewrverbe'}
+        // 'd7f7saim3': {nickname: 'Andi', peerId: 'dscdsv-csdvsdv-dvewvew-btrbrb3', connection: 'efewfgrger', call: 'fewfewfwef'},
+        // '32mfdnmio': {nickname: 'Jimmy', peerId: 'ztjzt-ckhjgvv-dvewvew-b3cddrv', connection: 'vverberberb', call: 'vewrverbe'}
     },
     error: null
 };
@@ -42,9 +41,6 @@ const peersReducer = (peers = initialState, action) => {
             return peers;
         }
         case REMOVE_CALL: {
-            return peers;
-        }
-        case SET_STREAM: {
             return peers;
         }
         default: {

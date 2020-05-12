@@ -7,8 +7,13 @@ const util = {
         return socket ? socket.customData : false;
     },
     addCustomSocketData: (io, socketId, addedCustomData) => {
-        let customDataRef =  io.nsps['/'].connected[socketId].customData;
-        return io.nsps['/'].connected[socketId].customData = {...customDataRef, ...addedCustomData};
+        let socket =  io.nsps['/'].sockets[socketId];
+        if (socket) {
+            if (!socket.customData) {
+                socket.customData = {};
+            }
+            return io.nsps['/'].connected[socketId].customData = {...socket.customData, ...addedCustomData};
+        }
     },
     getSocketIdsInRoom: (io, roomId) => {
         const room = io.sockets.adapter.rooms[roomId];
@@ -16,6 +21,10 @@ const util = {
     },
     socketAlreadyInRoom: (socket, roomId) => {
         return Object.keys(socket.rooms).includes(roomId);
+    },
+    getSocketCurrentRooms: (io, socket) => {
+        return socket.rooms;
+
     }
 };
 
@@ -57,8 +66,11 @@ const initSocketActions = (io, socket) => {
 
     // Leave room
     socket.on('leave', (roomId) => {
-        console.log(`User: ${socket.id} left room: ${roomId}`);
         socket.to(roomId).emit('user-leave', socket.id);
+        socket.leave(roomId);
+        const {nickname, currentRoomId, peerId} = util.getSocketCustomData(io, socket.id);
+        console.log(`User ${nickname} with peerId: ${peerId} left roomId ${currentRoomId}`);
+        util.addCustomSocketData(io, socket.id, {currentRoomId: null});
     });
 };
 
@@ -71,20 +83,21 @@ const initSocketIO = (server) => {
 
         // Arbitrary data can be send from the frontend via query params.
         const nickname = socket.handshake.query['nickname'];
-        socket.customData = {nickname: nickname, peerId: socket.id};
+        socket.customData = {nickname: nickname, peerId: socket.id}; // FIXME use custom peerId, socket.id leads to error when it starts with underscore
         console.log('User with nickname:', nickname, 'connected. PeerId:', socket.customData.peerId);
 
         // Init user triggered actions
         initSocketActions(io, socket);
 
         // Cleanup when client disconnects
-        socket.on('disconnect', (what) => {
-            console.log(`User: ${socket.id} disconnected`);
-            const customData = util.getSocketCustomData(io, socket.id);
-            if (customData && customData.currentRoomId) {
-                socket.to(customData.currentRoomId).emit('user-leave', socket.id);
+        socket.on('disconnect', () => {
+            const {nickname, currentRoomId, peerId} = socket.customData;
+            console.log(`User ${nickname} with peerId: ${peerId} disconnected completely`);
+            if (currentRoomId) {
+                socket.to(currentRoomId).emit('user-leave', socket.id);
+                socket.leave(currentRoomId);
                 util.addCustomSocketData(io, socket.id, {currentRoomId: null});
-                console.log(`User ${socket.nickname} with peerId: ${socket.peerId} disconnected from roomId ${socket.currentRoomId} `);
+                console.log(`User ${nickname} with peerId: ${peerId} left roomId ${currentRoomId}`);
             }
         })
     });

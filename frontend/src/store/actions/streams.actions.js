@@ -1,23 +1,23 @@
-import {SET_STREAM} from "../actionTypes";
-import streamStore from "../streamStore";
+import {ADD_STREAM, CLEAR_ALL_STREAMS} from "../actionTypes";
 
-export const setStream = (peerId, isActive) => (dispatch, getState) => {
-    dispatch({
-        type: SET_STREAM,
-        payload: {peerId, isActive}
-    });
+export const addStream = (peerId, stream) => (dispatch, getState) => {
+    if (stream) {
+        dispatch({type: ADD_STREAM, payload: {peerId, stream}});
+    }
 };
 
-export const startLocalStream = () => async (dispatch, getState) => {
-    const localPeer = getState().localUser.peer;
-     try {
-         let mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-         streamStore.setStream(localPeer.id, mediaStream);
-         dispatch(setStream(localPeer.id, true));
-
-         window.localStream = mediaStream;
-     } catch (error) {
-         console.error('local stream couldnt be started via "startStream()"', error);
-     }
+export const startLocalStream = (peer, options = {video: true, audio: true}) => async (dispatch, getState) => {
+    const localPeer = peer || getState().localUser.peer;
+    try {
+        let mediaStream = await navigator.mediaDevices.getUserMedia(options);
+        dispatch(addStream(localPeer.id, mediaStream));
+        window.localStream = mediaStream; // kind of hacky to stop the tracks on unmount
+        return mediaStream;
+    } catch (error) {
+        console.error('local stream couldnt be started via "startStream()"', error);
+    }
 };
+export const clearAllStreams = () => async (dispatch, getState) => {
+        dispatch({type: CLEAR_ALL_STREAMS});
 
+};

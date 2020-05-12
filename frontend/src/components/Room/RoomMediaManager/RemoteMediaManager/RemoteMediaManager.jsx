@@ -2,19 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
 import RemoteMediaCard from "../RemoteMediaCard/RemoteMediaCard";
 
-const RemoteMediaManager = ({localPeer, localStream, connections}) => {
+const RemoteMediaManager = ({connections}) => {
     return (
         <>
-            {localPeer && localStream && connections && connections.map(connection => {
-                return <RemoteMediaCard key={connection.connectionId} connection={connection} />
-            })
-            }
+            {connections && connections.map(connection => <RemoteMediaCard key={connection.connectionId} connection={connection} />)}
         </>
     );
 };
 
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
     connections: Object.values(state.connections.data)
 });
 

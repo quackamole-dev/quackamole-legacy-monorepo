@@ -18,18 +18,19 @@ const callsReducer = (calls = initialState, action) => {
             delete newData[call.id];
             return {data: newData, error: null};
         }
-        // case REMOVE_CONNECTION: {
-        //     const peerId = action.payload.connection.peer;
-        //     const call = calls[peerId];
-        //
-        //     if (call) {
-        //         const newData = {...calls.data};
-        //         delete newData[peerId];
-        //         return {...calls, data: newData, error: null};
-        //     } else {
-        //         return calls;
-        //     }
-        // }
+        case REMOVE_CONNECTION: {
+            const peerId = action.payload.connection.peer;
+            const call = calls.data[peerId];
+            console.log('remove call as well');
+
+            if (call) {
+                const newData = {...calls.data};
+                delete newData[peerId];
+                return {...calls, data: newData, error: null};
+            } else {
+                return calls;
+            }
+        }
         case SET_CALLS_ERROR: {
             return {...calls, error: action.payload.error};
         }

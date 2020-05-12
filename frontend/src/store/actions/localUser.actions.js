@@ -3,9 +3,9 @@ import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
 import {serializeQueryString} from "../../utils";
-import {addConnection, initConnectionListeners, removeConnection} from "./connections.actions";
+import {addConnection} from "./connections.actions";
 import {addCall} from "./calls.actions";
-import streamStore from "../streamStore";
+import {startLocalStream} from "./streams.actions";
 
 const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
@@ -21,6 +21,7 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
         payload: {peer}
     });
 
+    dispatch(startLocalStream(peer));
     dispatch(initLocalUserPeerListeners(peer));
 };
 
@@ -31,7 +32,7 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
  * @returns {function(...[*]=)}
  */
 export const initLocalUser = (queryParams) => async (dispatch, getState) => {
-    // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though
+    // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though, allow peerId to be different from socketId
     const protocol = SSL_ENABLED ? 'https' : 'http';
     const socket = io(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}`, {
         // transports: ['websocket'],
@@ -59,7 +60,6 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
 
     if (localPeer) {
         localPeer.on('open', id => {
-            console.log('------------------------My peer ID is: ' + localPeer.id, localPeer);
         });
 
         localPeer.on('connection', connection => {
@@ -67,27 +67,9 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
         });
 
         localPeer.on('call', call => {
-            const localStreamActive = getState().streams.data[localPeer.id];
-            console.log('ONCALL action, local stream active: ', localStreamActive, streamStore.getStream(localPeer.id));
-            call.answer(); // TODO get reference of local stream from redux acces the streamMap that cannot be stored in redux (blob data)
+            const localStream = getState().streams.data[localPeer.id];
+            call.answer(localStream);
             dispatch(addCall(call));
         })
     }
-//
-//
-//             localPeer.on('call', call => {
-//                 console.log('-----------------ONCALL', call);
-//                 if (call.peer === connection.peer) {
-//                     // call.answer(localStream); // TODO get reference of local stream from redux acces the streamMap that cannot be stored in redux (blob data)
-//
-//
-//                 } else {
-//                     console.log('call doesnt match connectionId, call:', call, 'connection:', connection)
-//                 }
-//             });
-//
-//
-//
-//         });
-//     }
 };

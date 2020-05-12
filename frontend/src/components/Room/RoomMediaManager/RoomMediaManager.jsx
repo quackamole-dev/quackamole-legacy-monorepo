@@ -1,11 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
-import GenericMediaCard from "./GenericMediaCard/GenericMediaCard";
-import {Box, Card, makeStyles} from "@material-ui/core";
-import {setVideoSrc} from "../../../utils";
+import GenericMediaCard from "../GenericMediaCard/GenericMediaCard";
+import {Box, makeStyles} from "@material-ui/core";
 import RemoteMediaManager from "./RemoteMediaManager/RemoteMediaManager";
-import streamStore from "../../../store/streamStore";
-import {startLocalStream} from "../../../store/actions/streams.actions";
 
 const useStyles = makeStyles((theme) => ({
     roomMediaManager: {
@@ -13,48 +10,24 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const RoomMediaManager = ({localPeer, localStream, startLocalStream}) => {
+const RoomMediaManager = ({localStream, localPeerMetadata}) => {
     const classes = useStyles();
-    const localVideoRef = useRef(null);
-
-    useEffect(() => {
-        return () => {
-            // unmount
-            streamStore.clearAllStreams();
-        }
-    }, []);
-
-    useEffect(() => {
-        if (localPeer && localPeer.id) {
-            startLocalStream();
-        }
-    }, [localPeer]);
-
-    // set src of <video> to remote stream when available
-    useEffect(() => {
-        if (localStream) {
-            setVideoSrc(localVideoRef, localStream, true);
-        }
-    }, [localStream]);
 
     return (
-        <Box bgcolor='lightblue' width={'200px'} minWidth={'150px'} className={classes.roomMediaManager}>
-            {console.log('localStream--', localStream)}
-            <GenericMediaCard stream={localStream} muted={true} user={{nickname: 'local'}}/>
-            <RemoteMediaManager localPeer={localPeer} localStream={localStream} />
+        <Box bgcolor='lightblue' width={'220px'} minWidth={'150px'} className={classes.roomMediaManager}>
+            <GenericMediaCard stream={localStream} muted={true} user={{nickname: localPeerMetadata.nickname}}/>
+            <RemoteMediaManager />
         </Box>
     );
 };
 
 const mapStateToProps = (state) => {
     const localPeer = state.localUser.peer;
-    // const localStreamActive = state.streams.data[localPeer];
-    const localStream = localPeer ? streamStore.getStream(localPeer.id) : null;
+    const localStream = localPeer ? state.streams.data[localPeer.id] : null;
     return {
-        localPeer: state.localUser.peer,
-        // localStreamActive: localStreamActive,
-        localStream: localStream
+        localPeerMetadata: state.localUser.metadata,
+        localStream: localStream,
     }
 };
 
-export default connect(mapStateToProps, {startLocalStream})(RoomMediaManager);
+export default connect(mapStateToProps, {})(RoomMediaManager);
