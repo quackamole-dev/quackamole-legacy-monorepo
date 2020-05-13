@@ -17,8 +17,6 @@ const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection, call
     const handleStartCall = () => {
         if (localPeer && !call) {
             // FIXME adjust to only make one of the peers make the call and the other answer it on connection.
-
-            console.log('CAAAAAALLLLLLL, local stream', localStream, connection);
             const call = localPeer.call(connection.peer, localStream);
             addCall(call);
         }

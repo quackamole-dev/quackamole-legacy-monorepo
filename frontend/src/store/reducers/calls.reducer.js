@@ -9,7 +9,6 @@ const callsReducer = (calls = initialState, action) => {
     switch (action.type) {
         case ADD_CALL: {
             const call = action.payload.call;
-            console.log('REDUCER ADD_CALL', call);
             return {data: {...calls.data, [call.peer]: call}, error: null};
         }
         case REMOVE_CALL: {
@@ -21,7 +20,6 @@ const callsReducer = (calls = initialState, action) => {
         case REMOVE_CONNECTION: {
             const peerId = action.payload.connection.peer;
             const call = calls.data[peerId];
-            console.log('remove call as well');
 
             if (call) {
                 const newData = {...calls.data};

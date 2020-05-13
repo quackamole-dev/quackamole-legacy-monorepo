@@ -24,7 +24,6 @@ const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, s
         // unmount
         return () => {
             if (socket) {
-                console.log('EMIT LEAVEEEEEEEEEEEE', socket);
                 socket.emit('leave', match.params.roomId);
                 socket.disconnect();
             }
@@ -34,7 +33,6 @@ const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, s
             }
 
             if (window.localStream) {
-                console.log('clear tracks local');
                 window.localStream.getTracks().forEach(track => track.stop());
             }
             clearAllStreams();
