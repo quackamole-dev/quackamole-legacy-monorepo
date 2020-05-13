@@ -1,6 +1,8 @@
 // The place to put all helper methods that do not necessarily belong to a specific component
 // Once this file gets too crowded, create an utils folder and start seperating the exported helper methods
 
+import {useEffect, useRef, useState} from "react";
+
 /**
  * Transforms a javascript object into a query string.
  * @param object The source object. Example: {a: 5, b: 10}
@@ -25,3 +27,28 @@ export const setVideoSrc = (videoRef, stream, muted= true) => {
         };
     }
 };
+
+// untested prototype for a hook that might replace setVideoSrc(). Right now there is no benefit of using it. Rethink design
+export const useStream = (muted = false) => {
+    const videoRef = useRef(null);
+    const [stream, setStream] = useState(null);
+
+    useEffect(() => {
+        if (videoRef.current && stream) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.oncanplay = () => {
+                videoRef.current.play();
+                videoRef.current.muted = muted;
+            };
+        }
+    }, [stream, videoRef, muted]);
+
+    return [videoRef, setStream];
+};
+
+export const clearStreamTracks = stream => {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+};
+

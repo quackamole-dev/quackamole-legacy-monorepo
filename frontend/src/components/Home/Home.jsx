@@ -96,7 +96,7 @@ const Home = () => {
                 </Box>
             </Box>
             {/*Temporary for debugging purposes*/}
-            <Link to={'/test-room'}>Debug Testroom</Link>
+            <Link to={'/rooms/dummy-room-id'}>Test room</Link>
         </ThemeProvider>
     )
 };

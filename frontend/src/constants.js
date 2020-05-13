@@ -1,5 +1,8 @@
-export const API_BASE_URL = 'derpmasters.online'; // will use a environment variable later on
-// export const API_BASE_URL = 'localhost'; // uncomment for local development
+const isLocal = process.env.NODE_ENV === 'development';
 
-export const PORT_SIGNALING = '5001';
-export const PORT_SOCKET = '5002';
+export const API_BASE_URL = isLocal ? 'localhost' : process.env.REACT_APP_API_BASE_URL;
+export const SSL_ENABLED = isLocal ? false : process.env.REACT_APP_SSL_ENABLED === 'true';
+
+export const PORT_SIGNALING = process.env.REACT_APP_PORT_SIGNALING;
+export const PORT_SOCKET = process.env.REACT_APP_PORT_SOCKET;
+

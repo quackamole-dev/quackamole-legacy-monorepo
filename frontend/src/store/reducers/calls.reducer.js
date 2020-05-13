@@ -1,4 +1,4 @@
-import {SET_CALLS, SET_CALLS_ERROR} from '../actionTypes';
+import {ADD_CALL, REMOVE_CALL, REMOVE_CONNECTION, SET_CALLS_ERROR} from '../actionTypes';
 
 const initialState = {
     data: {},
@@ -7,11 +7,30 @@ const initialState = {
 
 const callsReducer = (calls = initialState, action) => {
     switch (action.type) {
-        case SET_CALLS: {
-            return {calls: action.payload.calls, error: null};
+        case ADD_CALL: {
+            const call = action.payload.call;
+            return {data: {...calls.data, [call.peer]: call}, error: null};
+        }
+        case REMOVE_CALL: {
+            const newData = {...calls.data};
+            const call = action.payload.call;
+            delete newData[call.id];
+            return {data: newData, error: null};
+        }
+        case REMOVE_CONNECTION: {
+            const peerId = action.payload.connection.peer;
+            const call = calls.data[peerId];
+
+            if (call) {
+                const newData = {...calls.data};
+                delete newData[peerId];
+                return {...calls, data: newData, error: null};
+            } else {
+                return calls;
+            }
         }
         case SET_CALLS_ERROR: {
-            return {data: calls.data, error: action.payload.error};
+            return {...calls, error: action.payload.error};
         }
         default: {
             return calls;

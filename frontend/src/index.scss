@@ -1,0 +1,10 @@
+// Put global styles in here only if there are no good alternatives using MUI
+body {
+    min-height: 100vh;
+    display: flex;
+}
+
+#root {
+    min-height: 100vh;
+    min-width: 100vw;
+}

@@ -1,87 +1,63 @@
-import React from 'react';
-import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
-import MenuIcon from '@material-ui/icons/Menu';
-import theme from '../../style/theme/MainTheme';
+import React, {useEffect} from 'react';
+import {Box} from "@material-ui/core";
+import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
+import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
+import {connect} from "react-redux";
+import {addConnection, removeConnection, joinRoom} from "../../store/actions/connections.actions";
+import {initLocalUser} from "../../store/actions/localUser.actions";
+import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
+import RoomActionbar from "./RoomActionbar/RoomActionbar";
 
-const useStyles = makeStyles({
-  list: {
-    width: 250,
-  },
-  fullList: {
-    width: 'auto',
-  },
-  menuIcon: {
-      margin: '8px'
-  }
-});
+const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, startLocalStream, clearAllStreams}) => {
+    useEffect(() => {
+        initLocalUser({nickname: 'andiiii'});
+    }, []);
 
-const Room = () => {
-    const classes = useStyles();
-    const [state, setState] = React.useState(false);
+    useEffect(() => {
+        if (localPeer) {
+            startLocalStream();
+            joinRoom(match.params.roomId, 'dummy123');
+        }
+    }, [localPeer]);
 
-    const toggleDrawer = (event) => {    
-        if (event.type === 'keydown') {
-            return;
-          }
+    useEffect(() => {
+        // unmount
+        return () => {
+            if (socket) {
+                socket.emit('leave', match.params.roomId);
+                socket.disconnect();
+            }
 
-        setState(!state);
-      };
+            if (connections) {
+                Object.values(connections).forEach(conn => conn.close());
+            }
 
-    const list = () => (
-        <div
-        className={classes.list}
-        role="presentation"
-        onClick={toggleDrawer}
-        onKeyDown={toggleDrawer}
-      >
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </div>
-    );
+            if (window.localStream) {
+                window.localStream.getTracks().forEach(track => track.stop());
+            }
+            clearAllStreams();
+        }
+    }, [socket]);
 
     return (
-        <ThemeProvider theme={theme}>
-        <div>
-            <MenuIcon 
-                onClick={toggleDrawer} 
-                color='primary'
-                fontSize='large'
-                className={classes.menuIcon}
-                />
-            <Drawer 
-                open={state}  
-                onClose={toggleDrawer}
-                >
-                {list()}
-            </Drawer>
-        </div>
-        </ThemeProvider>
+        <>
+            <Box display='flex' flexDirection='column' width={1} height={'100%'} justifyContent={'space-between'} >
+                <Box display='flex' flexDirection='row' width={1} height={'90%'} justifyContent={'space-between'}>
+                    <RoomPluginContent/>
+                    <RoomMediaManager />
+                </Box>
+
+                <RoomActionbar />
+
+            </Box>
+        </>
     );
 };
 
-export default Room;
+const mapStateToProps = (state) => ({
+    socket: state.localUser.socket,
+    localPeer: state.localUser.peer,
+    connections: state.connections.data,
+});
 
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams})(Room);
