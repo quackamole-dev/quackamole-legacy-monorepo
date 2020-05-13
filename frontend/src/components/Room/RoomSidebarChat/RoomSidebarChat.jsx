@@ -7,7 +7,7 @@ import theme from '../../../style/theme/MainTheme';
 
 const useStyles = makeStyles({
     list: {
-        width: 350,
+        width: 300,
     },
     chatIcon: {
         margin: '8px'
