@@ -86,7 +86,7 @@ const RoomCreateForm = () => {
     const [status, setStatus] = React.useState('');
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
-    const [roomId, setRoomId] = React.useState('')
+    const [roomId, setRoomId] = React.useState('');
     const [active, setActive ] = React.useState(true);
     const classes = useStyles();
 
@@ -111,12 +111,11 @@ const RoomCreateForm = () => {
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                   },
             }).then(response => response.json()
             ).then( data => {
-                setLink(`http://localhost:3000/#/room-lobby/${data}`)
-                setRoomId(data)
+                setLink(`http://localhost:3000/#/room-lobby/${data}`);
+                setRoomId(data);
                 setActive(false)
             });
         } else {

@@ -71,8 +71,9 @@ class roomManager {
     };
 
     _checkRoomPassword = (roomId, password) => {
-        const roomRef = this.rooms[roomId];
-        return roomRef.password.length === 0 || roomRef.password === password;
+        // const roomRef = this.rooms[roomId];
+        // return roomRef.password.length === 0 || roomRef.password === password;
+        return true; // FIXME only temporary, password check bypassed until we really need it in v0.2
     };
 
     _createSanitizedRoomData = rawRoomData => {
