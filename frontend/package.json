@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "author": "DerpMasters",
+  "license": "MIT",
   "homepage": ".",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.28",
-    "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
@@ -52,5 +51,10 @@
   "devDependencies": {
     "cross-env": "^7.0.2",
     "gh-pages": "^2.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derpmasters/p2p-videochat-platform.git",
+    "directory": "frontend"
   }
 }
