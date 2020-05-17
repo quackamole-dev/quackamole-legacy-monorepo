@@ -17,14 +17,20 @@ export const removeConnection = connection => (dispatch, getState) => {
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
         connection.on('data', data => {
-            const parsedData = JSON.parse(data);
-            if (parsedData.textMessage) {
-                console.log( `%c MESSAGE - ${parsedData.textMessage.author}: "${parsedData.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+            const type = data.type;
+            if (type === 'message') {
+                console.log( `%c MESSAGE - ${data.textMessage.author}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
             // TODO this is where we could receive plugin data of other peers. Example: coords where they placed something in a game.
-            if (parsedData.pluginData) {
-                console.log('received plugin data:', parsedData);
+            if (type === 'pluginData') {
+                console.log('received plugin data:', data.payload);
+                window.postMessage(data, '*');
+
+                const iframe = getState().plugin.iframe;
+                if (iframe) {
+                    iframe.contentWindow.postMessage(data, "*");
+                }
             }
         });
 

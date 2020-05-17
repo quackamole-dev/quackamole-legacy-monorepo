@@ -11,6 +11,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import theme from '../../../style/theme/MainTheme';
+import {setPlugin} from "../../../store/actions/plugin.actions";
+import {connect} from "react-redux";
 
 const useStyles = makeStyles({
     list: {
@@ -21,7 +23,15 @@ const useStyles = makeStyles({
     }
 });
 
-const RoomSidebarMenu = () => {
+// TODO this data will be served by the backend in future releases. Not real plugins except first one in the list
+const plugins = [
+    {name: 'Random number', url: 'https://andreas-schoch.github.io/p2p-test-plugin/'},
+    {name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/'},
+    {name: 'Todo list', url: 'https://andreas-schoch.github.io/react-todo-app/'},
+    {name: 'Karaoke', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'},
+];
+
+const RoomSidebarMenu = ({plugin, setPlugin}) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
 
@@ -32,13 +42,18 @@ const RoomSidebarMenu = () => {
         setOpen(!open);
     };
 
+    const handleSelectPlugin = (evt) => {
+        const index = evt.currentTarget.dataset.index;
+        setPlugin(plugin ? {...plugin, ...plugins[index]} : plugins[index]);
+    };
+
     const list = () => (
         <div className={classes.list} role="presentation" onClick={toggleDrawer}>
             <List>
-                {['Plugin 1', 'Plugin 2', 'Plugin 3', 'Plugin 4'].map((text, index) => (
-                    <ListItem button key={text}>
+                {plugins.map(({name}, i) => (
+                    <ListItem button key={name} onClick={handleSelectPlugin} data-index={i}>
                         <ListItemIcon><LabelIcon/></ListItemIcon>
-                        <ListItemText primary={text}/>
+                        <ListItemText primary={name}/>
                     </ListItem>
                 ))}
             </List>
@@ -64,4 +79,8 @@ const RoomSidebarMenu = () => {
     );
 };
 
-export default RoomSidebarMenu;
+const mapStateToProps = (state) => ({
+    plugin: state.plugin
+});
+
+export default connect(mapStateToProps, {setPlugin})(RoomSidebarMenu);
