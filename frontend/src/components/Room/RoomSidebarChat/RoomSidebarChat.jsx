@@ -4,10 +4,12 @@ import ChatIcon from '@material-ui/icons/Chat';
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import theme from '../../../style/theme/MainTheme';
+import Chat from './Chat/Chat'
 
 const useStyles = makeStyles({
     list: {
         width: 300,
+        padding: 10,
     },
     chatIcon: {
         margin: '8px'
@@ -16,18 +18,17 @@ const useStyles = makeStyles({
 
 const RoomSidebarChat = () => {
     const classes = useStyles();
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     const toggleDrawer = (event) => {
         if (event.type === 'keydown') {
             return;
         }
-        setOpen(!open);
     };
 
     const list = () => (
         <div className={classes.list} role="presentation" onClick={toggleDrawer}>
-            {/* TODO create a chat component, that gets it's data from redux, render it here */}
+            <Chat/>
         </div>
     );
 
