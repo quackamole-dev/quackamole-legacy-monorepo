@@ -3,6 +3,8 @@ import ChatMsg from './ChatMsg';
 import TextField from '@material-ui/core/TextField';
 import SendIcon from '@material-ui/icons/Send';
 import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
+import {connect} from "react-redux";
+import {sendMessage} from '../../../../store/actions/chat.actions'
 
 const useStyles = makeStyles({
     chatContainer: {
@@ -15,7 +17,7 @@ const useStyles = makeStyles({
     },
 })
 
-const Chat = () => {
+const Chat = ({chatData, sendMessage}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('')
     const [messages, setMessages] = useState([
@@ -24,21 +26,16 @@ const Chat = () => {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Volutpat lacus laoreet non curabitur gravida.',
     ])
     const [myMessage, setMyMessage] = useState([
-        "Great! What's about you?",
-        'Of course I did. Speaking of which check this out',
-        'Of course I did. Speaking of which check this out',
-        'Of course I did. Speaking of which check this out',
-        'Of course I did. Speaking of which check thddddis out',
-
     ])
 
     const handleChangeTexfield = (event) => {
         setNewMessage(event.target.value)
     };
 
-    const sendMessage= (e) => {
+    const send = (e) => {
         e.preventDefault()
-        setMyMessage([...myMessage, newMessage])
+        sendMessage(newMessage)
+        setNewMessage('')  
     }
 
 
@@ -50,23 +47,27 @@ const Chat = () => {
             />
             <ChatMsg
             side={'right'}
-            messages={myMessage}
+            messages={chatData}
             />
             <div className={classes.chatSection}>
                 <TextField
                     multiline
                     fullWidth
                     className={classes.textField} 
-                    onChange={handleChangeTexfield}      
+                    onChange={handleChangeTexfield}
+                    value={newMessage}      
                 />
                 <SendIcon
                     color="primary"
-                    onClick={sendMessage}
+                    onClick={send}
                 />
             </div>
         </div>
     )
 };
 
+const mapStateToProps = (state, props) => ({
+    chatData: state.chat 
+})
 
-export default Chat;
+export default connect(mapStateToProps, {sendMessage})(Chat);
