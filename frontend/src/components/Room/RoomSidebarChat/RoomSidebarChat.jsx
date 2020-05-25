@@ -8,6 +8,12 @@ import Chat from './Chat/Chat'
 
 const useStyles = makeStyles({
     list: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        overflowY: 'auto',
+        WebkitFlex: '1 1 auto',
+        height: '100%',
         width: 300,
         padding: 10,
     },
@@ -18,16 +24,17 @@ const useStyles = makeStyles({
 
 const RoomSidebarChat = () => {
     const classes = useStyles();
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
     const toggleDrawer = (event) => {
         if (event.type === 'keydown') {
             return;
         }
+        setOpen(!open);
     };
 
     const list = () => (
-        <div className={classes.list} role="presentation" onClick={toggleDrawer}>
+        <div className={classes.list} role="presentation">
             <Chat/>
         </div>
     );

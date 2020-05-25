@@ -1,5 +1,6 @@
-import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM} from "../actionTypes";
+import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM, ADD_NEW_MESSAGE} from "../actionTypes";
 import {callConnection} from "./calls.actions";
+
 
 export const addConnection = connection => (dispatch, getState) => {
     if (connection && connection.peer) {
@@ -17,14 +18,19 @@ export const removeConnection = connection => (dispatch, getState) => {
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
         connection.on('data', data => {
-            const parsedData = JSON.parse(data);
-            if (parsedData.textMessage) {
-                console.log( `%c MESSAGE - ${parsedData.textMessage.author}: "${parsedData.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+            console.log(data, 'data')
+            // const parsedData = JSON.parse(data);
+            if (data.textMessage) {
+                dispatch({
+                    type: ADD_NEW_MESSAGE,
+                    payload: data.textMessage
+                })
+                console.log( `%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
             // TODO this is where we could receive plugin data of other peers. Example: coords where they placed something in a game.
-            if (parsedData.pluginData) {
-                console.log('received plugin data:', parsedData);
+            if (data.pluginData) {
+                console.log('received plugin data:', data);
             }
         });
 

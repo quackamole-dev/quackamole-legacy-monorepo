@@ -17,16 +17,9 @@ const useStyles = makeStyles({
     },
 })
 
-const Chat = ({chatData, sendMessage}) => {
+const Chat = ({chatData, sendMessage, connections, localPeer}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('')
-    const [messages, setMessages] = useState([
-        'Hi Jenny, How r u today?',
-        'Did you train yesterday',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Volutpat lacus laoreet non curabitur gravida.',
-    ])
-    const [myMessage, setMyMessage] = useState([
-    ])
 
     const handleChangeTexfield = (event) => {
         setNewMessage(event.target.value)
@@ -35,20 +28,23 @@ const Chat = ({chatData, sendMessage}) => {
     const send = (e) => {
         e.preventDefault()
         sendMessage(newMessage)
-        setNewMessage('')  
-    }
+        setNewMessage('')
+    };
 
+    const chatFeed = chatData.map(message => message.peerId === localPeer.id ?
+            <ChatMsg
+            side={'right'}
+            messages={[message.text]}
+            /> :
+            <ChatMsg
+            avatar={''}
+            messages={[message.text]}
+            />
+        );
 
     return (
         <div className={classes.chatContainer}>
-            <ChatMsg
-            avatar={''}
-            messages={messages}
-            />
-            <ChatMsg
-            side={'right'}
-            messages={chatData}
-            />
+            {chatFeed}
             <div className={classes.chatSection}>
                 <TextField
                     multiline
@@ -67,7 +63,9 @@ const Chat = ({chatData, sendMessage}) => {
 };
 
 const mapStateToProps = (state, props) => ({
-    chatData: state.chat 
+    chatData: state.chat,
+    connections: Object.values(state.connections.data),
+    localPeer: state.localUser.peer,
 })
 
 export default connect(mapStateToProps, {sendMessage})(Chat);
