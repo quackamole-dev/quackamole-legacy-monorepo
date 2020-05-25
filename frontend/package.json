@@ -1,8 +1,8 @@
 {
-  "name": "p2p-videochat-platform-frontend",
+  "name": "quackamole",
   "version": "0.1.0",
-  "private": true,
-  "author": "DerpMasters",
+  "private": false,
+  "author": "derpmasters",
   "license": "MIT",
   "homepage": ".",
   "dependencies": {
