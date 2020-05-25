@@ -1,0 +1,27 @@
+{
+  "name": "quackamole-sdk",
+  "version": "0.0.1",
+  "description": "tools to develop plugins for the quackamole platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "quackamole",
+    "p2p",
+    "plugin",
+    "webrtc",
+    "videochat",
+    "sdk",
+    "tools"
+  ],
+  "author": "derpmasters",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derpmasters/p2p-videochat-platform.git",
+    "directory": "sdk"
+  },
+  "dependencies": {
+  }
+}
