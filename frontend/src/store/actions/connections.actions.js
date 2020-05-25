@@ -1,7 +1,6 @@
 import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM, ADD_NEW_MESSAGE} from "../actionTypes";
 import {callConnection} from "./calls.actions";
 
-
 export const addConnection = connection => (dispatch, getState) => {
     if (connection && connection.peer) {
         dispatch({type: ADD_CONNECTION, payload: {connection}});
@@ -18,19 +17,26 @@ export const removeConnection = connection => (dispatch, getState) => {
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
         connection.on('data', data => {
-            console.log(data, 'data')
-            // const parsedData = JSON.parse(data);
+            // TODO only do dispatches here. Let the logic be inside separate actions.
+            //  data object could be an action itself --> {type: SOME_ACTION, payload: 'whatever'} or even a thunk
+            console.log(data, 'data');
             if (data.textMessage) {
                 dispatch({
                     type: ADD_NEW_MESSAGE,
                     payload: data.textMessage
-                })
-                console.log( `%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+                });
+                console.log(`%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
-            // TODO this is where we could receive plugin data of other peers. Example: coords where they placed something in a game.
-            if (data.pluginData) {
-                console.log('received plugin data:', data);
+            const type = data.type;
+            if (type === 'pluginData') {
+                console.log('received plugin data:', data.payload);
+                window.postMessage(data, '*');
+
+                const iframe = getState().plugin.iframe;
+                if (iframe) {
+                    iframe.contentWindow.postMessage(data, "*");
+                }
             }
         });
 
