@@ -6,6 +6,7 @@ import connectionsReducer from './connections.reducer';
 import callsReducer from './calls.reducer';
 import streamsReducer from "./streams.reducer";
 import pluginReducer from "./plugin.reducer";
+import chatReducer from "./chat.reducer";
 
 const reducer = combineReducers({
     // room: roomReducer,
@@ -14,7 +15,8 @@ const reducer = combineReducers({
     calls: callsReducer,
     connections: connectionsReducer,
     streams: streamsReducer,
-    plugin: pluginReducer
+    plugin: pluginReducer,
+    chat: chatReducer
 });
 
 export default reducer;

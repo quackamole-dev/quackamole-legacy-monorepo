@@ -1,4 +1,4 @@
-import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM} from "../actionTypes";
+import {ADD_CONNECTION, REMOVE_CALL, REMOVE_CONNECTION, REMOVE_STREAM, ADD_NEW_MESSAGE} from "../actionTypes";
 import {callConnection} from "./calls.actions";
 
 export const addConnection = connection => (dispatch, getState) => {
@@ -20,6 +20,12 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
             const type = data.type;
             if (type === 'message') {
                 console.log( `%c MESSAGE - ${data.textMessage.author}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+            if (data.textMessage) {
+                dispatch({
+                    type: ADD_NEW_MESSAGE,
+                    payload: data.textMessage
+                });
+                console.log( `%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
             // TODO this is where we could receive plugin data of other peers. Example: coords where they placed something in a game.
