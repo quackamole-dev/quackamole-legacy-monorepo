@@ -56,7 +56,6 @@ export const connectWithPeer = remotePeerId => (dispatch, getState) => {
     }
 };
 
-
 export const joinRoom = (roomId, password) => async (dispatch, getState) => {
     const {socket, peer} = getState().localUser;
 
