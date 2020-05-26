@@ -12,7 +12,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants'
+import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants';
 
 
 const useStyles = makeStyles({
@@ -105,7 +105,8 @@ const RoomCreateForm = () => {
             password: 'Test123.',
             maxUsers: 4,
             status: status
-        }
+        };
+
         if(name.length > 0 && status.length > 0) {
             const protocol = SSL_ENABLED ? 'https':'http';
             fetch(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}/api/rooms`, {
@@ -116,15 +117,15 @@ const RoomCreateForm = () => {
                   },
             }).then(response => response.json()
             ).then( data => {
-                setLink(`${protocol}://${FRONTEND_URL}:3000/#/room-lobby/${data}`)
+                setLink(`${protocol}://${FRONTEND_URL}:3000/#/room-lobby/${data}`);
                 setRoomId(data);
-                setActive(false)
+                setActive(false);
             });
         } else {
             console.log('error')
         }
     };
-    
+
     const copyToClipboard = () =>{
         let mylink = link;
         mylink.select();
@@ -134,7 +135,7 @@ const RoomCreateForm = () => {
     return (
         <ThemeProvider theme={theme}>
             {/* Header */}
-            <Box 
+            <Box
                 display='flex'
                 height={63}
                 bgcolor='#E53935'
@@ -143,7 +144,7 @@ const RoomCreateForm = () => {
             >
                <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
                     <ArrowBackIosIcon/>
-               </Link> 
+               </Link>
             </Box>
 
             {/* Body */}
@@ -151,7 +152,7 @@ const RoomCreateForm = () => {
                 className={classes.containerStyle}
             >
                 {/* create a new room */}
-                {active?
+                {active ?  // TODO ternary is too long, making it hard too read, create subcomponents for create and share markup
                 <Box
                     display='flex'
                     flexDirection='column'
@@ -169,7 +170,7 @@ const RoomCreateForm = () => {
                     <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel id="demo-simple-select-outlined-label">Status</InputLabel>
                         <Select
-                    
+
                         labelId="demo-simple-select-outlined-label"
                         id="demo-simple-select-outlined"
                         value={status}
@@ -191,19 +192,19 @@ const RoomCreateForm = () => {
                         onChange={handleChangeTexfield}
                         className={classes.textfield}
                     />
-                    <div className={classes.alignButton}> 
+                    <div className={classes.alignButton}>
                             <Button
                                 size="large"
                                 color="secondary"
                                 variant="contained"
                                 className={classes.myButton}
-                                onClick={createRoom}                       
+                                onClick={createRoom}
                             >
                                 create
                             </Button>
                     </div>
-                </Box>:
-                
+                </Box> :
+
                 // share your room
                 <Box
                 display='flex'
@@ -218,7 +219,7 @@ const RoomCreateForm = () => {
                     className={classes.titleStyle}
                 >Room was created
                 </Typography>
-                
+
                 <div className={classes.copyLink}>
                     <TextField
                         variant="outlined"
@@ -231,23 +232,23 @@ const RoomCreateForm = () => {
                         color="secondary"
                         variant="contained"
                         className={classes.myButton}
-                        onClick={() => {navigator.clipboard.writeText(link)}}                  
+                        onClick={() => {navigator.clipboard.writeText(link)}}
                     >
                         copy
                     </Button>
-                </div> 
+                </div>
                 <Typography
                         variant='h6'
                         className={classes.subtitle}
                     > Share your link and invite someone to your room
                 </Typography>
-                
+
                 <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none',}}>
                  <Button
                     size="large"
                     color="secondary"
                     variant="contained"
-                    className={classes.nextButton}                     
+                    className={classes.nextButton}
                    >
                         next
                 </Button>

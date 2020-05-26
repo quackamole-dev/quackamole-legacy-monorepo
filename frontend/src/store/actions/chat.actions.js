@@ -1,4 +1,4 @@
-import {ADD_NEW_MESSAGE} from '../actionTypes'
+import {ADD_NEW_MESSAGE} from '../actionTypes';
 
 export const sendMessage = (text) => async (dispatch, getState) => {
     const connections = Object.values(getState().connections.data);
@@ -11,10 +11,6 @@ export const sendMessage = (text) => async (dispatch, getState) => {
 
     dispatch({
         type: ADD_NEW_MESSAGE,
-        payload: {
-            text: text,
-            peerId: localPeer.id
-        }
+        payload: {text: text, peerId: localPeer.id}
     });
-}
-
+};

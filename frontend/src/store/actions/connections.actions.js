@@ -17,18 +17,18 @@ export const removeConnection = connection => (dispatch, getState) => {
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
         connection.on('data', data => {
-            const type = data.type;
-            if (type === 'message') {
-                console.log( `%c MESSAGE - ${data.textMessage.author}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+            // TODO only do dispatches here. Let the logic be inside separate actions.
+            //  data object could be an action itself --> {type: SOME_ACTION, payload: 'whatever'} or even a thunk
+            console.log(data, 'data');
             if (data.textMessage) {
                 dispatch({
                     type: ADD_NEW_MESSAGE,
                     payload: data.textMessage
                 });
-                console.log( `%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
+                console.log(`%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
-            // TODO this is where we could receive plugin data of other peers. Example: coords where they placed something in a game.
+            const type = data.type;
             if (type === 'pluginData') {
                 console.log('received plugin data:', data.payload);
                 window.postMessage(data, '*');
@@ -55,7 +55,6 @@ export const connectWithPeer = remotePeerId => (dispatch, getState) => {
         dispatch(callConnection(connection));
     }
 };
-
 
 export const joinRoom = (roomId, password) => async (dispatch, getState) => {
     const {socket, peer} = getState().localUser;
