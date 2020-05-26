@@ -5,7 +5,6 @@ import SendIcon from '@material-ui/icons/Send';
 import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
 import {connect} from "react-redux";
 import {sendMessage} from '../../../../store/actions/chat.actions';
-import Emoji from "react-emoji-render";
 import { toArray } from "react-emoji-render";
 
 const useStyles = makeStyles({
@@ -16,7 +15,23 @@ const useStyles = makeStyles({
         marginRight: "5px",
     },
     chatSection: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
+    customizeIcon: {
+        border: '2px solid #E53935',
+        borderRadius: '50%',
+        color: '#E53935',
+        height: 35,
+        width: 35,
+        padding: 4,
+        cursor: 'pointer',
+        '&:hover': {
+            background: "#E53935",
+            color: 'white',
+         },
+    }, 
 })
 
 const Chat = ({chatData, sendMessage, connections, localPeer}) => {
@@ -51,11 +66,11 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
       const chatFeed = chatData.map(message => message.peerId === localPeer.id ?
         <ChatMsg
         side={'right'}
-        messages={[message.text]}
+        messages={[parseEmojis(message.text)]}
         /> :
         <ChatMsg
         avatar={''}
-        messages={[message.text]}
+        messages={[parseEmojis(message.text)]}
         />
     );
 
@@ -64,6 +79,8 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
             {chatFeed}
             <div className={classes.chatSection}>
                 <TextField
+                    variant="outlined"
+                    size="small"
                     multiline
                     fullWidth
                     className={classes.textField} 
@@ -71,7 +88,7 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
                     value={parseEmojis(newMessage)}      
                 />
                 <SendIcon
-                    color="primary"
+                    className={classes.customizeIcon}
                     onClick={send}
                 />
             </div>

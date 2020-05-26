@@ -12,6 +12,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants'
 
 
 const useStyles = makeStyles({
@@ -106,7 +107,8 @@ const RoomCreateForm = () => {
             status: status
         }
         if(name.length > 0 && status.length > 0) {
-            fetch('http://localhost:5002/api/rooms', {
+            const protocol = SSL_ENABLED ? 'https':'http';
+            fetch(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}/api/rooms`, {
                 method: 'post',
                 body: JSON.stringify(data),
                 headers: {
@@ -114,7 +116,7 @@ const RoomCreateForm = () => {
                   },
             }).then(response => response.json()
             ).then( data => {
-                setLink(`http://localhost:3000/#/room-lobby/${data}`);
+                setLink(`${protocol}://${FRONTEND_URL}:3000/#/room-lobby/${data}`)
                 setRoomId(data);
                 setActive(false)
             });
@@ -176,7 +178,7 @@ const RoomCreateForm = () => {
                         className={classes.select}
                         >
                         <MenuItem value={'Privat'}>Privat</MenuItem>
-                        <MenuItem value={'Public'}>Public</MenuItem>
+                        {/* <MenuItem value={'Public'}>Public</MenuItem> */}
                         </Select>
                     </FormControl>
 
