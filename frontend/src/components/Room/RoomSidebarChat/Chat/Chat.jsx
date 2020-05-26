@@ -63,14 +63,16 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
       };
 
     //handle the chat feed to display all messages on the right position
-      const chatFeed = chatData.map(message => message.peerId === localPeer.id ?
+      const chatFeed = chatData.map((message, i) => message.peerId === localPeer.id ?
         <ChatMsg
-        side={'right'}
-        messages={[parseEmojis(message.text)]}
+            key={i}
+            side={'right'}
+            messages={[parseEmojis(message.text)]}
         /> :
         <ChatMsg
-        avatar={''}
-        messages={[parseEmojis(message.text)]}
+            key={i}
+            avatar={''}
+            messages={[parseEmojis(message.text)]}
         />
     );
 
