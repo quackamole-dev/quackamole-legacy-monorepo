@@ -42,6 +42,14 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
         setNewMessage(event.target.value)
     };
 
+    const handleKeyPress = (event) => {
+        if(event.key === 'Enter' && newMessage.length > 0) {
+            event.preventDefault()
+            sendMessage(newMessage)
+            setNewMessage('')
+        }
+    }
+
     const send = (e) => {
         e.preventDefault()
         sendMessage(newMessage)
@@ -85,6 +93,7 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
                     fullWidth
                     className={classes.textField} 
                     onChange={handleChangeTexfield}
+                    onKeyPress={handleKeyPress}
                     value={parseEmojis(newMessage)}      
                 />
                 <SendIcon

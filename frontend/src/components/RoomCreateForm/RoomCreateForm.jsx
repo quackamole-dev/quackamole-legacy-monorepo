@@ -45,6 +45,7 @@ const useStyles = makeStyles({
     textfield: {
         width: '616px',
         marginLeft: '16px',
+        marginTop: 50,
     },
     textfieldLink: {
         width: '506px',
@@ -98,6 +99,7 @@ const RoomCreateForm = () => {
     const handleChangeTexfield = (event) => {
         setName(event.target.value)
     };
+    
 
     const createRoom = () => {
         let data = {
@@ -106,7 +108,7 @@ const RoomCreateForm = () => {
             maxUsers: 4,
             status: status
         }
-        if(name.length > 0 && status.length > 0) {
+        if(name.length > 0) {
             const protocol = SSL_ENABLED ? 'https':'http';
             fetch(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}/api/rooms`, {
                 method: 'post',
@@ -166,6 +168,8 @@ const RoomCreateForm = () => {
                     >Create a new room
                     </Typography>
 
+                    {/* Add status plublic or privat */}
+{/* 
                     <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel id="demo-simple-select-outlined-label">Status</InputLabel>
                         <Select
@@ -178,9 +182,9 @@ const RoomCreateForm = () => {
                         className={classes.select}
                         >
                         <MenuItem value={'Privat'}>Privat</MenuItem>
-                        {/* <MenuItem value={'Public'}>Public</MenuItem> */}
+                        <MenuItem value={'Public'}>Public</MenuItem>
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
 
                     <TextField
                         required
