@@ -43,28 +43,24 @@ const initSocketActions = (io, socket) => {
         // TODO rethink where to put this logic. It is only here so the roomManager doesn't have a direct dependency to socket.io
         if (!roomManager.doesRoomExist(roomId)) {
             console.log(`Room with the id: ${roomId} does not exist`);
-            callback(new SocketCustomError('RoomError', 'This room does not exist.'));
-            return;
+            return callback(new SocketCustomError('RoomError', 'This room does not exist.'));
         }
 
         if (util.socketAlreadyInRoom(socket, roomId)) {
             const socketData = util.getSocketCustomData(io, socket);
             console.log(`Socket with nickname: ${socketData.nickname} is already in room: ${roomId}`);
-            callback(new SocketCustomError('RoomError', 'You are already in this room.'));
-            return;
+            return callback(new SocketCustomError('RoomError', 'You are already in this room.'));
         }
 
         if(!roomManager.isCorrectPassword(roomId, password)) {
             console.log(`User: ${peerId} provided the wrong password for room: ${roomId}`);
-            callback(new SocketCustomError('RoomError', 'You provided the wrong password.'));
-            return;
+            return callback(new SocketCustomError('RoomError', 'You provided the wrong password.'));
         }
 
         const roomRef = roomManager.getRoomById(roomId);
         const numJoinedUsers = util.getSocketIdsInRoom(io, roomRef.id).length;
         if (numJoinedUsers >= roomRef.maxUsers) {
-            callback(new SocketCustomError('RoomError', 'This room is already full.'));
-            return;
+            return callback(new SocketCustomError('RoomError', 'This room is already full.'));
         }
 
         util.addCustomSocketData(io, socket.id, {currentRoomId: roomRef.id});
@@ -72,7 +68,7 @@ const initSocketActions = (io, socket) => {
         socket.to(roomRef.id).emit('user-join', roomRef);
 
         roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
-        callback(null, {room: roomRef});
+        return callback(null, {room: roomRef});
     });
 
     // Leave room
