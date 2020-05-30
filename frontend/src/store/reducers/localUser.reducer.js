@@ -1,9 +1,10 @@
 import {INIT_LOCAL_USER_SOCKET, INIT_LOCAL_USER_PEER, SET_LOCAL_USER_METADATA, SET_LOCAL_USER_ERROR} from '../actionTypes';
+import {getPersistedData} from "../../utils";
 
 const initialState = {
     peer: null,
     socket: null,
-    metadata: { nickname: 'Andi'},
+    metadata: getPersistedData('metadata'),
     error: null
 };
 

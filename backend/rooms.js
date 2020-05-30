@@ -10,7 +10,7 @@ class roomManager {
                 password: 'dummy123',
                 name: 'dummy room name',
                 // joinedUsers: [], // not stored in here. Taken dynamically out of socketIOs internal state
-                maxUsers: 4
+                maxUsers: 2
             }
         }
     }
@@ -21,21 +21,6 @@ class roomManager {
 
         console.log(`Room: ${sanitizedRoomData.name} was created. RoomId: ${sanitizedRoomData.id}`);
         return this.getRoomById(sanitizedRoomData.id);
-    };
-
-    verifyPassword = (roomId, peerId, password) => {
-        const roomRef = this.rooms[roomId];
-        console.log(`User: ${peerId} is attempting to join the roomId: ${roomId}`);
-
-        if (roomRef) {
-            if (this._verifyPassword(roomId, password)) {
-                console.log(`User: ${peerId} provided the correct password for room: ${roomId}`);
-                return roomRef;
-            } else {
-                console.log(`User: ${peerId} provided the wrong password for room: ${roomId}`);
-                return false;
-            }
-        }
     };
 
     leaveRoom = (roomId, peerId) => {
@@ -70,7 +55,7 @@ class roomManager {
         return this.rooms;
     };
 
-    _verifyPassword = (roomId, password) => {
+    isCorrectPassword = (roomId, password) => {
         // const roomRef = this.rooms[roomId];
         // return roomRef.password.length === 0 || roomRef.password === password;
         return true; // FIXME only temporary, password check bypassed until we really need it in v0.2 or v0.3

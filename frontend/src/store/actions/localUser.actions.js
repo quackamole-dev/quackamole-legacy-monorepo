@@ -2,7 +2,7 @@ import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, SET_LOCAL_USER_METADATA} f
 import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
-import {serializeQueryString} from "../../utils";
+import {persistData, serializeQueryString} from "../../utils";
 import {addConnection} from "./connections.actions";
 import {addCall} from "./calls.actions";
 import {startLocalStream} from "./streams.actions";
@@ -13,7 +13,7 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
         port: PORT_SIGNALING,
         path: '/peer/signal',
         // debug: 3,
-        config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
+        config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}  // TODO read stuff like this from a config file, or a GET request to the backend
     });
 
     dispatch({
@@ -25,32 +25,21 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     dispatch(initLocalUserPeerListeners(peer));
 };
 
-
 /**
  * Init the socket.io client. Once socket is ready, init the peerJS Peer and store them in the store.
- * @param queryParams
- * @returns {function(...[*]=)}
  */
-export const initLocalUser = (queryParams) => async (dispatch, getState) => {
+export const initLocalUser = () => async (dispatch, getState) => {
+    const metadata = getState().localUser.metadata || {};
     // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though, allow peerId to be different from socketId
     const protocol = SSL_ENABLED ? 'https' : 'http';
     const socket = io(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}`, {
-        // transports: ['websocket'],
+        transports: ['websocket'],
         secure: SSL_ENABLED,
-        query: serializeQueryString(queryParams)
+        query: serializeQueryString(metadata)
     });
 
     socket.on('ready', (socketId) => {
-        dispatch({
-            type: SET_LOCAL_USER_METADATA,
-            payload: {metadata: queryParams}
-        });
-
-        dispatch({
-            type: INIT_LOCAL_USER_SOCKET,
-            payload: {socket}
-        });
-
+        dispatch({type: INIT_LOCAL_USER_SOCKET, payload: {socket}});
         dispatch(initLocalUserPeer(socketId));
     });
 };
@@ -72,4 +61,9 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
             dispatch(addCall(call));
         })
     }
+};
+
+export const setMetadata = (metadata) => (dispatch, getState) => {
+    persistData('metadata', metadata);
+    dispatch({type: SET_LOCAL_USER_METADATA, payload: {metadata}});
 };
