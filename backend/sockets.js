@@ -39,6 +39,7 @@ const initSocketActions = (io, socket) => {
 
     // Join room.
     socket.on('join', ({roomId, password, peerId}, callback) => {
+        // TODO rethink where to put this logic. It is only here so the roomManager doesn't have a direct dependency to socket.io
         if (!roomManager.doesRoomExist(roomId)) {
             console.log(`Room with the id: ${roomId} does not exist`);
             callback(false);
@@ -52,16 +53,24 @@ const initSocketActions = (io, socket) => {
             return;
         }
 
-        const roomRef = roomManager.joinRoom(roomId, peerId, password);
+        const roomRef = roomManager.verifyPassword(roomId, peerId, password);
         if (roomRef) {
+
+            const numJoinedUsers = util.getSocketIdsInRoom(io, roomRef.id).length;
+            if (numJoinedUsers >= roomRef.maxUsers) {
+                callback(false);
+                return;
+            }
+
             util.addCustomSocketData(io, socket.id, {currentRoomId: roomRef.id});
             socket.join(roomRef.id);
             socket.to(roomRef.id).emit('user-join', roomRef);
-        }
 
-        roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
-        console.log(`Room: ${roomRef.id} - joinedUsers: ${roomRef.joinedUsers}`);
-        callback({room: roomRef});
+            roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
+            callback({room: roomRef});
+            return;
+        }
+        callback(false);
     });
 
     // Leave room

@@ -11,12 +11,14 @@ const initPeerServer = require('./peer.js');
 const initSocketIO = require('./sockets');
 
 const SSL_ENABLED = process.env.SSL_ENABLED === 'true';
+const environment = process.env.NODE_ENV || 'development';
 
-    let sslOptions = {
-    // FIXME socket communication from the frontend doesn't work correctly on localhost with ssl enabled atm. Need to self-sign certificates. Might use https://github.com/jsha/minica
-    key: fs.readFileSync(SSL_ENABLED ? '/etc/letsencrypt/live/derpmasters.online/privkey.pem' : 'localhost.key'),
-    cert: fs.readFileSync(SSL_ENABLED ? '/etc/letsencrypt/live/derpmasters.online/fullchain.pem' : 'localhost.crt'),
-};
+    let sslOptions = null;
+    if (SSL_ENABLED) {
+        const sslKey = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/privkey.pem' : 'localhost.key';
+        const sslCert = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/fullchain.pem' : 'localhost.crt';
+        sslOptions = {key: fs.readFileSync(sslKey), cert: fs.readFileSync(sslCert)};
+    }
 
 const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
 const corsOptions = {
