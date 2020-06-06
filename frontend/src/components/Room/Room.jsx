@@ -7,10 +7,12 @@ import {addConnection, removeConnection, joinRoom} from "../../store/actions/con
 import {initLocalUser} from "../../store/actions/localUser.actions";
 import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
 import RoomActionbar from "./RoomActionbar/RoomActionbar";
+import {getPersistedData} from "../../utils";
 
 const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, startLocalStream, clearAllStreams}) => {
     useEffect(() => {
-        initLocalUser({nickname: 'andiiii'});
+        const metadata = getPersistedData('metadata') || {nickname: 'default'};
+        initLocalUser(metadata);
     }, []);
 
     useEffect(() => {

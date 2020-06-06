@@ -3,7 +3,7 @@ import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
 import {persistData, serializeQueryString} from "../../utils";
-import {addConnection} from "./connections.actions";
+import {addConnection, removeConnection} from "./connections.actions";
 import {addCall} from "./calls.actions";
 import {startLocalStream} from "./streams.actions";
 
@@ -16,13 +16,9 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
         config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
     });
 
-    dispatch({
-        type: INIT_LOCAL_USER_PEER,
-        payload: {peer}
-    });
-
-    dispatch(startLocalStream(peer));
-    dispatch(initLocalUserPeerListeners(peer));
+    await dispatch({type: INIT_LOCAL_USER_PEER, payload: {peer}});
+    await dispatch(startLocalStream(peer));
+    await dispatch(initLocalUserPeerListeners(peer));
 };
 
 /**
@@ -42,9 +38,16 @@ export const initLocalUser = (metadata) => async (dispatch, getState) => {
         dispatch({type: INIT_LOCAL_USER_SOCKET, payload: {socket}});
         dispatch(initLocalUserPeer(socketId));
     });
+
+    socket.on('user-leave', (socketId) => {
+        const connection = getState().connections.data[socketId];
+        if (connection) {
+            dispatch(removeConnection(connection));
+        }
+    });
 };
 
-const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
+const initLocalUserPeerListeners = (peer) => async (dispatch, getState) => {
     const localPeer = peer || getState().localUser.peer;
 
     if (localPeer) {
@@ -55,8 +58,8 @@ const initLocalUserPeerListeners = (peer) => (dispatch, getState) => {
             dispatch(addConnection(connection));
         });
 
-        localPeer.on('call', call => {
-            const localStream = getState().streams.data[localPeer.id];
+        localPeer.on('call', async call => {
+            const localStream = await getState().streams.data[localPeer.id] || dispatch(startLocalStream(peer));
             call.answer(localStream);
             dispatch(addCall(call));
         })

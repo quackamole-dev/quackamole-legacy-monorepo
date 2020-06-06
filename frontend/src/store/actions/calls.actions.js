@@ -10,10 +10,7 @@ export const addCall = call => (dispatch, getState) => {
 
 export const removeCall = call => (dispatch, getState) => {
     if (call) {
-        dispatch({
-            type: REMOVE_CALL,
-            payload: {call}
-        });
+        dispatch({type: REMOVE_CALL, payload: {call}});
     }
 };
 

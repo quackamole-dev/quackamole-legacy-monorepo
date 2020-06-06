@@ -1,5 +1,6 @@
 import {ADD_CONNECTION, REMOVE_CONNECTION, ADD_NEW_MESSAGE, ADD_PEER, SET_CURRENT_ROOM_ERROR, SET_CURRENT_ROOM} from "../actionTypes";
-import {callConnection} from "./calls.actions";
+import {callConnection, removeCall} from "./calls.actions";
+import {removeStream} from "./streams.actions";
 
 export const addConnection = connection => (dispatch, getState) => {
     if (connection && connection.peer) {
@@ -10,6 +11,17 @@ export const addConnection = connection => (dispatch, getState) => {
 
 export const removeConnection = connection => (dispatch, getState) => {
     if (connection && connection.peer) {
+
+        const stream = getState().streams.data[connection.peer];
+        if (stream) {
+            dispatch(removeStream(connection.peer));
+        }
+
+        const call = getState().calls.data[connection.peer];
+        if (call) {
+            dispatch(removeCall(call));
+        }
+
         dispatch({type: REMOVE_CONNECTION, payload: {connection}});
     }
 };
@@ -23,7 +35,7 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
         connection.on('data', data => {
             // TODO only do dispatches here. Let the logic be inside separate actions.
             //  data object could be an action itself --> {type: SOME_ACTION, payload: 'whatever'} or even a thunk
-            console.log('data----------------', data);
+            console.log('connection on data', data);
             if (data.textMessage) {
                 dispatch({
                     type: ADD_NEW_MESSAGE,

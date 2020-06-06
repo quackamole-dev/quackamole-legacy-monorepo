@@ -1,8 +1,14 @@
-import {ADD_STREAM, CLEAR_ALL_STREAMS} from "../actionTypes";
+import {ADD_STREAM, CLEAR_ALL_STREAMS, REMOVE_STREAM} from "../actionTypes";
 
 export const addStream = (peerId, stream) => (dispatch, getState) => {
     if (stream) {
         dispatch({type: ADD_STREAM, payload: {peerId, stream}});
+    }
+};
+
+export const removeStream = (peerId) => (dispatch, getState) => {
+    if (peerId) {
+        dispatch({type: REMOVE_STREAM, payload: {peerId}});
     }
 };
 
