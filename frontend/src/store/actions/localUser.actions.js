@@ -25,11 +25,8 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     dispatch(initLocalUserPeerListeners(peer));
 };
 
-
 /**
  * Init the socket.io client. Once socket is ready, init the peerJS Peer and store them in the store.
- * @param queryParams
- * @returns {function(...[*]=)}
  */
 export const initLocalUser = (metadata) => async (dispatch, getState) => {
     // const metadata = getState().localUser.metadata || {};

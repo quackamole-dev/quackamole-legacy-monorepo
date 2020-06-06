@@ -4,7 +4,7 @@ import GenericMediaCard from "../../GenericMediaCard/GenericMediaCard";
 import {connect} from "react-redux";
 import {addCall} from "../../../../store/actions/calls.actions";
 
-const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection, call, addCall}) => {
+const RemoteMediaCard = ({localPeer, localStream, remoteStream, remoteNickname, connection, call, addCall}) => {
 
     useEffect(() => {
         if (localPeer && connection && !remoteStream) {
@@ -25,7 +25,7 @@ const RemoteMediaCard = ({localPeer, localStream, remoteStream, connection, call
     return (
         <>
             { call
-                ? <GenericMediaCard stream={remoteStream} user={{nickname: 'remote'}} />
+                ? <GenericMediaCard stream={remoteStream} user={{nickname: remoteNickname}} />
                 : <CircularProgress color="inherit"/>
 
             }
@@ -37,10 +37,12 @@ const mapStateToProps = (state, ownProps) => {
     const localPeer = state.localUser.peer;
     const remotePeerId = ownProps.connection.peer;
     const remoteStream = remotePeerId ? state.streams.data[remotePeerId] : null;
+    const remoteMetadata = state.peers.data[remotePeerId] ? state.peers.data[remotePeerId].metadata : {};
     return {
         localPeer: localPeer,
         localStream: localPeer ? state.streams.data[localPeer.id] : null,
         remoteStream: remoteStream,
+        remoteNickname: remoteMetadata.nickname || 'missing Nickname',
         call: state.calls.data[remotePeerId]
     }
 };
