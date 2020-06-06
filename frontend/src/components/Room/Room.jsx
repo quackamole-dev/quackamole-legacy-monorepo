@@ -48,9 +48,7 @@ const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, s
                     <RoomPluginContent/>
                     <RoomMediaManager />
                 </Box>
-
                 <RoomActionbar />
-
             </Box>
         </>
     );

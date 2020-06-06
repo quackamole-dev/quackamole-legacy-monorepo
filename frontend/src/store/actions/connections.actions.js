@@ -85,9 +85,13 @@ export const joinRoom = (roomId, password) => async (dispatch, getState) => {
     if (socket && peer) {
         socket.emit('join', {roomId, password, peerId: peer.id},
             // callback: the joining user himself is responsible to establish connections with other users
-            (data) => {
-                if (data) {
+            (err, data) => {
+                if (!err) {
+                    dispatch({type: SET_CURRENT_ROOM, payload: {room: data.room}});
                     data.room.joinedUsers.forEach((remotePeerId) => dispatch(connectWithPeer(remotePeerId)));
+                } else {
+                    console.log('room error', err);
+                    dispatch({type: SET_CURRENT_ROOM_ERROR, payload: {error: err}});
                 }
             });
     }

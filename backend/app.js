@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require('dotenv').config({path: './config.env'});
 const express = require('express');
 const https = require('https');

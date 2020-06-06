@@ -19,8 +19,8 @@ export const startLocalStream = (peer, constraintsOverride) => async (dispatch, 
             audio: true,
             video: {
                 frameRate: {ideal: 24, max: 30},
-                width: {ideal: 640},
-                height: {ideal: 360}
+                width: {ideal: 64},
+                height: {ideal: 36}
             }};
 
         let mediaStream = await navigator.mediaDevices.getUserMedia(constraintsOverride || constraints);
