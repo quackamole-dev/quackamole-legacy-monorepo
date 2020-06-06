@@ -20,17 +20,15 @@ const Room = ({socket, localPeer, localNickname, connections, match, history, in
     }, []);
 
     useEffect(() => {
-        if (roomError) {
-            history.push(`/room-lobby/${match.params.roomId}`);
-        }
-    }, [roomError]);
-
-    useEffect(() => {
         if (localPeer && localNickname && !roomError) {
             startLocalStream();
             tryJoinRoom(match.params.roomId, 'dummy123');
         }
-    }, [localPeer]);
+
+        if (roomError) {
+            history.push(`/room-lobby/${match.params.roomId}`);
+        }
+    }, [localPeer, localNickname, roomError]);
 
     useEffect(() => {
         // unmount

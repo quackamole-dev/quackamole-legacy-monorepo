@@ -30,6 +30,38 @@ class QuackamoleEventManager {
     };
 }
 
+const quackamoleEventManagerSingleton = new QuackamoleEventManager();
+
+
+class Quackamole {
+    constructor() {
+        this.eventManager = quackamoleEventManagerSingleton;
+        this._init();
+    }
+
+    send = (payload) => {
+        const message = {type: 'broadcast', payload};
+        window.top.postMessage(message, '*');
+    };
+
+    listen = (type, callback) => {
+        window.addEventListener('message', (event) => {
+            this.__eventManager.on(type, callback);
+        })
+    };
+
+    __receiveMessage = event => {
+        switch(event.data.type) {
+            case 'pluginData': {
+
+            }
+        }
+    }
+
+
+}
+
 module.exports = {
-    QuackamoleEventManager: QuackamoleEventManager
+    quackamoleEventManager: quackamoleEventManagerSingleton,
+    Quackamole: Quackamole
 };
