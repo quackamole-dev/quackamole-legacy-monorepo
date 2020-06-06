@@ -9,7 +9,7 @@ import pluginReducer from "./plugin.reducer";
 import chatReducer from "./chat.reducer";
 
 const reducer = combineReducers({
-    // room: roomReducer,
+    room: roomReducer,
     localUser: localUserReducer,
     peers: peersReducer,
     calls: callsReducer,

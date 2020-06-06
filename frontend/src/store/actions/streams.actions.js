@@ -6,10 +6,18 @@ export const addStream = (peerId, stream) => (dispatch, getState) => {
     }
 };
 
-export const startLocalStream = (peer, options = {video: true, audio: true}) => async (dispatch, getState) => {
+export const startLocalStream = (peer, constraintsOverride) => async (dispatch, getState) => {
     const localPeer = peer || getState().localUser.peer;
     try {
-        let mediaStream = await navigator.mediaDevices.getUserMedia(options);
+        const constraints = {
+            audio: true,
+            video: {
+                frameRate: {ideal: 24, max: 30},
+                width: {ideal: 640},
+                height: {ideal: 360}
+            }};
+
+        let mediaStream = await navigator.mediaDevices.getUserMedia(constraintsOverride || constraints);
         dispatch(addStream(localPeer.id, mediaStream));
         window.localStream = mediaStream; // kind of hacky to stop the tracks on unmount
         return mediaStream;
