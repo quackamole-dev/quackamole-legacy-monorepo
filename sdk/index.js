@@ -91,3 +91,12 @@ try {
 } catch(e) {}
 
 // TODO quackamole.requestConnectedPeers() and requestLocalPeer() should return a promise
+
+// TODO quackamole.requestSyncData(ownData, peerIds) - request latest data of all specified peers.
+//  Resolve it somehow (timestamps for now, then experiment with gunDBs HAM conflict resolution in a test plugin.
+
+// TODO create a Peer class that gives you some useful properties and methods
+
+// TODO add ability to control some things on the platform. Those things could be visual appearance of app, indicators, audio, video.
+//  Keep security in mind. Don't give plugins any more freedom than they need to function.
+
