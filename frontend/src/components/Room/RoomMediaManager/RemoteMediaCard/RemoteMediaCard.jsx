@@ -1,18 +1,8 @@
 import React from 'react';
-import {CircularProgress} from "@material-ui/core";
 import GenericMediaCard from "../../GenericMediaCard/GenericMediaCard";
 import {connect} from "react-redux";
 
-const RemoteMediaCard = ({remoteStream, remoteNickname}) => {
-    return (
-        <>
-            {remoteStream
-                ? <GenericMediaCard stream={remoteStream} user={{nickname: remoteNickname}} />
-                : <CircularProgress color="inherit"/>
-            }
-        </>
-    );
-};
+const RemoteMediaCard = ({remoteStream, remoteNickname}) => <GenericMediaCard stream={remoteStream} user={{nickname: remoteNickname}} />;
 
 const mapStateToProps = (state, ownProps) => {
     const remotePeerId = ownProps.connection.peer;

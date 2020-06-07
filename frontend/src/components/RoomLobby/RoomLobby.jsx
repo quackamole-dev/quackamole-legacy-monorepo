@@ -8,8 +8,10 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import {setMetadata} from "../../store/actions/localUser.actions";
+import {resetLocalUser, setMetadata} from "../../store/actions/localUser.actions";
 import {connect} from "react-redux";
+import {setCurrentRoomError} from "../../store/actions/room.actions";
+import {RESET_LOCAL_USER} from "../../store/actionTypes";
 
 const useStyles = makeStyles ({
     containerStyle: {
@@ -47,7 +49,7 @@ const useStyles = makeStyles ({
     }
 });
 
-const RoomLobby = ({history, match, setMetadata, nickname, roomError}) => {
+const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrentRoomError, resetLocalUser}) => {
     const [newNickname, setNewNickname] = useState(nickname);
     const [link, setLink] = useState(match.params.roomId);
     const classes = useStyles();
@@ -62,6 +64,8 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError}) => {
 
     const handleJoin = (e) => {
         setMetadata({nickname: newNickname});
+        setCurrentRoomError(null);
+        resetLocalUser();
         history.push(`/rooms/${match.params.roomId}`);
     };
 
@@ -110,4 +114,4 @@ const mapStateToProps = (state, props) => ({
     roomError: state.room.error
 });
 
-export default connect(mapStateToProps, {setMetadata})(RoomLobby);
+export default connect(mapStateToProps, {setMetadata, setCurrentRoomError, resetLocalUser})(RoomLobby);

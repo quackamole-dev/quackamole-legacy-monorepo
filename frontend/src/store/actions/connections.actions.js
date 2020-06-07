@@ -1,35 +1,36 @@
 import {ADD_CONNECTION, REMOVE_CONNECTION, ADD_NEW_MESSAGE, ADD_PEER, SET_CURRENT_ROOM_ERROR, SET_CURRENT_ROOM} from "../actionTypes";
 import {callConnection, removeCall} from "./calls.actions";
-import {removeStream} from "./streams.actions";
+import {removeStream, startLocalStream} from "./streams.actions";
+import {setCurrentRoomError} from "./room.actions";
 
-export const addConnection = connection => (dispatch, getState) => {
+export const addConnection = connection => async (dispatch, getState) => {
     if (connection && connection.peer) {
-        dispatch({type: ADD_CONNECTION, payload: {connection}});
-        dispatch(initConnectionListeners(connection));
+        await dispatch({type: ADD_CONNECTION, payload: {connection}});
+        await dispatch(initConnectionListeners(connection));
     }
 };
 
-export const removeConnection = connection => (dispatch, getState) => {
+export const removeConnection = connection => async (dispatch, getState) => {
     if (connection && connection.peer) {
 
         const stream = getState().streams.data[connection.peer];
         if (stream) {
-            dispatch(removeStream(connection.peer));
+            await dispatch(removeStream(connection.peer));
         }
 
         const call = getState().calls.data[connection.peer];
         if (call) {
-            dispatch(removeCall(call));
+            await dispatch(removeCall(call));
         }
 
-        dispatch({type: REMOVE_CONNECTION, payload: {connection}});
+        await dispatch({type: REMOVE_CONNECTION, payload: {connection}});
     }
 };
 
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.connectionId) {
         connection.on('open', () => {
-            dispatch(introduceYourself(connection));
+            setTimeout(() => dispatch(introduceYourself(connection), 500)); // TODO temporary delay for experimentation
         });
 
         connection.on('data', data => {
@@ -37,10 +38,7 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
             //  data object could be an action itself --> {type: SOME_ACTION, payload: 'whatever'} or even a thunk
             console.log('connection on data', data);
             if (data.textMessage) {
-                dispatch({
-                    type: ADD_NEW_MESSAGE,
-                    payload: data.textMessage
-                });
+                dispatch({type: ADD_NEW_MESSAGE, payload: data.textMessage});
                 console.log(`%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
@@ -59,7 +57,6 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
                 console.log('Connected peer is introducing himself to you:', data.payload);
                 const remoteMetadata = data.payload.metadata;
                 dispatch({type: ADD_PEER, payload: {metadata: remoteMetadata, peerId: connection.peer}});
-                // dispatch(introduceYourself(connection));
             }
         });
 
@@ -69,13 +66,13 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     }
 };
 
-export const connectWithPeer = remotePeerId => (dispatch, getState) => {
+export const connectWithPeer = remotePeerId => async (dispatch, getState) => {
     const {peer} = getState().localUser;
 
     if (remotePeerId !== peer.id) {
-        const connection = peer.connect(remotePeerId, {metadata: {nickname: 'test-metadata'}});
-        dispatch(addConnection(connection));
-        dispatch(callConnection(connection));
+        const connection = await peer.connect(remotePeerId);
+        await dispatch(addConnection(connection));
+        await dispatch(callConnection(connection));
     }
 };
 
@@ -85,13 +82,13 @@ export const joinRoom = (roomId, password) => async (dispatch, getState) => {
     if (socket && peer) {
         socket.emit('join', {roomId, password, peerId: peer.id},
             // callback: the joining user himself is responsible to establish connections with other users
-            (err, data) => {
+            async (err, data) => {
                 if (!err) {
-                    dispatch({type: SET_CURRENT_ROOM, payload: {room: data.room}});
+                    await dispatch(startLocalStream(peer));
+                    await dispatch({type: SET_CURRENT_ROOM, payload: {room: data.room}});
                     data.room.joinedUsers.forEach((remotePeerId) => dispatch(connectWithPeer(remotePeerId)));
                 } else {
-                    console.log('room error', err);
-                    dispatch({type: SET_CURRENT_ROOM_ERROR, payload: {error: err}});
+                    dispatch(setCurrentRoomError(err));
                 }
             });
     }

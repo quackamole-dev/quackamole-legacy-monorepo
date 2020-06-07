@@ -1,4 +1,4 @@
-import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, SET_LOCAL_USER_METADATA} from "../actionTypes";
+import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_METADATA} from "../actionTypes";
 import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
@@ -6,6 +6,8 @@ import {persistData, serializeQueryString} from "../../utils";
 import {addConnection, removeConnection} from "./connections.actions";
 import {addCall} from "./calls.actions";
 import {startLocalStream} from "./streams.actions";
+
+export const resetLocalUser = () => ({type: RESET_LOCAL_USER});
 
 const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     const peer = await new Peer(customPeerId, {
