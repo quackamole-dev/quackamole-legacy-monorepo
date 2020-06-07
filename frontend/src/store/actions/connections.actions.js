@@ -1,4 +1,4 @@
-import {ADD_CONNECTION, REMOVE_CONNECTION, ADD_NEW_MESSAGE, ADD_PEER, SET_CURRENT_ROOM_ERROR, SET_CURRENT_ROOM} from "../actionTypes";
+import {ADD_CONNECTION, REMOVE_CONNECTION, ADD_NEW_MESSAGE, ADD_PEER, SET_CURRENT_ROOM} from "../actionTypes";
 import {callConnection, removeCall} from "./calls.actions";
 import {removeStream, startLocalStream} from "./streams.actions";
 import {setCurrentRoomError} from "./room.actions";
@@ -34,26 +34,23 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
         });
 
         connection.on('data', data => {
-            // TODO only do dispatches here. Let the logic be inside separate actions.
-            //  data object could be an action itself --> {type: SOME_ACTION, payload: 'whatever'} or even a thunk
-            console.log('connection on data', data);
+            console.log('on connection data', data);
+            const type = data.type;
+
             if (data.textMessage) {
                 dispatch({type: ADD_NEW_MESSAGE, payload: data.textMessage});
                 console.log(`%c MESSAGE - ${data.textMessage.peerId}: "${data.textMessage.text}"`, 'background: black; color: white; padding: 1rem');
             }
 
-            const type = data.type;
-            if (type === 'pluginData') {
-                console.log('received plugin data:', data.payload);
-                window.postMessage(data, '*');
-
+            if (type === 'PLUGIN_DATA') {
+                window.postMessage(data.payload, '*');
                 const iframe = getState().plugin.iframe;
                 if (iframe) {
                     iframe.contentWindow.postMessage(data, "*");
                 }
             }
 
-            if (type === 'peerIntroduction') {
+            if (type === 'PEER_INTRODUCTION') {
                 console.log('Connected peer is introducing himself to you:', data.payload);
                 const remoteMetadata = data.payload.metadata;
                 dispatch({type: ADD_PEER, payload: {metadata: remoteMetadata, peerId: connection.peer}});
@@ -76,7 +73,13 @@ export const connectWithPeer = remotePeerId => async (dispatch, getState) => {
     }
 };
 
-export const joinRoom = (roomId, password) => async (dispatch, getState) => {
+export const sendDataToConnection = (connection, data) => async (dispatch, getState) => {
+    if (connection) {
+        connection.send(data);
+    }
+};
+
+export const joinRoom = (roomId, password) => async (dispatch, getState) => { // TODO move to room actions
     const {socket, peer} = getState().localUser;
 
     if (socket && peer) {
@@ -98,6 +101,8 @@ export const introduceYourself = (connection) => async (dispatch, getState) => {
     const metadata = getState().localUser.metadata;
 
     if (metadata) {
-        connection.send({type: 'peerIntroduction', payload: {metadata}})
+        dispatch(sendDataToConnection(connection, {type: 'PEER_INTRODUCTION', payload: {metadata}}));
     }
 };
+
+

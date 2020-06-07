@@ -15,6 +15,7 @@ class QuackamoleEventManager {
         const eventListeners = this.__getEventListenersFor(eventType);
 
         for (const [callback, repeat] of eventListeners) {
+            console.log('emit callback', callback, eventType);
             if (!repeat) {
                 eventListeners.delete(callback);
             }
@@ -36,30 +37,45 @@ const quackamoleEventManagerSingleton = new QuackamoleEventManager();
 class Quackamole {
     constructor() {
         this.eventManager = quackamoleEventManagerSingleton;
-        this._init();
+        this.__init();
     }
 
-    send = (payload) => {
-        const message = {type: 'broadcast', payload};
-        window.top.postMessage(message, '*');
+    broadcastData = (eventType, data, includeSelf = true) => {
+        const action = {type: 'PLUGIN_SEND_TO_ALL_PEERS', payload: {eventType, data}};
+        console.log('broadcastData', action);
+        window.top.postMessage(action, '*');
+        this.eventManager.emit(eventType, data);
     };
 
-    listen = (type, callback) => {
-        window.addEventListener('message', (event) => {
-            this.__eventManager.on(type, callback);
-        })
+    sendDataTo = (peerIds, eventType, data) => {
+        const action = {type: 'PLUGIN_SEND_TO_PEER', payload: {peerIds, eventType, data}};
+        window.top.postMessage(action, '*');
     };
+
+    getPeerIds = () => {
+        const action = {type: 'PLUGIN_REQUEST_PEER_IDS'};
+        window.top.postMessage(action, '*');
+    };
+
+    __init = () => {
+        window.addEventListener('message', this.__receiveMessage);
+    }
 
     __receiveMessage = event => {
+        console.log('__receive message', event);
         switch(event.data.type) {
-            case 'pluginData': {
-
+            case 'PLUGIN_DATA': {
+                // emit the event received from another peer.
+                const {eventType, data} = event.data.payload;
+                this.eventManager.emit(eventType, data);
             }
         }
     }
 }
 
-module.exports = {
-    quackamoleEventManager: quackamoleEventManagerSingleton,
-    Quackamole: Quackamole
-};
+try {
+    module.exports = {
+        quackamoleEventManager: quackamoleEventManagerSingleton,
+        Quackamole: Quackamole
+    };
+} catch(e) {}
