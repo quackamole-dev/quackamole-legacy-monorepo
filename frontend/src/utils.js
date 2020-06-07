@@ -1,7 +1,8 @@
 // The place to put all helper methods that do not necessarily belong to a specific component
 // Once this file gets too crowded, create an utils folder and start seperating the exported helper methods
 
-import {useEffect, useRef, useState} from "react";
+// import {useEffect, useRef, useState} from "react";
+import ipRegex from "ip-regex";
 
 /**
  * Transforms a javascript object into a query string.
@@ -61,3 +62,7 @@ export const persistData = (key, data) => {
     const dataStringified = JSON.stringify(data);
     localStorage.setItem(key, dataStringified);
 };
+
+export const isIpAddress = (testedString) => {
+    return ipRegex().test(testedString);
+}

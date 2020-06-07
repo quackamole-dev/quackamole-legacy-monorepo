@@ -13,7 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants';
-
+import {isIpAddress} from "../../utils";
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -117,7 +117,8 @@ const RoomCreateForm = () => {
                   },
             }).then(response => response.json()
             ).then( data => {
-                setLink(`${protocol}://${FRONTEND_URL}:3000/#/room-lobby/${data}`);
+                const port = isIpAddress(FRONTEND_URL) ? '3000' : ''; // TODO temp fix for gh-pages. remove once frontend is served via proxy by real domain
+                setLink(`${protocol}://${FRONTEND_URL}:${port}/#/room-lobby/${data}`);
                 setRoomId(data);
                 setActive(false);
             });
