@@ -52,10 +52,15 @@ class Quackamole {
         window.top.postMessage(action, '*');
     };
 
-    getPeerIds = () => {
-        const action = {type: 'PLUGIN_REQUEST_PEER_IDS'};
-        window.top.postMessage(action, '*');
-    };
+    // requestConnectedPeers = () => {
+    //     const action = {type: 'PLUGIN_REQUEST_CONNECTED_PEER_IDS'};
+    //     window.top.postMessage(action, '*');
+    // };
+    //
+    // requestLocalPeer = () => {
+    //     const action = {type: 'PLUGIN_REQUEST_LOCAL_PEER'};
+    //     window.top.postMessage(action, '*');
+    // };
 
     __init = () => {
         window.addEventListener('message', this.__receiveMessage);
@@ -69,6 +74,11 @@ class Quackamole {
                 const {eventType, data} = event.data.payload;
                 this.eventManager.emit(eventType, data);
             }
+            // case 'RECEIVE_LOCAL_PEER': {
+            //     // emit the event received from another peer.
+            //     const {eventType, data} = event.data.payload;
+            //     this.eventManager.emit(eventType, data);
+            // }
         }
     }
 }
@@ -79,3 +89,5 @@ try {
         Quackamole: Quackamole
     };
 } catch(e) {}
+
+// TODO quackamole.requestConnectedPeers() and requestLocalPeer() should return a promise
