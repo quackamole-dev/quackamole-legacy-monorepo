@@ -92,11 +92,18 @@ try {
 
 // TODO quackamole.requestConnectedPeers() and requestLocalPeer() should return a promise
 
-// TODO quackamole.requestSyncData(ownData, peerIds) - request latest data of all specified peers.
-//  Resolve it somehow (timestamps for now, then experiment with gunDBs HAM conflict resolution in a test plugin.
-
-// TODO create a Peer class that gives you some useful properties and methods
+// TODO create a Peer class with useful abstractions like: -> peer.send(eventType, data) - (basically just a OOP wrapper for existing sendDataTo() and other relevant methods)
 
 // TODO add ability to control some things on the platform. Those things could be visual appearance of app, indicators, audio, video.
 //  Keep security in mind. Don't give plugins any more freedom than they need to function.
 
+// TODO "quackamole.lockstepLoop(main)", the callback (main) is triggered each time you get the currentStep data from ALL connections
+//  each time main is called, currentStep is incremented and it starts all over again and again.
+//  Imagine it like a gameloop with uncertain updates/second.
+//  for now resolve conflicts using only timestamps and don't worry about manipulation/cheating (experiment with pouchDB or gunDB for more sophisticated conflict resolution)
+
+// TODO think about using observables instead of callbacks and promises
+//  Example1: quackamole.localPeer can be an observable. use .subscribe() to react to it when it is available
+//  Example2: const counter = new quackamole.observe('counter'); - creates observable, assigning value leads to cross-peer event that updates same observable of other peers.
+//  Observables should NOT be mandatory. Create a wrapper that uses existing functionality under the hood.
+//  Try rxjs but research more lightweight alternatives. Potentially add support for multiple observable libraries and let developer choose what they prefer.
