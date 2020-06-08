@@ -40,21 +40,17 @@ const initSocketActions = (io, socket) => {
 
     // Join room.
     socket.on('join', ({roomId, password, peerId}, callback) => {
-        // TODO rethink where to put this logic. It is only here so the roomManager doesn't have a direct dependency to socket.io
+        // TODO roomManager should be renamed into roomUtils if join room logic is outside of it.
         if (!roomManager.doesRoomExist(roomId)) {
-            console.log(`Room with the id: ${roomId} does not exist`);
             return callback(new SocketCustomError('RoomError', 'This room does not exist.'));
         }
 
         if (util.socketAlreadyInRoom(socket, roomId)) {
-            const socketData = util.getSocketCustomData(io, socket);
-            console.log(`Socket with nickname: ${socketData.nickname} is already in room: ${roomId}`);
             return callback(new SocketCustomError('RoomError', 'You are already in this room.'));
         }
 
-        if(!roomManager.isCorrectPassword(roomId, password)) {
-            console.log(`User: ${peerId} provided the wrong password for room: ${roomId}`);
-            return callback(new SocketCustomError('RoomError', 'You provided the wrong password.'));
+        if (!roomManager.isPasswordCorrect(roomId, password)) {
+            return callback(new SocketCustomError('RoomError', 'Wrong password provided.'));
         }
 
         const roomRef = roomManager.getRoomById(roomId);
@@ -68,7 +64,7 @@ const initSocketActions = (io, socket) => {
         socket.to(roomRef.id).emit('user-join', roomRef);
 
         roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
-        return callback(null, {room: roomRef});
+        callback(null, {room: roomRef});
     });
 
     // Leave room

@@ -3,32 +3,34 @@ import {Box} from "@material-ui/core";
 import RoomPluginContent from "./RoomPluginContent/RoomPluginContent";
 import RoomMediaManager from "./RoomMediaManager/RoomMediaManager";
 import {connect} from "react-redux";
-import {addConnection, removeConnection, tryJoinRoom} from "../../store/actions/connections.actions";
+import {addConnection, removeConnection, joinRoom} from "../../store/actions/connections.actions";
 import {initLocalUser} from "../../store/actions/localUser.actions";
 import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
 import RoomActionbar from "./RoomActionbar/RoomActionbar";
 import {getPersistedData} from "../../utils";
 
-const Room = ({socket, localPeer, localNickname, connections, match, history, initLocalUser, tryJoinRoom, startLocalStream, clearAllStreams, roomError}) => {
-    // TODO refactor these messy useEffects. Start using useCallback and add all dependencies
+const Room = ({socket, localPeer, localMetadata, localStream, connections, match, history, initLocalUser, joinRoom, startLocalStream, clearAllStreams, roomError}) => {
+    // // TODO refactor these messy useEffects. Start using useCallback and add all dependencies
+
     useEffect(() => {
-        if (getPersistedData('metadata').nickname && !roomError) {
-            initLocalUser();
-        } else {
-            history.push(`/room-lobby/${match.params.roomId}`);
+        const metadata = getPersistedData('metadata');
+        if (!localPeer) {
+            initLocalUser(metadata);
         }
     }, []);
 
     useEffect(() => {
-        if (localPeer && localNickname && !roomError) {
-            startLocalStream();
-            tryJoinRoom(match.params.roomId, 'dummy123');
-        }
-
         if (roomError) {
             history.push(`/room-lobby/${match.params.roomId}`);
         }
-    }, [localPeer, localNickname, roomError]);
+    }, [roomError]);
+
+    useEffect(() => {
+        if (localMetadata.nickname && localPeer) {
+            startLocalStream();
+            joinRoom(match.params.roomId, 'dummy123');
+        }
+    }, [localPeer, localMetadata, startLocalStream, joinRoom, match]);
 
     useEffect(() => {
         // unmount
@@ -62,12 +64,16 @@ const Room = ({socket, localPeer, localNickname, connections, match, history, in
     );
 };
 
-const mapStateToProps = (state) => ({
-    socket: state.localUser.socket,
-    localPeer: state.localUser.peer,
-    localNickname: state.localUser.metadata.nickname,
-    connections: state.connections.data,
-    roomError: state.room.error
-});
+const mapStateToProps = (state) => {
+    const localPeer = state.localUser.peer;
+    return {
+        socket: state.localUser.socket,
+        localPeer: localPeer,
+        localMetadata: state.localUser.metadata,
+        localStream: localPeer ? state.streams.data[localPeer] : null,
+        connections: state.connections.data,
+        roomError: state.room.error
+    };
+};
 
-export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, tryJoinRoom, startLocalStream, clearAllStreams})(Room);
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams})(Room);

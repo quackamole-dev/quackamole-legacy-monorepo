@@ -4,13 +4,13 @@ const {v4: uuid} = require('uuid');
 // Redis could be used to store this data later on. That might allow multiple server instances with load balancing
 class roomManager {
     constructor() {
-        this.rooms = {
+        this.rooms = { // TODO try out redis to store roomData
             'dummy-room-id': {
                 id: 'dummy-room-id',
-                password: 'dummy123',
+                password: 'dummy123',  // TODO hash pws once we start using them to secure rooms.
                 name: 'dummy room name',
                 // joinedUsers: [], // not stored in here. Taken dynamically out of socketIOs internal state
-                maxUsers: 2
+                maxUsers: 4
             }
         }
     }
@@ -40,14 +40,7 @@ class roomManager {
     };
 
     getRoomById = roomId => {
-        const roomRef = this.rooms[roomId];
-        if (roomRef) {
-            return {
-                id: roomRef.id,
-                name: roomRef.name,
-                maxUsers: roomRef.maxUsers,
-            }
-        }
+        return this.rooms[roomId];
     };
 
     getAllRooms = () => {
@@ -55,7 +48,7 @@ class roomManager {
         return this.rooms;
     };
 
-    isCorrectPassword = (roomId, password) => {
+    isPasswordCorrect = (roomId, password) => {
         // const roomRef = this.rooms[roomId];
         // return roomRef.password.length === 0 || roomRef.password === password;
         return true; // FIXME only temporary, password check bypassed until we really need it in v0.2 or v0.3

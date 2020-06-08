@@ -1,20 +1,17 @@
 import React, {useEffect, useRef} from 'react';
 import {Box} from "@material-ui/core";
 import {connect} from "react-redux";
-import {broadcastPluginMessageToPeers, setPlugin} from "../../../store/actions/plugin.actions";
+import {handlePluginMessage, setPlugin} from "../../../store/actions/plugin.actions";
 
-const RoomPluginContent = ({plugin, broadcastPluginMessageToPeers, setPlugin}) => {
+const RoomPluginContent = ({plugin, handlePluginMessage, setPlugin}) => {
     const iframeRef = useRef();
 
     useEffect(() => {
-        const handleBroadcastPluginMessage = (evt) => {
-            if (evt.data.type === 'broadcast') {
-                broadcastPluginMessageToPeers({type: 'pluginData', payload: evt.data.payload}, iframeRef.current);
-            }
+        const handleMessage = (evt) => {
+            handlePluginMessage(evt);
         };
-
-        window.addEventListener('message', handleBroadcastPluginMessage);
-        return () => window.removeEventListener('message', handleBroadcastPluginMessage);
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
     }, []);
 
     useEffect(() => {
@@ -25,8 +22,9 @@ const RoomPluginContent = ({plugin, broadcastPluginMessageToPeers, setPlugin}) =
 
     return (
         <Box bgcolor='salmon' flexGrow={1}>
-            {plugin && plugin.url && <iframe src={plugin.url} style={{width: '100%', height: '100%'}} ref={iframeRef} />}
+            {plugin && plugin.url && <iframe src={plugin.url} style={{width: '100%', height: '100%'}} ref={iframeRef} title={'plugin content'} />}
         </Box>
+
     );
 };
 
@@ -34,4 +32,4 @@ const mapStateToProps = (state) => ({
     plugin: state.plugin
 });
 
-export default connect(mapStateToProps, {broadcastPluginMessageToPeers, setPlugin})(RoomPluginContent);
+export default connect(mapStateToProps, {handlePluginMessage, setPlugin})(RoomPluginContent);
