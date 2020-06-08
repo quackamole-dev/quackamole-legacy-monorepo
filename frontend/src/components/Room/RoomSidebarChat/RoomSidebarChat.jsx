@@ -4,7 +4,7 @@ import ChatIcon from '@material-ui/icons/Chat';
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import theme from '../../../style/theme/MainTheme';
-import Chat from './Chat/Chat'
+import Chat from './Chat/Chat';
 
 const useStyles = makeStyles({
     list: {
@@ -14,7 +14,7 @@ const useStyles = makeStyles({
         overflowY: 'auto',
         WebkitFlex: '1 1 auto',
         height: '100%',
-        width: 300,
+        width: 400,
         padding: 10,
     },
     chatIcon: {

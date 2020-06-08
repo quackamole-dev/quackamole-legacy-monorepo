@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import cx from 'clsx';
+import cx from 'clsx';  // TODO This comes from some example code, it has some nice features but we need to discuss whether we want to use it
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
@@ -18,6 +17,7 @@ const ChatMsg = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {
     AvatarProps,
     getTypographyProps,
   } = props;
+
   const attachClass = index => {
     if (index === 0) {
       return classes[`${side}First`];
@@ -68,15 +68,7 @@ const ChatMsg = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {
     </Grid>
   );
 });
-ChatMsg.propTypes = {
-  avatar: PropTypes.string,
-  messages: PropTypes.arrayOf(PropTypes.string),
-  side: PropTypes.oneOf(['left', 'right']),
-  GridContainerProps: PropTypes.shape({}),
-  GridItemProps: PropTypes.shape({}),
-  AvatarProps: PropTypes.shape({}),
-  getTypographyProps: PropTypes.func,
-};
+
 ChatMsg.defaultProps = {
   avatar: '',
   messages: [],
@@ -86,4 +78,5 @@ ChatMsg.defaultProps = {
   AvatarProps: {},
   getTypographyProps: () => ({}),
 };
+
 export default ChatMsg;

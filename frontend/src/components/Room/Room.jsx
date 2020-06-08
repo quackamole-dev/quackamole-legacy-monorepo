@@ -7,18 +7,30 @@ import {addConnection, removeConnection, joinRoom} from "../../store/actions/con
 import {initLocalUser} from "../../store/actions/localUser.actions";
 import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
 import RoomActionbar from "./RoomActionbar/RoomActionbar";
+import {getPersistedData} from "../../utils";
 
-const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, startLocalStream, clearAllStreams}) => {
+const Room = ({socket, localPeer, localMetadata, localStream, connections, match, history, initLocalUser, joinRoom, startLocalStream, clearAllStreams, roomError}) => {
+    // // TODO refactor these messy useEffects. Start using useCallback and add all dependencies
+
     useEffect(() => {
-        initLocalUser({nickname: 'andiiii'});
+        const metadata = getPersistedData('metadata');
+        if (!localPeer) {
+            initLocalUser(metadata);
+        }
     }, []);
 
     useEffect(() => {
-        if (localPeer) {
+        if (roomError) {
+            history.push(`/room-lobby/${match.params.roomId}`);
+        }
+    }, [roomError]);
+
+    useEffect(() => {
+        if (localMetadata.nickname && localPeer) {
             startLocalStream();
             joinRoom(match.params.roomId, 'dummy123');
         }
-    }, [localPeer]);
+    }, [localPeer, localMetadata, startLocalStream, joinRoom, match]);
 
     useEffect(() => {
         // unmount
@@ -46,18 +58,22 @@ const Room = ({socket, localPeer, connections, match, initLocalUser, joinRoom, s
                     <RoomPluginContent/>
                     <RoomMediaManager />
                 </Box>
-
                 <RoomActionbar />
-
             </Box>
         </>
     );
 };
 
-const mapStateToProps = (state) => ({
-    socket: state.localUser.socket,
-    localPeer: state.localUser.peer,
-    connections: state.connections.data,
-});
+const mapStateToProps = (state) => {
+    const localPeer = state.localUser.peer;
+    return {
+        socket: state.localUser.socket,
+        localPeer: localPeer,
+        localMetadata: state.localUser.metadata,
+        localStream: localPeer ? state.streams.data[localPeer] : null,
+        connections: state.connections.data,
+        roomError: state.room.error
+    };
+};
 
 export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams})(Room);

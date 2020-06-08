@@ -1,5 +1,6 @@
 const IOServer = require('socket.io');
 const roomManager = require('./rooms');
+const {SocketCustomError} = require('./errors');
 
 const util = {
     getSocketCustomData: (io, socketId) => {
@@ -39,29 +40,31 @@ const initSocketActions = (io, socket) => {
 
     // Join room.
     socket.on('join', ({roomId, password, peerId}, callback) => {
+        // TODO roomManager should be renamed into roomUtils if join room logic is outside of it.
         if (!roomManager.doesRoomExist(roomId)) {
-            console.log(`Room with the id: ${roomId} does not exist`);
-            callback(false);
-            return;
+            return callback(new SocketCustomError('RoomError', 'This room does not exist.'));
         }
 
         if (util.socketAlreadyInRoom(socket, roomId)) {
-            const socketData = util.getSocketCustomData(io, socket);
-            console.log(`Socket with nickname: ${socketData.nickname} is already in room: ${roomId}`);
-            callback(false);
-            return;
+            return callback(new SocketCustomError('RoomError', 'You are already in this room.'));
         }
 
-        const roomRef = roomManager.joinRoom(roomId, peerId, password);
-        if (roomRef) {
-            util.addCustomSocketData(io, socket.id, {currentRoomId: roomRef.id});
-            socket.join(roomRef.id);
-            socket.to(roomRef.id).emit('user-join', roomRef);
+        if (!roomManager.isPasswordCorrect(roomId, password)) {
+            return callback(new SocketCustomError('RoomError', 'Wrong password provided.'));
         }
+
+        const roomRef = roomManager.getRoomById(roomId);
+        const numJoinedUsers = util.getSocketIdsInRoom(io, roomRef.id).length;
+        if (numJoinedUsers >= roomRef.maxUsers) {
+            return callback(new SocketCustomError('RoomError', 'This room is already full.'));
+        }
+
+        util.addCustomSocketData(io, socket.id, {currentRoomId: roomRef.id});
+        socket.join(roomRef.id);
+        socket.to(roomRef.id).emit('user-join', roomRef);
 
         roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
-        console.log(`Room: ${roomRef.id} - joinedUsers: ${roomRef.joinedUsers}`);
-        callback({room: roomRef});
+        callback(null, {room: roomRef});
     });
 
     // Leave room

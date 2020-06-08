@@ -5,15 +5,17 @@ import peersReducer from './peers.reducer';
 import connectionsReducer from './connections.reducer';
 import callsReducer from './calls.reducer';
 import streamsReducer from "./streams.reducer";
+import pluginReducer from "./plugin.reducer";
 import chatReducer from "./chat.reducer";
 
 const reducer = combineReducers({
-    // room: roomReducer,
+    room: roomReducer,
     localUser: localUserReducer,
     peers: peersReducer,
     calls: callsReducer,
     connections: connectionsReducer,
     streams: streamsReducer,
+    plugin: pluginReducer,
     chat: chatReducer
 });
 

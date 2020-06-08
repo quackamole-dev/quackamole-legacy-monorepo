@@ -1,9 +1,10 @@
-import {INIT_LOCAL_USER_SOCKET, INIT_LOCAL_USER_PEER, SET_LOCAL_USER_METADATA, SET_LOCAL_USER_ERROR} from '../actionTypes';
+import {INIT_LOCAL_USER_SOCKET, INIT_LOCAL_USER_PEER, SET_LOCAL_USER_METADATA, SET_LOCAL_USER_ERROR, RESET_LOCAL_USER} from '../actionTypes';
+import {getPersistedData} from "../../utils";
 
 const initialState = {
     peer: null,
     socket: null,
-    metadata: { nickname: 'Andi'},
+    metadata: getPersistedData('metadata'),
     error: null
 };
 
@@ -20,6 +21,9 @@ const localUserReducer = (localPeer = initialState, action) => {
         }
         case SET_LOCAL_USER_ERROR: {
             return {...localPeer, error: action.payload.error}
+        }
+        case RESET_LOCAL_USER: {
+            return initialState;
         }
         default: {
             return localPeer;

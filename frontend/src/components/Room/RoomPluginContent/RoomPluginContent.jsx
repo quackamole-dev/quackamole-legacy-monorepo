@@ -1,15 +1,35 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Box} from "@material-ui/core";
+import {connect} from "react-redux";
+import {handlePluginMessage, setPlugin} from "../../../store/actions/plugin.actions";
 
-const RoomPluginContent = () => {
+const RoomPluginContent = ({plugin, handlePluginMessage, setPlugin}) => {
+    const iframeRef = useRef();
+
+    useEffect(() => {
+        const handleMessage = (evt) => {
+            handlePluginMessage(evt);
+        };
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
+
+    useEffect(() => {
+        if (iframeRef && iframeRef.current) {
+            setPlugin({...plugin, iframe: iframeRef.current});
+        }
+    }, [iframeRef, plugin.url]);
 
     return (
         <Box bgcolor='salmon' flexGrow={1}>
-            {/* Example game, not a real plugin, just to show how plugins will be rendered. */}
-            <iframe src="https://andreas-schoch.github.io/breakout-game/" style={{width: '100%', height: '100%'}} />
-
+            {plugin && plugin.url && <iframe src={plugin.url} style={{width: '100%', height: '100%'}} ref={iframeRef} title={'plugin content'} />}
         </Box>
+
     );
 };
 
-export default RoomPluginContent;
+const mapStateToProps = (state) => ({
+    plugin: state.plugin
+});
+
+export default connect(mapStateToProps, {handlePluginMessage, setPlugin})(RoomPluginContent);

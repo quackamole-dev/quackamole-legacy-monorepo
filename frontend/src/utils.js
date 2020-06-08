@@ -1,7 +1,8 @@
 // The place to put all helper methods that do not necessarily belong to a specific component
 // Once this file gets too crowded, create an utils folder and start seperating the exported helper methods
 
-import {useEffect, useRef, useState} from "react";
+// import {useEffect, useRef, useState} from "react";
+import ipRegex from "ip-regex";
 
 /**
  * Transforms a javascript object into a query string.
@@ -29,22 +30,22 @@ export const setVideoSrc = (videoRef, stream, muted= true) => {
 };
 
 // untested prototype for a hook that might replace setVideoSrc(). Right now there is no benefit of using it. Rethink design
-export const useStream = (muted = false) => {
-    const videoRef = useRef(null);
-    const [stream, setStream] = useState(null);
-
-    useEffect(() => {
-        if (videoRef.current && stream) {
-            videoRef.current.srcObject = stream;
-            videoRef.current.oncanplay = () => {
-                videoRef.current.play();
-                videoRef.current.muted = muted;
-            };
-        }
-    }, [stream, videoRef, muted]);
-
-    return [videoRef, setStream];
-};
+// export const useStream = (muted = false) => {
+//     const videoRef = useRef(null);
+//     const [stream, setStream] = useState(null);
+//
+//     useEffect(() => {
+//         if (videoRef.current && stream) {
+//             videoRef.current.srcObject = stream;
+//             videoRef.current.oncanplay = () => {
+//                 videoRef.current.play();
+//                 videoRef.current.muted = muted;
+//             };
+//         }
+//     }, [stream, videoRef, muted]);
+//
+//     return [videoRef, setStream];
+// };
 
 export const clearStreamTracks = stream => {
     if (stream) {
@@ -52,3 +53,16 @@ export const clearStreamTracks = stream => {
     }
 };
 
+export const getPersistedData = (key) => {
+    const dataJson = localStorage.getItem(key);
+    return dataJson ? JSON.parse(dataJson) : {};
+};
+
+export const persistData = (key, data) => {
+    const dataStringified = JSON.stringify(data);
+    localStorage.setItem(key, dataStringified);
+};
+
+export const isIpAddress = (testedString) => {
+    return ipRegex().test(testedString);
+}
