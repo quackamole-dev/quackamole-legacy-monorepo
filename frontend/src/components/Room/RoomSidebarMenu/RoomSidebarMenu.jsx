@@ -26,6 +26,7 @@ const useStyles = makeStyles({
 // TODO this data will be served by the backend in future releases. Not real plugins except first one in the list
 const plugins = [
     {name: 'Random number', url: 'https://andreas-schoch.github.io/p2p-test-plugin/'},
+    {name: 'Paint', url: 'https://andreas-schoch.github.io/quackamole-plugin-paint/'},
     {name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/'},
     {name: 'Todo list', url: 'https://andreas-schoch.github.io/react-todo-app/'},
     {name: 'Karaoke', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'},
