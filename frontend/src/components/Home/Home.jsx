@@ -6,8 +6,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import {Link} from "react-router-dom";
 import BulletPoint from "./BulletPoint/BulletPoint";
-import {useMediaQuery} from '@material-ui/core'
-
+import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
     box: {
@@ -82,7 +81,7 @@ const useStyles = makeStyles({
 
 const Home = () => {
     const classes = useStyles();
-    const smallScreen = useMediaQuery("(max-width: 950px)")
+    const smallScreen = useMediaQuery("(max-width: 950px)");
     const bulletPoints = [
         {
             title: 'Gaming',
@@ -102,7 +101,7 @@ const Home = () => {
             image: 'https://image.freepik.com/free-vector/group-chat-concept-illustration_114360-1495.jpg',
             text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec urna dolor. Maecenas vehicula dui ut quam imperdiet.',
         }
-    ]
+    ];
     
     
 

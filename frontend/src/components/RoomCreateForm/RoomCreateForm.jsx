@@ -27,7 +27,7 @@ const useStyles = makeStyles({
         padding: '16px',
         color: 'white',
         fontWeight: 'bold',
-        backgroundColor: '#FB8C00',
+        backgroundColor: '#388E3C',
     },
     formControl: {
         width: '20%',
@@ -140,7 +140,7 @@ const RoomCreateForm = () => {
             <Box
                 display='flex'
                 height={63}
-                bgcolor='#E53935'
+                bgcolor='#2E7D32'
                 alignItems='center'
                 paddingLeft='36px'
             >

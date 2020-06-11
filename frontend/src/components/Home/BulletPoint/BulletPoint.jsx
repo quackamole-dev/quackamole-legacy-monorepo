@@ -4,7 +4,7 @@ import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 import CallOutlinedIcon from '@material-ui/icons/CallOutlined';
 import ToysOutlinedIcon from '@material-ui/icons/ToysOutlined';
 import Typography from '@material-ui/core/Typography';
-import {useMediaQuery} from '@material-ui/core'
+import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
     container: {
@@ -42,11 +42,11 @@ const useStyles = makeStyles({
         paddingRight: 16,
         marginBottom: 16
     }
-})
+});
 
 const BulletPoint = (props) => {
-    const classes = useStyles()
-    const smallScreen = useMediaQuery("(max-width: 950px)")
+    const classes = useStyles();
+    const smallScreen = useMediaQuery("(max-width: 950px)");
 
     const checkIcons = (icon) => {
         if(icon === 'ToysOutlinedIcon') {
@@ -65,15 +65,11 @@ const BulletPoint = (props) => {
                         className={classes.customizeIcon}
                     />
         }
-    }
+    };
 
     return (
-        <div
-            className={smallScreen?classes.smallScreenContainer:classes.container}
-        >
-            <div
-                className={classes.alignTitle}
-            >
+        <div className={smallScreen ? classes.smallScreenContainer : classes.container}>
+            <div className={classes.alignTitle}>
                 {checkIcons(props.content.icon)}
                 <Typography
                     variant='h5'
@@ -95,6 +91,5 @@ const BulletPoint = (props) => {
             />
         </div>
     )
-}
-
-export default BulletPoint
+};
+export default BulletPoint;

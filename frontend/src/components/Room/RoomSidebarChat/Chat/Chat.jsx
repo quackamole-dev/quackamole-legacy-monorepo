@@ -44,11 +44,9 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
 
     const handleKeyPress = (event) => {
         if(event.key === 'Enter' && newMessage.length > 0) {
-            event.preventDefault()
-            sendMessage(newMessage)
-            setNewMessage('')
+            send()
         }
-    }
+    };
 
     const send = (e) => {
         e.preventDefault();
