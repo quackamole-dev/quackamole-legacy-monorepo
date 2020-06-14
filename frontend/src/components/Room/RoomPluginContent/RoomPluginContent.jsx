@@ -21,7 +21,7 @@ const RoomPluginContent = ({plugin, handlePluginMessage, setPlugin}) => {
     }, [iframeRef, plugin.url]);
 
     return (
-        <Box bgcolor='salmon' flexGrow={1}>
+        <Box flexGrow={1}>
             {plugin && plugin.url && <iframe src={plugin.url} style={{width: '100%', height: '100%'}} ref={iframeRef} title={'plugin content'} />}
         </Box>
 
