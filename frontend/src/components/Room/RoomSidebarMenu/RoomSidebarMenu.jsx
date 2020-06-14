@@ -27,6 +27,7 @@ const useStyles = makeStyles({
 const plugins = [
     {name: 'Random number', url: 'https://andreas-schoch.github.io/p2p-test-plugin/'},
     {name: 'Paint', url: 'https://andreas-schoch.github.io/quackamole-plugin-paint/'},
+    {name: 'Gomoku', url: 'https://derpmasters.github.io/quackamole-plugin-gomoku/'},
     {name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/'},
     {name: 'Todo list', url: 'https://andreas-schoch.github.io/react-todo-app/'},
     {name: 'Karaoke', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'},
