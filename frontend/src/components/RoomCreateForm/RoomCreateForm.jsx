@@ -14,6 +14,7 @@ import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants';
 import {isIpAddress} from "../../utils";
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles({
         color: 'white',
         fontWeight: 'bold',
         backgroundColor: '#388E3C',
+        width: '100%'
     },
     formControl: {
         width: '20%',
@@ -43,23 +45,24 @@ const useStyles = makeStyles({
         }
     },
     textfield: {
-        width: '616px',
-        marginLeft: '16px',
-        marginTop: 50,
+        width: '90%',
+        marginTop: '48px',
     },
     textfieldLink: {
-        width: '506px',
+        width: '90%',
         marginRight: '16px',
         marginLeft: '16px',
     },
     alignButton: {
         display: 'flex',
         justifyContent: 'flex-end',
-        margin: '16px'
+        width: '100%',
+        margin: '16px',
     },
     myButton: {
         color: 'white',
-        boxShadow: 'none'
+        boxShadow: 'none',
+        margin: '16px',
     },
     paper: {
         padding: theme.spacing(2),
@@ -69,18 +72,19 @@ const useStyles = makeStyles({
     copyLink: {
         display: 'flex',
         alignItems: 'center',
-        marginTop: '16px'
+        marginTop: '16px',
+        width: '90%'
     },
     nextButton: {
         color: 'white',
         boxShadow: 'none',
-        margin: '32px',
-        width: '576px'
+        marginBottom: '16px',
+        width: '100%'
     },
     subtitle: {
         display: 'flex',
         justifyContent: 'center',
-        marginTop: '16px'
+        margin: '16px'
     }
 });
 
@@ -134,96 +138,58 @@ const RoomCreateForm = () => {
         document.execCommand('copy');
     };
 
-    return (
-        <ThemeProvider theme={theme}>
-            {/* Header */}
+    const createRommComponent = 
             <Box
                 display='flex'
-                height={63}
-                bgcolor='#2E7D32'
-                alignItems='center'
-                paddingLeft='36px'
-            >
-               <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
-                    <ArrowBackIosIcon/>
-               </Link>
-            </Box>
-
-            {/* Body */}
-            <Container
-                className={classes.containerStyle}
-            >
-                {/* create a new room */}
-                {active ?  // TODO ternary is too long, making it hard too read, create subcomponents for create and share markup
-                <Box
-                    display='flex'
-                    flexDirection='column'
-                    width={648}
-                    height={307}
-                    borderRadius='5px'
-                    bgcolor='white'
-                >
-                    <Typography
-                        variant='h4'
-                        className={classes.titleStyle}
-                    >Create a new room
-                    </Typography>
-
-                    {/* Add status plublic or privat */}
-{/*
-                    <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel id="demo-simple-select-outlined-label">Status</InputLabel>
-                        <Select
-
-                        labelId="demo-simple-select-outlined-label"
-                        id="demo-simple-select-outlined"
-                        value={status}
-                        onChange={handleChange}
-                        label="Status"
-                        className={classes.select}
-                        >
-                        <MenuItem value={'Privat'}>Privat</MenuItem>
-                        <MenuItem value={'Public'}>Public</MenuItem>
-                        </Select>
-                    </FormControl> */}
-
-                    <TextField
-                        required
-                        id="outlined-required"
-                        label="Room name"
-                        variant="outlined"
-                        value={name}
-                        onChange={handleChangeTexfield}
-                        className={classes.textfield}
-                    />
-                    <div className={classes.alignButton}>
-                            <Button
-                                size="large"
-                                color="secondary"
-                                variant="contained"
-                                className={classes.myButton}
-                                onClick={createRoom}
-                            >
-                                create
-                            </Button>
-                    </div>
-                </Box> :
-
-                // share your room
-                <Box
-                display='flex'
                 flexDirection='column'
-                width={648}
-                height={307}
+                alignItems='center'
+                width={'100%'}
                 borderRadius='5px'
                 bgcolor='white'
+            >
+            <Typography
+                variant='h4'
+                className={classes.titleStyle}
+            >Create a new room
+            </Typography>
+            <TextField
+                required
+                id="outlined-required"
+                label="Room name"
+                variant="outlined"
+                value={name}
+                onChange={handleChangeTexfield}
+                className={classes.textfield}
+            />
+            <div className={classes.alignButton}>
+                <Button
+                    size="large"
+                    color="secondary"
+                    variant="contained"
+                    className={classes.myButton}
+                    onClick={createRoom}
                 >
+                    create
+                </Button>
+            </div>
+        </Box>;
+
+
+    const shareRoomComponent = 
+            <Box
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+                width={'100%'}
+                borderRadius='5px'
+                bgcolor='white'
+            >
                 <Typography
                     variant='h4'
                     className={classes.titleStyle}
                 >Room was created
                 </Typography>
-
+            
                 <div className={classes.copyLink}>
                     <TextField
                         variant="outlined"
@@ -243,23 +209,50 @@ const RoomCreateForm = () => {
                 </div>
                 <Typography
                         variant='h6'
+                        align='center'
                         className={classes.subtitle}
                     > Share your link and invite someone to your room
                 </Typography>
-
-                <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none',}}>
-                 <Button
+            
+                <Link 
+                    to={`/room-lobby/${roomId}`} 
+                    style={{ textDecoration: 'none', width: '80%'}}
+                >
+                <Button
                     size="large"
                     color="secondary"
                     variant="contained"
                     className={classes.nextButton}
-                   >
-                        next
+                    to={`/room-lobby/${roomId}`} 
+                >
+                    next
                 </Button>
                 </Link>
-               </Box>
-            }
-            </Container>
+           </Box>;
+
+    return (
+        <ThemeProvider theme={theme}>
+            {/* Header */}
+            <Box
+                display='flex'
+                height={63}
+                bgcolor='#2E7D32'
+                alignItems='center'
+                paddingLeft='36px'
+            >
+               <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
+                    <ArrowBackIosIcon/>
+               </Link>
+            </Box>
+
+            {/* Body */}
+            <Grid container
+                className={classes.containerStyle}
+            >
+                <Grid item xs={11} md={6} lg={5}>
+                   {active ? createRommComponent : shareRoomComponent}
+                </Grid>
+            </Grid>
         </ThemeProvider>
     )
 };
