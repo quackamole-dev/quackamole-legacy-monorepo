@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ChatMsg from './ChatMsg';
 import TextField from '@material-ui/core/TextField';
 import SendIcon from '@material-ui/icons/Send';
-import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {connect} from "react-redux";
 import {sendMessage} from '../../../../store/actions/chat.actions';
 import {toArray} from "react-emoji-render";
@@ -34,12 +34,18 @@ const useStyles = makeStyles({
     },
 });
 
-const Chat = ({chatData, sendMessage, connections, localPeer}) => {
+const Chat = ({chatData, sendMessage, localPeer}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('');
 
     const handleChangeTexfield = (event) => {
         setNewMessage(event.target.value)
+    };
+
+    const handleKeyPress = (event) => {
+        if(event.key === 'Enter' && newMessage.length > 0) {
+            send(event)
+        }
     };
 
     const send = (e) => {
@@ -63,18 +69,10 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
       };
 
     //handle the chat feed to display all messages on the right position
-      const chatFeed = chatData.map((message, i) => message.peerId === localPeer.id ?
-        <ChatMsg
-            key={i}
-            side={'right'}
-            messages={[parseEmojis(message.text)]}
-        /> :
-        <ChatMsg
-            key={i}
-            avatar={''}
-            messages={[parseEmojis(message.text)]}
-        />
-    );
+      const chatFeed = chatData.map((message, i) => message.peerId === localPeer.id
+          ? <ChatMsg key={i} side={'right'} messages={[parseEmojis(message.text)]}/>
+          : <ChatMsg key={i} avatar={''} messages={[parseEmojis(message.text)]}/>
+      );
 
     return (
         <div className={classes.chatContainer}>
@@ -87,20 +85,17 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
                     fullWidth
                     className={classes.textField}
                     onChange={handleChangeTexfield}
+                    onKeyPress={handleKeyPress}
                     value={parseEmojis(newMessage)}
                 />
-                <SendIcon
-                    className={classes.customizeIcon}
-                    onClick={send}
-                />
+                <SendIcon className={classes.customizeIcon} onClick={send}/>
             </div>
         </div>
     )
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = state => ({
     chatData: state.chat,
-    connections: Object.values(state.connections.data),
     localPeer: state.localUser.peer,
 });
 
