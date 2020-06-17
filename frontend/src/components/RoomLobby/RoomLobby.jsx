@@ -3,7 +3,6 @@ import {Link} from "react-router-dom";
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import theme from '../../style/theme/MainTheme';
 import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -11,7 +10,6 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import {resetLocalUser, setMetadata} from "../../store/actions/localUser.actions";
 import {connect} from "react-redux";
 import {setCurrentRoomError} from "../../store/actions/room.actions";
-import {RESET_LOCAL_USER} from "../../store/actionTypes";
 import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles ({
@@ -76,9 +74,7 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
     return (
         <ThemeProvider theme={theme}>
             <Box display='flex' height={63} bgcolor='#2E7D32' alignItems='center' paddingLeft='36px'>
-                <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
-                    <ArrowBackIosIcon/>
-                </Link>
+                <Link to="/" style={{ textDecoration: 'none', color: 'white'}}><ArrowBackIosIcon/></Link>
             </Box>
             <Grid container className={classes.containerStyle}>
                 <Grid item xs={11} md={6} lg={5}>
@@ -115,7 +111,7 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
     )
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state) => ({
     nickname: state.localUser.metadata.nickname || '',
     roomError: state.room.error
 });

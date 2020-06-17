@@ -1,5 +1,5 @@
 import React from 'react';
-import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 import CallOutlinedIcon from '@material-ui/icons/CallOutlined';
 import ToysOutlinedIcon from '@material-ui/icons/ToysOutlined';
@@ -50,20 +50,11 @@ const BulletPoint = (props) => {
 
     const checkIcons = (icon) => {
         if(icon === 'ToysOutlinedIcon') {
-            return <ToysOutlinedIcon 
-                        fontSize='large'
-                        className={classes.customizeIcon}
-                    />
+            return <ToysOutlinedIcon fontSize='large' className={classes.customizeIcon}/>
         } else if(icon === 'AssessmentOutlinedIcon') {
-            return <AssessmentOutlinedIcon
-                        fontSize='large'
-                        className={classes.customizeIcon}
-                    />
+            return <AssessmentOutlinedIcon fontSize='large' className={classes.customizeIcon}/>
         } else if(icon === 'CallOutlinedIcon') {
-            return <CallOutlinedIcon
-                        fontSize='large'
-                        className={classes.customizeIcon}
-                    />
+            return <CallOutlinedIcon fontSize='large' className={classes.customizeIcon}/>
         }
     };
 
@@ -71,24 +62,10 @@ const BulletPoint = (props) => {
         <div className={smallScreen ? classes.smallScreenContainer : classes.container}>
             <div className={classes.alignTitle}>
                 {checkIcons(props.content.icon)}
-                <Typography
-                    variant='h5'
-                    className={classes.customizeTitle}
-                >
-                    {props.content.title}
-                </Typography>
+                <Typography variant='h5' className={classes.customizeTitle}>{props.content.title}</Typography>
             </div>
-            <Typography
-                    className={classes.customizeText}
-                    align='center'           
-            >
-                {props.content.text}
-            </Typography>
-            <img 
-                src={props.content.image}
-                height='181'
-                width='275'
-            />
+            <Typography className={classes.customizeText} align='center'>{props.content.text}</Typography>
+            <img src={props.content.image} height='181' width='275'/>
         </div>
     )
 };

@@ -102,60 +102,33 @@ const Home = () => {
             text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec urna dolor. Maecenas vehicula dui ut quam imperdiet.',
         }
     ];
-    
-    
 
     return (
         <ThemeProvider theme={theme}>
             {/* Header */}
-            <Box
-                height={63}
-                bgcolor='#2E7D32'
-            > </Box>
+            <Box height={63} bgcolor='#2E7D32'> </Box>
 
             {/* Body */}
-            <Box
-                height={540}
-                display='flex'
-                zIndex={1}
-            >
-                <Box
-                    className={smallScreen?classes.smallScreenBox:classes.box}
-                    bgcolor= '#388E3C'
-                >
+            <Box height={540} display='flex' zIndex={1}>
+                <Box className={smallScreen ? classes.smallScreenBox : classes.box} bgcolor= '#388E3C'>
                     <div className={classes.titleContainer}>
-                    <Typography
-                        variant='h3'
-                        className={classes.titleStyle}
-                        gutterBottom
-                        align='center'
-                    > Create now a room and have fun
+                    <Typography variant='h3' className={classes.titleStyle} gutterBottom align='center'>
+                        Create now a room and have fun
                     </Typography>
                     <Link to="/create-room" style={{textDecoration: 'none'}}>
-                        <Button
-                            size="large"
-                            className={classes.buttonStyle}
-                        >
-                            Create
-                        </Button>
+                        <Button size="large" className={classes.buttonStyle}>Create</Button>
                     </Link>
                     </div>
-                    <img src="https://www.zohowebstatic.com/sites/default/files/cliq-primetime-features.jpg"
-                        className={smallScreen?classes.smallScreenMainImg:classes.mainImg}
-                    />
+                    <img src="https://www.zohowebstatic.com/sites/default/files/cliq-primetime-features.jpg" className={smallScreen?classes.smallScreenMainImg:classes.mainImg}/>
                 </Box>
             </Box>
 
             {/* Bullet Points */}
             <div className={smallScreen?classes.smallScreenBulletPoints:classes.bulletPoints}>
-                {
-                    bulletPoints.map(data => 
-                        <BulletPoint content={data}></BulletPoint>
-                    )
-                }
+                {bulletPoints.map(data => <BulletPoint content={data}></BulletPoint>)}
             </div>
 
-            
+
             {/*Temporary for debugging purposes*/}
             <Link to={'/rooms/dummy-room-id'}>Test room</Link>
         </ThemeProvider>

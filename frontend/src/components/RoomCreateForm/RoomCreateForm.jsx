@@ -3,12 +3,7 @@ import {Link} from "react-router-dom";
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import theme from '../../style/theme/MainTheme';
 import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
@@ -96,10 +91,6 @@ const RoomCreateForm = () => {
     const [active, setActive ] = React.useState(true);
     const classes = useStyles();
 
-    const handleChange = (event) => {
-        setStatus(event.target.value);
-    };
-
     const handleChangeTexfield = (event) => {
         setName(event.target.value)
     };
@@ -132,26 +123,9 @@ const RoomCreateForm = () => {
         }
     };
 
-    const copyToClipboard = () =>{
-        let mylink = link;
-        mylink.select();
-        document.execCommand('copy');
-    };
-
-    const createRommComponent = 
-            <Box
-                display='flex'
-                flexDirection='column'
-                alignItems='center'
-                width={'100%'}
-                borderRadius='5px'
-                bgcolor='white'
-            >
-            <Typography
-                variant='h4'
-                className={classes.titleStyle}
-            >Create a new room
-            </Typography>
+    const createRoomComponent =
+        <Box display='flex' flexDirection='column' alignItems='center' width={'100%'} borderRadius='5px' bgcolor='white'>
+            <Typography variant='h4' className={classes.titleStyle}>Create a new room</Typography>
             <TextField
                 required
                 id="outlined-required"
@@ -175,7 +149,7 @@ const RoomCreateForm = () => {
         </Box>;
 
 
-    const shareRoomComponent = 
+    const shareRoomComponent =
             <Box
                 display='flex'
                 flexDirection='column'
@@ -184,46 +158,24 @@ const RoomCreateForm = () => {
                 borderRadius='5px'
                 bgcolor='white'
             >
-                <Typography
-                    variant='h4'
-                    className={classes.titleStyle}
-                >Room was created
-                </Typography>
-            
+                <Typography variant='h4' className={classes.titleStyle}>Room was created</Typography>
                 <div className={classes.copyLink}>
-                    <TextField
-                        variant="outlined"
-                        value={link}
-                        onChange={handleChangeTexfield}
-                        className={classes.textfieldLink}
-                    />
-                    <Button
-                        size="large"
-                        color="secondary"
-                        variant="contained"
-                        className={classes.myButton}
-                        onClick={() => {navigator.clipboard.writeText(link)}}
-                    >
+                    <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink}/>
+                    <Button size="large" color="secondary" variant="contained" className={classes.myButton} onClick={() => {navigator.clipboard.writeText(link)}}>
                         copy
                     </Button>
                 </div>
-                <Typography
-                        variant='h6'
-                        align='center'
-                        className={classes.subtitle}
-                    > Share your link and invite someone to your room
+                <Typography variant='h6' align='center' className={classes.subtitle}>
+                    Share your link and invite someone to your room
                 </Typography>
-            
-                <Link 
-                    to={`/room-lobby/${roomId}`} 
-                    style={{ textDecoration: 'none', width: '80%'}}
-                >
+
+                <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none', width: '80%'}}>
                 <Button
                     size="large"
                     color="secondary"
                     variant="contained"
                     className={classes.nextButton}
-                    to={`/room-lobby/${roomId}`} 
+                    to={`/room-lobby/${roomId}`}
                 >
                     next
                 </Button>
@@ -246,11 +198,9 @@ const RoomCreateForm = () => {
             </Box>
 
             {/* Body */}
-            <Grid container
-                className={classes.containerStyle}
-            >
+            <Grid container className={classes.containerStyle}>
                 <Grid item xs={11} md={6} lg={5}>
-                   {active ? createRommComponent : shareRoomComponent}
+                   {active ? createRoomComponent : shareRoomComponent}
                 </Grid>
             </Grid>
         </ThemeProvider>
