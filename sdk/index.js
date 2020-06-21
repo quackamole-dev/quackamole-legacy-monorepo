@@ -4,17 +4,17 @@ class QuackamoleEventManager {
         this.syntheticEvents = new Map();
     }
 
-    on = (eventType, callback, repeat = true) => {
+    on(eventType, callback, repeat = true) {
         const eventListeners = this.__getEventListenersFor(eventType);
         eventListeners.set(callback, repeat);
-    };
+    }
 
-    off = (eventType, callback) => {
+    off(eventType, callback) {
         const eventListeners = this.__getEventListenersFor(eventType);
         eventListeners.delete(callback);
-    };
+    }
 
-    emit = (eventType, payload, metadata) => {
+    emit(eventType, payload, metadata) {
         const eventListeners = this.__getEventListenersFor(eventType);
 
         for (const [callback, repeat] of eventListeners) {
@@ -24,14 +24,14 @@ class QuackamoleEventManager {
             }
             callback(payload, metadata);
         }
-    };
+    }
 
-    __getEventListenersFor = (eventType) => {
+    __getEventListenersFor(eventType) {
         if (!this.syntheticEvents.get(eventType)) {
             this.syntheticEvents.set(eventType, new Map());
         }
         return this.syntheticEvents.get(eventType);
-    };
+    }
 }
 
 const quackamoleEventManagerSingleton = new QuackamoleEventManager();
@@ -43,17 +43,17 @@ class Quackamole {
         this.__init();
     }
 
-    broadcastData = (eventType, data, includeSelf = true) => {
+    broadcastData(eventType, data, includeSelf = true) {
         const action = {type: 'PLUGIN_SEND_TO_ALL_PEERS', payload: {eventType, data}};
         console.log('broadcastData', action);
         window.top.postMessage(action, '*');
         this.eventManager.emit(eventType, data);
-    };
+    }
 
-    sendDataTo = (peerIds, eventType, data) => {
+    sendDataTo(peerIds, eventType, data) {
         const action = {type: 'PLUGIN_SEND_TO_PEER', payload: {peerIds, eventType, data}};
         window.top.postMessage(action, '*');
-    };
+    }
 
     // requestConnectedPeers = () => {
     //     const action = {type: 'PLUGIN_REQUEST_CONNECTED_PEER_IDS'};
@@ -65,13 +65,13 @@ class Quackamole {
     //     window.top.postMessage(action, '*');
     // };
 
-    __init = () => {
-        window.addEventListener('message', this.__receiveMessage);
+    __init() {
+        window.addEventListener('message', this.__receiveMessage.bind(this));
     }
 
-    __receiveMessage = event => {
+    __receiveMessage(event) {
         console.log('__receive message', event);
-        switch(event.data.type) {
+        switch (event.data.type) {
             case 'PLUGIN_DATA': {
                 // emit the event received from another peer.
                 const {eventType, data} = event.data.payload;
