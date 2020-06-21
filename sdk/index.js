@@ -1,5 +1,8 @@
 class QuackamoleEventManager {
-    static syntheticEvents = new Map();
+
+    constructor() {
+        this.syntheticEvents = new Map();
+    }
 
     on = (eventType, callback, repeat = true) => {
         const eventListeners = this.__getEventListenersFor(eventType);
@@ -24,10 +27,10 @@ class QuackamoleEventManager {
     };
 
     __getEventListenersFor = (eventType) => {
-        if (!QuackamoleEventManager.syntheticEvents.get(eventType)) {
-            QuackamoleEventManager.syntheticEvents.set(eventType, new Map());
+        if (!this.syntheticEvents.get(eventType)) {
+            this.syntheticEvents.set(eventType, new Map());
         }
-        return QuackamoleEventManager.syntheticEvents.get(eventType);
+        return this.syntheticEvents.get(eventType);
     };
 }
 
