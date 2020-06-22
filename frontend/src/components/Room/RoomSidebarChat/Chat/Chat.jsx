@@ -6,13 +6,15 @@ import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
 import {connect} from "react-redux";
 import {sendMessage} from '../../../../store/actions/chat.actions';
 import {toArray} from "react-emoji-render";
+import {parseEmojis} from "../../../../utils";
 
 const useStyles = makeStyles({
     chatContainer: {
+        overflow: 'auto',
     },
     textField: {
         width: "85%",
-        marginRight: "5px",
+        marginRight: "5px"
     },
     chatSection: {
         display: "flex",
@@ -20,21 +22,21 @@ const useStyles = makeStyles({
         alignItems: "center",
     },
     customizeIcon: {
-        border: '2px solid #E53935',
+        border: '2px solid #2E7D32',
         borderRadius: '50%',
-        color: '#E53935',
+        color: '#2E7D32',
         height: 35,
         width: 35,
         padding: 4,
         cursor: 'pointer',
         '&:hover': {
-            background: "#E53935",
+            background: "#2E7D32",
             color: 'white',
          },
     },
 });
 
-const Chat = ({chatData, sendMessage, connections, localPeer}) => {
+const Chat = ({chatData, sendMessage, connections, localPeer, localPeerMetadata}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('');
 
@@ -54,20 +56,6 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
         setNewMessage('');
     };
 
-    const parseEmojis = value => {
-        const emojisArray = toArray(value);
-
-        // toArray outputs React elements for emojis and strings for other
-        const newValue = emojisArray.reduce((previous, current) => {
-          if (typeof current === "string") {
-            return previous + current;
-          }
-          return previous + current.props.children;
-        }, "");
-
-        return newValue;
-      };
-
     //handle the chat feed to display all messages on the right position
       const chatFeed = chatData.map((message, i) => message.peerId === localPeer.id ?
         <ChatMsg
@@ -78,13 +66,15 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
         <ChatMsg
             key={i}
             avatar={''}
-            messages={[parseEmojis(message.text)]}
+            messages={[parseEmojis(`${localPeerMetadata.nickname}: ${message.text}`)]}
         />
     );
 
     return (
-        <div className={classes.chatContainer}>
-            {chatFeed}
+        <div>
+            <div className={classes.chatContainer}>
+                {chatFeed}
+            </div>
             <div className={classes.chatSection}>
                 <TextField
                     variant="outlined"
@@ -105,10 +95,18 @@ const Chat = ({chatData, sendMessage, connections, localPeer}) => {
     )
 };
 
-const mapStateToProps = (state, props) => ({
-    chatData: state.chat,
-    connections: Object.values(state.connections.data),
-    localPeer: state.localUser.peer,
-});
+const mapStateToProps = (state, props) => {
+    const chatData = state.chat;
+    const connections = Object.values(state.connections.data);
+    const localPeer = state.localUser.peer;
+    const localStream = localPeer ? state.streams.data[localPeer.id] : null;
+    return {
+        localPeerMetadata: state.localUser.metadata,
+        localStream: localStream,
+        localPeer: localPeer,
+        chatData: chatData,
+        connections: connections
+    }
+};
 
 export default connect(mapStateToProps, {sendMessage})(Chat);

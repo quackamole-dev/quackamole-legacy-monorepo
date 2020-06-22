@@ -3,6 +3,7 @@
 
 // import {useEffect, useRef, useState} from "react";
 import ipRegex from "ip-regex";
+import {toArray} from "react-emoji-render";
 
 /**
  * Transforms a javascript object into a query string.
@@ -66,3 +67,18 @@ export const persistData = (key, data) => {
 export const isIpAddress = (testedString) => {
     return ipRegex().test(testedString);
 }
+
+// convert string to smiley
+export const parseEmojis = value => {
+    const emojisArray = toArray(value);
+
+    // toArray outputs React elements for emojis and strings for other
+    const newValue = emojisArray.reduce((previous, current) => {
+      if (typeof current === "string") {
+        return previous + current;
+      }
+      return previous + current.props.children;
+    }, "");
+
+    return newValue;
+  };

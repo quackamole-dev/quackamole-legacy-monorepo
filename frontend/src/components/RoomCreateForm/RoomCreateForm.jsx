@@ -15,6 +15,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants';
 import {isIpAddress} from "../../utils";
 import Grid from '@material-ui/core/Grid';
+import {connect} from "react-redux";
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -93,7 +94,7 @@ const RoomCreateForm = () => {
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
     const [roomId, setRoomId] = React.useState('');
-    const [active, setActive ] = React.useState(true);
+    const [active, setActive] = React.useState(true);
     const classes = useStyles();
 
     const handleChange = (event) => {
@@ -102,6 +103,15 @@ const RoomCreateForm = () => {
 
     const handleChangeTexfield = (event) => {
         setName(event.target.value)
+    };
+
+    const handleKeyPress = (event) => {
+        console.log(active)
+        if(active) {
+            if(event.key === 'Enter') {
+                createRoom()
+            }
+        }
     };
 
     const createRoom = () => {
@@ -160,6 +170,7 @@ const RoomCreateForm = () => {
                 value={name}
                 onChange={handleChangeTexfield}
                 className={classes.textfield}
+                onKeyPress={handleKeyPress}
             />
             <div className={classes.alignButton}>
                 <Button
@@ -257,4 +268,4 @@ const RoomCreateForm = () => {
     )
 };
 
-export default RoomCreateForm;
+export default connect()(RoomCreateForm);

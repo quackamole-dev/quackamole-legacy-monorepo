@@ -11,7 +11,6 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        overflowY: 'auto',
         WebkitFlex: '1 1 auto',
         height: '100%',
         width: 400,

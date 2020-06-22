@@ -2,7 +2,9 @@ import React from 'react';
 import {Box} from "@material-ui/core";
 import RoomSidebarMenu from "../RoomSidebarMenu/RoomSidebarMenu";
 import RoomSidebarChat from "../RoomSidebarChat/RoomSidebarChat";
+import EmojiHotbar from "../EmojiHotbar/EmojiHotbar";
 import {Link} from "react-router-dom";
+
 
 const RoomActionbar = () => {
     return (
@@ -11,6 +13,7 @@ const RoomActionbar = () => {
                 {/* space for some easy access actions like mute, enable camera, chat etc. */}
                 <RoomSidebarMenu />
                 <RoomSidebarChat />
+                <EmojiHotbar />
                 <Link to={'/'}>Home</Link>
             </Box>
         </>
