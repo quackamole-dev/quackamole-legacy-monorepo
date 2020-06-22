@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react';
 import {connect} from "react-redux";
 import GenericMediaCard from "../GenericMediaCard/GenericMediaCard";
 import {Box, makeStyles} from "@material-ui/core";

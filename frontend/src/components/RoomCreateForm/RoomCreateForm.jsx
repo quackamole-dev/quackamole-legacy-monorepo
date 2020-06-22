@@ -84,7 +84,6 @@ const useStyles = makeStyles({
 });
 
 const RoomCreateForm = () => {
-    const [status, setStatus] = React.useState('');
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
     const [roomId, setRoomId] = React.useState('');
@@ -99,8 +98,7 @@ const RoomCreateForm = () => {
         let data = {
             name: name,
             password: 'Test123.',
-            maxUsers: 4,
-            status: status
+            maxUsers: 4
         };
 
         if(name.length > 0) {
@@ -113,8 +111,8 @@ const RoomCreateForm = () => {
                   },
             }).then(response => response.json()
             ).then( data => {
-                const port = isIpAddress(FRONTEND_URL) ? '3000' : ''; // TODO temp fix for gh-pages. remove once frontend is served via proxy by real domain
-                setLink(`${protocol}://${FRONTEND_URL}:${port}/#/room-lobby/${data}`);
+                const port = isIpAddress(FRONTEND_URL) || 'localhost' ? ':3000' : '';
+                setLink(`${protocol}://${FRONTEND_URL}${port}/#/room-lobby/${data}`);
                 setRoomId(data);
                 setActive(false);
             });

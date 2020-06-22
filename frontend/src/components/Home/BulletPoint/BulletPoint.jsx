@@ -65,7 +65,7 @@ const BulletPoint = (props) => {
                 <Typography variant='h5' className={classes.customizeTitle}>{props.content.title}</Typography>
             </div>
             <Typography className={classes.customizeText} align='center'>{props.content.text}</Typography>
-            <img src={props.content.image} height='181' width='275'/>
+            <img src={props.content.image} height='181' width='275' alt='icon' />
         </div>
     )
 };

@@ -119,7 +119,11 @@ const Home = () => {
                         <Button size="large" className={classes.buttonStyle}>Create</Button>
                     </Link>
                     </div>
-                    <img src="https://www.zohowebstatic.com/sites/default/files/cliq-primetime-features.jpg" className={smallScreen?classes.smallScreenMainImg:classes.mainImg}/>
+                    <img
+                        src="https://www.zohowebstatic.com/sites/default/files/cliq-primetime-features.jpg"
+                        className={smallScreen ? classes.smallScreenMainImg : classes.mainImg}
+                        alt={'quackamole room preview'}
+                    />
                 </Box>
             </Box>
 

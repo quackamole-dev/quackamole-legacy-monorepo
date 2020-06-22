@@ -1,4 +1,4 @@
-const isLocal = process.env.NODE_ENV === 'development';
+export const isLocal = process.env.NODE_ENV === 'development';
 
 export const API_BASE_URL = isLocal ? 'localhost' : process.env.REACT_APP_API_BASE_URL;
 export const SSL_ENABLED = isLocal ? false : process.env.REACT_APP_SSL_ENABLED === 'true';

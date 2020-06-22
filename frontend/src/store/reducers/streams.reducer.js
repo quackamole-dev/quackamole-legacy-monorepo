@@ -1,4 +1,4 @@
-import {ADD_STREAM, REMOVE_STREAM, REMOVE_CONNECTION, SET_STREAMS_ERROR, CLEAR_ALL_STREAMS} from '../actionTypes';
+import {ADD_STREAM, REMOVE_STREAM, SET_STREAMS_ERROR, CLEAR_ALL_STREAMS} from '../actionTypes';
 import {clearStreamTracks} from "../../utils";
 
 const initialState = {
