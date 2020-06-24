@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../constants';
+import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET, IS_LOCALHOST} from '../../constants';
 import {isIpAddress} from "../../utils";
 import Grid from '@material-ui/core/Grid';
 
@@ -111,7 +111,7 @@ const RoomCreateForm = () => {
                   },
             }).then(response => response.json()
             ).then( data => {
-                const port = isIpAddress(FRONTEND_URL) || 'localhost' ? ':3000' : '';
+                const port = isIpAddress(FRONTEND_URL) || IS_LOCALHOST ? ':3000' : '';
                 setLink(`${protocol}://${FRONTEND_URL}${port}/#/room-lobby/${data}`);
                 setRoomId(data);
                 setActive(false);
