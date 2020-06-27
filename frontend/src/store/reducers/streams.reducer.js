@@ -23,7 +23,7 @@ const streamsReducer = produce((streamsDraft, action) => {
             return;
         }
         case SET_STREAMS_ERROR: {
-            streamsDraft.error = null;
+            streamsDraft.error = action.payload.error;
             return;
         }
         case CLEAR_ALL_STREAMS: {

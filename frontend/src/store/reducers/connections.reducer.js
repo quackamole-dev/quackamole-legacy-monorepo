@@ -21,7 +21,7 @@ const connectionsReducer = produce((connectionsDraft, action) => {
             return;
         }
         case SET_CONNECTIONS_ERROR: {
-            connectionsDraft.error = null;
+            connectionsDraft.error = action.payload.error;
             return;
         }
         default: {}

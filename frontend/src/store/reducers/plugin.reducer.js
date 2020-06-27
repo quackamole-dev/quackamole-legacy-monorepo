@@ -23,7 +23,7 @@ const pluginReducer = produce((pluginDraft, action) => {
             return;
         }
         case SET_PLUGIN_ERROR: {
-            pluginDraft.error = null;
+            pluginDraft.error = action.payload.error;
             return;
         }
         default: {}

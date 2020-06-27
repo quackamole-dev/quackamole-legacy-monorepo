@@ -17,7 +17,7 @@ const roomReducer = produce((roomDraft, action) => {
             return;
         }
         case SET_CURRENT_ROOM_ERROR: {
-            roomDraft.error = null;
+            roomDraft.error = action.payload.error;
             return;
         }
         default: {}

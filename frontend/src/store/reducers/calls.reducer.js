@@ -21,7 +21,7 @@ const callsReducer = produce((callsDraft, action) => {
             return;
         }
         case SET_CALLS_ERROR: {
-            callsDraft.error = null;
+            callsDraft.error = action.payload.error;
             return;
         }
         default: {}

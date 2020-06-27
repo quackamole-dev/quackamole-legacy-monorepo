@@ -24,7 +24,7 @@ const peersReducer = produce((peersDraft, action) => {
             return;
         }
         case SET_PEERS_ERROR: {
-            peersDraft.error = null;
+            peersDraft.error = action.payload.error;
             return;
 
         }
