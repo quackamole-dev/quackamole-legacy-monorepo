@@ -7,8 +7,9 @@ import {joinRoom} from "../../store/actions/connections.actions";
 import {initLocalUser} from "../../store/actions/localUser.actions";
 import RoomActionbar from "./RoomActionbar/RoomActionbar";
 import {roomExitCleanup} from '../../store/actions/room.actions';
+import {startLocalStream} from '../../store/actions/streams.actions';
 
-const Room = ({socket, localPeer, match, history, initLocalUser, joinRoom, roomError, currentRoom, localPeerLoading, roomExitCleanup}) => {
+const Room = ({socket, localPeer, match, history, initLocalUser, joinRoom, roomError, currentRoom, localPeerLoading, roomExitCleanup, startLocalStream}) => {
 
     useEffect(() => {
         if (roomError) {
@@ -16,6 +17,7 @@ const Room = ({socket, localPeer, match, history, initLocalUser, joinRoom, roomE
         } else if (!localPeer && !localPeerLoading) {
             initLocalUser();
         } else if (localPeer && socket && !currentRoom.id) {
+            startLocalStream();
             joinRoom(match.params.roomId, 'dummy123');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,4 +53,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {initLocalUser, joinRoom, roomExitCleanup})(Room);
+export default connect(mapStateToProps, {initLocalUser, joinRoom, roomExitCleanup, startLocalStream})(Room);

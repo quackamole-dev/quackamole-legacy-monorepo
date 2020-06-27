@@ -29,7 +29,7 @@ const initLocalUserSocket = (metadata) => async (dispatch, getState) => {
     dispatch({type: SET_LOCAL_USER_LOADING, payload: {loading: true}});
     const protocol = SSL_ENABLED ? 'https' : 'http';
     const socket = io(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}`, {
-        transports: ['websocket'],
+        // transports: ['websocket'],
         secure: SSL_ENABLED,
         query: serializeQueryString(metadata)
     });
