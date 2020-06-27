@@ -78,7 +78,6 @@ const useStyles = makeStyles({
     }
 });
 
-
 const Home = () => {
     const classes = useStyles();
     const smallScreen = useMediaQuery("(max-width: 950px)");
@@ -129,9 +128,8 @@ const Home = () => {
 
             {/* Bullet Points */}
             <div className={smallScreen?classes.smallScreenBulletPoints:classes.bulletPoints}>
-                {bulletPoints.map(data => <BulletPoint content={data}></BulletPoint>)}
+                {bulletPoints.map((data, i) => <BulletPoint content={data} key={data.title + i}> </BulletPoint>)}
             </div>
-
 
             {/*Temporary for debugging purposes*/}
             <Link to={'/rooms/dummy-room-id'}>Test room</Link>
