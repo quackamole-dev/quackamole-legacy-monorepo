@@ -9,8 +9,8 @@ class roomManager {
                 id: 'dummy-room-id',
                 password: 'dummy123',  // TODO hash pws once we start using them to secure rooms.
                 name: 'dummy room name',
-                // joinedUsers: [], // not stored in here. Taken dynamically out of socketIOs internal state
-                maxUsers: 4
+                maxUsers: 4,
+                defaultPluginId: 'gomoku'
             }
         }
     }
@@ -23,17 +23,17 @@ class roomManager {
         return this.getRoomById(sanitizedRoomData.id);
     };
 
-    leaveRoom = (roomId, peerId) => {
-        const roomRef = this.rooms[roomId];
-
-        if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
-            roomRef.joinedUsers.filter(user => user !== peerId);
-            return roomRef;
-        } else {
-            console.log(`The user: ${peerId} is not in this room, therefore cannot leave`);
-            return false;
-        }
-    };
+    // leaveRoom = (roomId, peerId) => {
+    //     const roomRef = this.rooms[roomId];
+    //
+    //     if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
+    //         roomRef.joinedUsers.filter(user => user !== peerId);
+    //         return roomRef;
+    //     } else {
+    //         console.log(`The user: ${peerId} is not in this room, therefore cannot leave`);
+    //         return false;
+    //     }
+    // };
 
     doesRoomExist = (roomId) => {
         return !!this.rooms[roomId];
@@ -48,6 +48,19 @@ class roomManager {
         return this.rooms;
     };
 
+    updateRoom = (roomId, data) => {
+      const room = this.getRoomById(roomId);
+
+      if (room) {
+          const {name, maxUsers, activePluginId} = data;
+          // TODO verify data before using it
+          room.name = name || room.name;
+          room.maxUsers = maxUsers || room.maxUsers;
+          room.activePluginId = activePluginId || room.activePluginId;
+          return room;
+      }
+    };
+
     isPasswordCorrect = (roomId, password) => {
         // const roomRef = this.rooms[roomId];
         // return roomRef.password.length === 0 || roomRef.password === password;
@@ -57,10 +70,11 @@ class roomManager {
     _createSanitizedRoomData = rawRoomData => {
         return {
             id: uuid(),
-            password: rawRoomData.password,
-            name: rawRoomData.name,
-            maxUsers: rawRoomData.maxUsers,
-            joinedUsers: [],
+            password: rawRoomData.password || '',
+            name: rawRoomData.name || 'default room name',  // TODO use faker to generate some random default names
+            maxUsers: rawRoomData.maxUsers || 4,
+            joinedUsers: ['not used, always empty for now'],
+            activePluginId: rawRoomData.activePluginId || ''
         }
     };
 }
