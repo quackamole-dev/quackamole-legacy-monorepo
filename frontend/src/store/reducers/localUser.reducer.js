@@ -1,5 +1,6 @@
 import {INIT_LOCAL_USER_SOCKET, INIT_LOCAL_USER_PEER, SET_LOCAL_USER_METADATA, SET_LOCAL_USER_ERROR, RESET_LOCAL_USER} from '../actionTypes';
 import {getPersistedData} from "../../utils";
+import produce from 'immer'
 
 const initialState = {
     peer: null,
@@ -8,28 +9,33 @@ const initialState = {
     error: null
 };
 
-const localUserReducer = (localPeer = initialState, action) => {
+const localUserReducer = produce((localPeerDraft, action) => {
     switch (action.type) {
         case INIT_LOCAL_USER_SOCKET: {
-            return {...localPeer, socket: action.payload.socket, error: null};
+            localPeerDraft.socket = action.payload.socket;
+            localPeerDraft.error = null;
+            return;
         }
         case INIT_LOCAL_USER_PEER: {
-            return {...localPeer, peer: action.payload.peer, error: null};
+            localPeerDraft.peer = action.payload.peer;
+            localPeerDraft.error = null;
+            return;
         }
         case SET_LOCAL_USER_METADATA: {
-            return {...localPeer, metadata: action.payload.metadata, error: null};
+            localPeerDraft.metadata = action.payload.metadata;
+            localPeerDraft.error = null;
+            return;
         }
         case SET_LOCAL_USER_ERROR: {
-            return {...localPeer, error: action.payload.error}
+            localPeerDraft.error = action.payload.error;
+            return;
         }
         case RESET_LOCAL_USER: {
-            return initialState;
+            localPeerDraft =  initialState;
+            return;
         }
-        default: {
-            return localPeer;
-        }
+        default: {}
     }
-};
+}, initialState);
 
 export default localUserReducer;
-
