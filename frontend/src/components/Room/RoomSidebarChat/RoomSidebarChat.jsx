@@ -14,7 +14,7 @@ const useStyles = makeStyles({
         overflowY: 'auto',
         WebkitFlex: '1 1 auto',
         height: '100%',
-        width: 400,
+        width: 320,
         padding: 10,
     },
     chatIcon: {

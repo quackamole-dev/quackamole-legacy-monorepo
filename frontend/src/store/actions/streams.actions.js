@@ -29,7 +29,6 @@ export const startLocalStream = (peer, constraintsOverride) => async (dispatch, 
 
             let mediaStream = await navigator.mediaDevices.getUserMedia(constraintsOverride || constraints);
             dispatch(addStream(localPeer.id, mediaStream));
-            window.localStream = mediaStream; // kind of hacky to stop the tracks on unmount
             return mediaStream;
         } catch (error) {
             console.error('local stream couldnt be started', error);
@@ -40,5 +39,4 @@ export const startLocalStream = (peer, constraintsOverride) => async (dispatch, 
 };
 export const clearAllStreams = () => async (dispatch, getState) => {
         dispatch({type: CLEAR_ALL_STREAMS});
-
 };

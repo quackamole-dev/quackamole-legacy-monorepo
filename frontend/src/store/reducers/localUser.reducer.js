@@ -36,7 +36,11 @@ const localUserReducer = produce((localPeerDraft, action) => {
             return;
         }
         case RESET_LOCAL_USER: {
-            localPeerDraft =  initialState;
+            localPeerDraft.peer = null;
+            localPeerDraft.socket = null;
+            localPeerDraft.loading = false;
+            localPeerDraft.metadata = getPersistedData('metadata');
+            localPeerDraft.error = null;
             return;
         }
         default: {}
