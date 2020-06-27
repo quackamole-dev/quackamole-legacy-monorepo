@@ -37,6 +37,7 @@ const GenericMediaCard = ({stream, muted = false, user}) => {
 
     useEffect(() => {
         setVideoSrc(videoRef, stream, muted);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stream]);
 
     return (

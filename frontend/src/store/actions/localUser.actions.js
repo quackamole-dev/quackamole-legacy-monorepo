@@ -1,4 +1,4 @@
-import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_METADATA} from "../actionTypes";
+import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_LOADING, SET_LOCAL_USER_METADATA} from '../actionTypes';
 import Peer from "peerjs";
 import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
@@ -19,14 +19,17 @@ const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
     });
 
     await dispatch({type: INIT_LOCAL_USER_PEER, payload: {peer}});
-    await dispatch(startLocalStream(peer));
+    // await dispatch(startLocalStream(peer));
     await dispatch(initLocalUserPeerListeners(peer));
+    dispatch({type: SET_LOCAL_USER_LOADING, payload: {loading: false}});
 };
 
 /**
  * Init the socket.io client. Once socket is ready, init the peerJS Peer and store them in the store.
  */
 export const initLocalUser = (metadata) => async (dispatch, getState) => {
+    if (getState().localUser.loading) { return; }
+    dispatch({type: SET_LOCAL_USER_LOADING, payload: {loading: true}});
     // const metadata = getState().localUser.metadata || {};
     // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though, allow peerId to be different from socketId
     const protocol = SSL_ENABLED ? 'https' : 'http';

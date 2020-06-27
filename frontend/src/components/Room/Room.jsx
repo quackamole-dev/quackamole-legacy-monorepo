@@ -8,29 +8,26 @@ import {initLocalUser} from "../../store/actions/localUser.actions";
 import {startLocalStream, clearAllStreams} from "../../store/actions/streams.actions";
 import RoomActionbar from "./RoomActionbar/RoomActionbar";
 import {getPersistedData} from "../../utils";
+import {setCurrentRoomError} from '../../store/actions/room.actions';
 
-const Room = ({socket, localPeer, localMetadata, localStream, connections, match, history, initLocalUser, joinRoom, startLocalStream, clearAllStreams, roomError}) => {
-    // // TODO refactor these messy useEffects. Start using useCallback and add all dependencies
-
-    useEffect(() => {
-        const metadata = getPersistedData('metadata');
-        if (!localPeer) {
-            initLocalUser(metadata);
-        }
-    }, []);
+const Room = ({socket, localPeer, localMetadata, connections, match, history, initLocalUser, joinRoom, startLocalStream, clearAllStreams, roomError, currentRoom, localPeerLoading, setCurrentRoomError}) => {
+    // // TODO too much going on in this component itself, hide unmount logic and think about restructuring
 
     useEffect(() => {
         if (roomError) {
             history.push(`/room-lobby/${match.params.roomId}`);
-        }
-    }, [roomError]);
-
-    useEffect(() => {
-        if (localMetadata.nickname && localPeer) {
+        } else if (!localPeer && !localPeerLoading && localMetadata.nickname) {
+            const metadata = getPersistedData('metadata');
+            initLocalUser(metadata);
+        } else if (localPeer && !currentRoom.id) {
             startLocalStream();
             joinRoom(match.params.roomId, 'dummy123');
+        } else if (!localMetadata.nickname || !localMetadata.nickname.length) {
+            setCurrentRoomError({error: {name: 'RoomError', message: 'Please enter a nickname before joining the room.'}});
+            history.push(`/room-lobby/${match.params.roomId}`);
         }
-    }, [localPeer, localMetadata, startLocalStream, joinRoom, match]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localPeer, roomError, socket]);
 
     useEffect(() => {
         // unmount
@@ -49,6 +46,7 @@ const Room = ({socket, localPeer, localMetadata, localStream, connections, match
             }
             clearAllStreams();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket]);
 
     return (
@@ -69,11 +67,13 @@ const mapStateToProps = (state) => {
     return {
         socket: state.localUser.socket,
         localPeer: localPeer,
+        localPeerLoading: state.localUser.loading,
         localMetadata: state.localUser.metadata,
         localStream: localPeer ? state.streams.data[localPeer] : null,
         connections: state.connections.data,
-        roomError: state.room.error
+        roomError: state.room.error,
+        currentRoom: state.room.data
     };
 };
 
-export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams})(Room);
+export default connect(mapStateToProps, {addConnection, removeConnection, initLocalUser, joinRoom, startLocalStream, clearAllStreams, setCurrentRoomError})(Room);

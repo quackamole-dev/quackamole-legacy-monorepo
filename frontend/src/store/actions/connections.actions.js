@@ -104,5 +104,3 @@ export const introduceYourself = (connection) => async (dispatch, getState) => {
         dispatch(sendDataToConnection(connection, {type: 'PEER_INTRODUCTION', payload: {metadata}}));
     }
 };
-
-

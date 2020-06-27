@@ -12,12 +12,14 @@ const RoomPluginContent = ({plugin, handlePluginMessage, setPlugin}) => {
         };
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (iframeRef && iframeRef.current) {
             setPlugin({...plugin, iframe: iframeRef.current});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [iframeRef, plugin.url]);
 
     return (
