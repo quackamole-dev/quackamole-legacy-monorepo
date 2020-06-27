@@ -1,30 +1,31 @@
 import {ADD_CONNECTION, REMOVE_CONNECTION, SET_CONNECTIONS_ERROR} from '../actionTypes';
+import produce from 'immer';
 
 const initialState = {
     data: {},
     error: null
 };
 
-const connectionsReducer = (connections = initialState, action) => {
+const connectionsReducer = produce((connectionsDraft, action) => {
     switch (action.type) {
         case ADD_CONNECTION: {
             const connection = action.payload.connection;
-            return {data: {...connections.data, [connection.peer]: connection}, error: null};
+            connectionsDraft.data[connection.peer] =  connection;
+            connectionsDraft.error = null;
+            return;
         }
         case REMOVE_CONNECTION: {
-            const newData = {...connections.data};
             const connection = action.payload.connection;
-            delete newData[connection.peer];
-            return {data: newData, error: null};
+            delete connectionsDraft.data[connection.peer];
+            connectionsDraft.error = null;
+            return;
         }
         case SET_CONNECTIONS_ERROR: {
-            return {...connections, error: action.payload.error};
+            connectionsDraft.error = null;
+            return;
         }
-        default: {
-            return connections;
-        }
+        default: {}
     }
-};
+}, initialState);
 
 export default connectionsReducer;
-

@@ -1,4 +1,5 @@
 import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR} from '../actionTypes';
+import produce from 'immer'
 
 const initialState = {
     data: {
@@ -8,18 +9,19 @@ const initialState = {
     error: null
 };
 
-const roomReducer = (room = initialState, action) => {
+const roomReducer = produce((roomDraft, action) => {
     switch (action.type) {
         case SET_CURRENT_ROOM: {
-            return {data: action.payload.room, error: null};
+            roomDraft.data = action.payload.room;
+            roomDraft.error = null;
+            return;
         }
         case SET_CURRENT_ROOM_ERROR: {
-            return {data: room.data, error: action.payload.error};
+            roomDraft.error = null;
+            return;
         }
-        default: {
-            return room;
-        }
+        default: {}
     }
-};
+}, initialState);
 
 export default roomReducer;

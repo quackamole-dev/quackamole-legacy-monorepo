@@ -1,17 +1,16 @@
 import {ADD_NEW_MESSAGE} from '../actionTypes';
+import produce from 'immer';
 
-const initialState = [
-];
+const initialState = [];
 
-const chatReducer = (state = initialState, action) => {
+const chatReducer = produce((messagesDraft, action) => {
     switch(action.type) {
         case ADD_NEW_MESSAGE: {
-            return [...state, action.payload];
+            messagesDraft.push(action.payload);  // FIXME should be action.payload.message
+            return;
         }
-        default: {
-            return state;
-        }
+        default: {}
     }
-};
+}, initialState);
 
 export default chatReducer

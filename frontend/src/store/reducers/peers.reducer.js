@@ -1,4 +1,5 @@
 import {ADD_PEER, REMOVE_PEER, SET_PEERS_ERROR} from '../actionTypes';
+import produce from 'immer';
 
 const initialState = {
     data: {
@@ -8,26 +9,28 @@ const initialState = {
     error: null
 };
 
-const peersReducer = (peers = initialState, action) => {
+const peersReducer = produce((peersDraft, action) => {
     switch (action.type) {
         case ADD_PEER: {
             const {peerId, metadata} = action.payload;
-            return {data: {...peers.data, [peerId]: {metadata}}, error: null};
+            peersDraft.data[peerId] = {metadata};
+            peersDraft.error = null;
+            return;
         }
         case REMOVE_PEER: {
-            const newData = {...peers.data};
             const peer = action.payload.peer;
-            delete newData[peer.id];
-            return {data: newData, error: null};
+            delete peersDraft.data[peer.id];
+            peersDraft.error = null;
+            return;
         }
         case SET_PEERS_ERROR: {
-            return {...peers, error: action.payload.error};
+            peersDraft.error = null;
+            return;
+
         }
         default: {
-            return peers;
         }
     }
-};
+}, initialState);
 
 export default peersReducer;
-
