@@ -85,6 +85,7 @@ const Chat = ({chatData, sendMessage, localPeer, localPeerMetadata}) => {
                     onChange={handleChangeTexfield}
                     onKeyPress={handleKeyPress}
                     value={parseEmojis(newMessage)}
+                    autoFocus
                 />
                 <SendIcon
                     className={classes.customizeIcon}
