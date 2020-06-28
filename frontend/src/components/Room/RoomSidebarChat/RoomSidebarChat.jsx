@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import theme from '../../../style/theme/MainTheme';
 import Chat from './Chat/Chat';
+import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
     list: {
@@ -16,6 +17,15 @@ const useStyles = makeStyles({
         width: 400,
         padding: 10,
     },
+    smallScreenList: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        WebkitFlex: '1 1 auto',
+        height: '100%',
+        width: 300,
+        padding: 10,
+    },
     chatIcon: {
         margin: '8px'
     }
@@ -24,6 +34,7 @@ const useStyles = makeStyles({
 const RoomSidebarChat = () => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
+    const smallScreen = useMediaQuery("(max-width: 450px)");
 
     const toggleDrawer = (event) => {
         if (event.type === 'keydown') {
@@ -33,7 +44,7 @@ const RoomSidebarChat = () => {
     };
 
     const list = () => (
-        <div className={classes.list} role="presentation">
+        <div className={smallScreen ? classes.smallScreenList : classes.list} role="presentation">
             <Chat/>
         </div>
     );

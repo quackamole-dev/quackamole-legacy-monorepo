@@ -26,7 +26,7 @@ const useStyles = makeStyles({
   }
 });
 
-const EmojiHotbbar = ({sendMessage}) => {
+const EmojiHotbbar = ({sendMessage, localPeer}) => {
   const classes = useStyles('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [smileys, setSmileys] = useState([':)', '😂','😘', '<3', ':-(', ':-@', '😇', '😑', '🤑', '🤯']);
@@ -35,6 +35,7 @@ const EmojiHotbbar = ({sendMessage}) => {
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+    console.log(smileys)
   };
 
   const handleClose = (smiley) => {

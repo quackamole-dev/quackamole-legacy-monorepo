@@ -113,7 +113,7 @@ const RoomCreateForm = () => {
             }
         }
     };
-
+    
     const createRoom = () => {
         let data = {
             name: name,
@@ -138,7 +138,7 @@ const RoomCreateForm = () => {
                 setActive(false);
             });
         } else {
-            console.log('error')
+            console.log('please enter your name')
         }
     };
 

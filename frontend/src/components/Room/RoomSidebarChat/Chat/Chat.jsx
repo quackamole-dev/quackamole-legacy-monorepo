@@ -36,7 +36,7 @@ const useStyles = makeStyles({
     },
 });
 
-const Chat = ({chatData, sendMessage, connections, localPeer, localPeerMetadata}) => {
+const Chat = ({chatData, sendMessage, localPeer, localPeerMetadata}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('');
 
@@ -97,7 +97,6 @@ const Chat = ({chatData, sendMessage, connections, localPeer, localPeerMetadata}
 
 const mapStateToProps = (state, props) => {
     const chatData = state.chat;
-    const connections = Object.values(state.connections.data);
     const localPeer = state.localUser.peer;
     const localStream = localPeer ? state.streams.data[localPeer.id] : null;
     return {
@@ -105,7 +104,6 @@ const mapStateToProps = (state, props) => {
         localStream: localStream,
         localPeer: localPeer,
         chatData: chatData,
-        connections: connections
     }
 };
 
