@@ -16,6 +16,7 @@ import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET } from '../../const
 import {isIpAddress} from "../../utils";
 import Grid from '@material-ui/core/Grid';
 import {connect} from "react-redux";
+import {useHistory} from "react-router";
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -96,6 +97,7 @@ const RoomCreateForm = () => {
     const [roomId, setRoomId] = React.useState('');
     const [active, setActive] = React.useState(true);
     const classes = useStyles();
+    const history = useHistory();
 
     const handleChange = (event) => {
         setStatus(event.target.value);
@@ -106,11 +108,12 @@ const RoomCreateForm = () => {
     };
 
     const handleKeyPress = (event) => {
-        console.log(active)
         if(active) {
             if(event.key === 'Enter') {
                 createRoom()
             }
+        } else {
+            history.push(`/room-lobby/${roomId}`)
         }
     };
     
@@ -171,6 +174,7 @@ const RoomCreateForm = () => {
                 onChange={handleChangeTexfield}
                 className={classes.textfield}
                 onKeyPress={handleKeyPress}
+                autoFocus
             />
             <div className={classes.alignButton}>
                 <Button
@@ -194,6 +198,7 @@ const RoomCreateForm = () => {
                 width={'100%'}
                 borderRadius='5px'
                 bgcolor='white'
+                onKeyPress={handleKeyPress}
             >
                 <Typography
                     variant='h4'
@@ -207,6 +212,7 @@ const RoomCreateForm = () => {
                         value={link}
                         onChange={handleChangeTexfield}
                         className={classes.textfieldLink}
+                        autoFocus
                     />
                     <Button
                         size="large"

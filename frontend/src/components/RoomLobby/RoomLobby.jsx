@@ -14,6 +14,7 @@ import {setCurrentRoomError} from "../../store/actions/room.actions";
 import {RESET_LOCAL_USER} from "../../store/actionTypes";
 import Grid from '@material-ui/core/Grid';
 
+
 const useStyles = makeStyles ({
     containerStyle: {
         display: 'flex',
@@ -57,6 +58,7 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
     const [newNickname, setNewNickname] = useState(nickname);
     const [link, setLink] = useState(match.params.roomId);
     const classes = useStyles();
+  
 
     const handleChangeName = (e) => {
         setNewNickname(e.target.value)
@@ -65,6 +67,12 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
     const handleChangeLink = (e) => {
         setLink(e.target.value)
     };
+
+    const handleKeyPress = (e) => {
+        if(e.key === 'Enter') {
+            handleJoin()
+        }
+    }
 
     const handleJoin = (e) => {
         setMetadata({nickname: newNickname});
@@ -92,6 +100,8 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
                             value={newNickname}
                             className={classes.nicknameStyle}
                             onChange={handleChangeName}
+                            onKeyPress={handleKeyPress}
+                            autoFocus
                         />
                         <TextField
                             required
