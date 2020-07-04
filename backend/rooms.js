@@ -10,7 +10,7 @@ class roomManager {
                 password: 'dummy123',  // TODO hash pws once we start using them to secure rooms.
                 name: 'dummy room name',
                 maxUsers: 4,
-                defaultPluginId: 'gomoku'
+                activePluginId: 'gomoku'
             }
         }
     }

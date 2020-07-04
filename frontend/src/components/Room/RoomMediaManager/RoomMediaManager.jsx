@@ -7,6 +7,8 @@ import RemoteMediaManager from "./RemoteMediaManager/RemoteMediaManager";
 const useStyles = makeStyles((theme) => ({
     roomMediaManager: {
         padding: '5px',
+        backgroundColor: '#f5deb340',
+        borderLeft: '1px solid #0000003b'
     },
 }));
 

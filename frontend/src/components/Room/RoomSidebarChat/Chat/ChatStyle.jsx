@@ -3,6 +3,11 @@ export default ({ palette, spacing }) => {
     const size = spacing(4);
     const rightBgColor = palette.primary.main;
     return {
+      wrapper: {
+        "&:nth-child(1)": {
+          marginTop: 'auto', // https://bugs.chromium.org/p/chromium/issues/detail?id=411624
+        }
+      },
       avatar: {
         width: size,
         height: size,

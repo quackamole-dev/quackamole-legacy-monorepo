@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 const RoomActionbar = () => {
     return (
         <>
-            <Box bgcolor={'wheat'} height={'10%'} display='flex' flexDirection='row' width={1} justifyContent={'center'}>
+            <Box bgcolor={'#f5deb3eb'} height={'10%'} display='flex' flexDirection='row' width={1} justifyContent={'center'} borderTop={'1px solid #0000003b'}>
                 {/* space for some easy access actions like mute, enable camera, chat etc. */}
                 <RoomSidebarMenu />
                 <RoomSidebarChat />

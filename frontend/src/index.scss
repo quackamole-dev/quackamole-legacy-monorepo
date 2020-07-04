@@ -1,4 +1,8 @@
 // Put global styles in here only if there are no good alternatives using MUI
+* {
+    box-sizing: border-box;
+}
+
 body {
     min-height: 100vh;
     display: flex;

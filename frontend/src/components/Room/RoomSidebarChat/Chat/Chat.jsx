@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import ChatMsg from './ChatMsg';
 import TextField from '@material-ui/core/TextField';
 import SendIcon from '@material-ui/icons/Send';
@@ -8,87 +8,110 @@ import {sendMessage} from '../../../../store/actions/chat.actions';
 import {toArray} from "react-emoji-render";
 
 const useStyles = makeStyles({
-    chatContainer: {
+    chat: {
+        height: '100vh',
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        width: '320px'
     },
-    textField: {
-        width: "85%",
-        marginRight: "5px",
+    chatFeed: {
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        flexGrow: 1,
+        maxHeight: 'calc(100% - 60px)',
+        overflow: 'auto',
+        padding: '8px'
     },
-    chatSection: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+    chatInput: {
+        display: 'flex',
+        flexFlow: 'row nowrap',
+        alignItems: 'flex-end',
+        padding: '8px'
     },
-    customizeIcon: {
-        border: '2px solid #E53935',
-        borderRadius: '50%',
-        color: '#E53935',
-        height: 35,
-        width: 35,
-        padding: 4,
+    chatInputTextfield: {
+        flexGrow: 1,
+        zIndex: 1000,
+        backgroundColor: 'white'
+    },
+    chatInputSendBtn: {
+        fontSize: '40px',
+        margin: 'auto 5px',
         cursor: 'pointer',
+        opacity: 0.8,
+        transition: 'opacity 0.2s',
         '&:hover': {
-            background: "#E53935",
-            color: 'white',
-         },
-    },
+            opacity: 0.95
+        }
+    }
 });
 
 const Chat = ({chatData, sendMessage, localPeer}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('');
+    const feedRef = useRef(null);
+
+    useEffect(() => {
+        if (feedRef.current) {
+            feedRef.current.scrollTop = feedRef.current.scrollHeight;
+        }
+    }, [chatData]);
 
     const handleChangeTexfield = (event) => {
         setNewMessage(event.target.value)
     };
 
     const handleKeyPress = (event) => {
-        if(event.key === 'Enter' && newMessage.length > 0) {
-            send(event)
+        if (event.key === 'Enter') {
+            if (event.shiftKey) {
+                setNewMessage(newMessage.concat('\n'));
+            } else {
+                send(event);
+            }
         }
     };
 
     const send = (e) => {
         e.preventDefault();
-        sendMessage(newMessage);
-        setNewMessage('');
+        if (newMessage.replace(/\n/g, '').length) {
+            sendMessage(newMessage);
+            setNewMessage('');
+        }
     };
 
     const parseEmojis = value => {
-        const emojisArray = toArray(value);
-
         // toArray outputs React elements for emojis and strings for other
-        const newValue = emojisArray.reduce((previous, current) => {
-          if (typeof current === "string") {
+        return toArray(value).reduce((previous, current) => {
+          if (typeof current === 'string') {
             return previous + current;
           }
           return previous + current.props.children;
-        }, "");
-
-        return newValue;
+        }, '');
       };
 
     //handle the chat feed to display all messages on the right position
-      const chatFeed = chatData.map((message, i) => message.peerId === localPeer.id
+      const chatMessages = chatData.map((message, i) => message.peerId === localPeer.id
           ? <ChatMsg key={i} side={'right'} messages={[parseEmojis(message.text)]}/>
           : <ChatMsg key={i} avatar={''} messages={[parseEmojis(message.text)]}/>
       );
 
     return (
-        <div className={classes.chatContainer}>
-            {chatFeed}
-            <div className={classes.chatSection}>
+        <div className={classes.chat}>
+
+            <div className={classes.chatFeed} ref={feedRef}>
+                {chatMessages}
+            </div>
+
+            <div className={classes.chatInput}>
                 <TextField
                     variant="outlined"
-                    size="small"
                     multiline
-                    fullWidth
-                    className={classes.textField}
+                    rowsMax={5}
+                    className={classes.chatInputTextfield}
                     onChange={handleChangeTexfield}
                     onKeyPress={handleKeyPress}
-                    value={parseEmojis(newMessage)}
+                    value={newMessage}
                 />
-                <SendIcon className={classes.customizeIcon} onClick={send}/>
+                <SendIcon className={classes.chatInputSendBtn} onClick={send}/>
             </div>
         </div>
     )

@@ -28,37 +28,18 @@ const ChatMsg = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {
     return '';
   };
   return (
-    <Grid
-      container
-      spacing={2}
-      justify={side === 'right' ? 'flex-end' : 'flex-start'}
-      {...GridContainerProps}
-    >
+    <Grid container spacing={2} justify={side === 'right' ? 'flex-end' : 'flex-start'}{...GridContainerProps} className={classes.wrapper}>
       {side === 'left' && (
         <Grid item {...GridItemProps}>
-          <Avatar
-            src={avatar}
-            {...AvatarProps}
-            className={cx(classes.avatar, AvatarProps.className)}
-          />
+          <Avatar src={avatar}{...AvatarProps} className={cx(classes.avatar, AvatarProps.className)}/>
         </Grid>
       )}
       <Grid item xs={8}>
         {messages.map((msg, i) => {
           const TypographyProps = getTypographyProps(msg, i, props);
           return (
-            // eslint-disable-next-line react/no-array-index-key
             <div key={msg.id || i} className={classes[`${side}Row`]}>
-              <Typography
-                align={'left'}
-                {...TypographyProps}
-                className={cx(
-                  classes.msg,
-                  classes[side],
-                  attachClass(i),
-                  TypographyProps.className
-                )}
-              >
+              <Typography align={'left'} {...TypographyProps} className={cx(classes.msg, classes[side], attachClass(i), TypographyProps.className)}>
                 {msg}
               </Typography>
             </div>
