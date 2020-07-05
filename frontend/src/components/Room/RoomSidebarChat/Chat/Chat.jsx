@@ -110,6 +110,7 @@ const Chat = ({chatData, sendMessage, localPeer}) => {
                     onChange={handleChangeTexfield}
                     onKeyPress={handleKeyPress}
                     value={newMessage}
+                    autoFocus
                 />
                 <SendIcon className={classes.chatInputSendBtn} onClick={send}/>
             </div>

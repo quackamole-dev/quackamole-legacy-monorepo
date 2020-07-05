@@ -136,7 +136,7 @@ const Home = () => {
             </Box>
 
             {/* Bullet Points */}
-            <div className={smallScreen?classes.smallScreenBulletPoints:classes.bulletPoints}>
+            <div className={smallScreen ? classes.smallScreenBulletPoints : classes.bulletPoints}>
                 {bulletPoints.map((data, i) => <BulletPoint content={data} key={data.title + i}> </BulletPoint>)}
             </div>
 

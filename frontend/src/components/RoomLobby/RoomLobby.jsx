@@ -64,6 +64,12 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
         setLink(e.target.value)
     };
 
+    const handleKeyPress = (e) => {
+        if(e.key === 'Enter') {
+            handleJoin()
+        }
+    }
+
     const handleJoin = (e) => {
         setMetadata({nickname: newNickname});
         setCurrentRoomError(null);
@@ -88,6 +94,8 @@ const RoomLobby = ({history, match, setMetadata, nickname, roomError, setCurrent
                             value={newNickname}
                             className={classes.nicknameStyle}
                             onChange={handleChangeName}
+                            onKeyPress={handleKeyPress}
+                            autoFocus
                         />
                         <TextField
                             required

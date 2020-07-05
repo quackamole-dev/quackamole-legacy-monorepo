@@ -10,6 +10,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET, IS_LOCALHOST} from '../../constants';
 import {isIpAddress} from "../../utils";
 import Grid from '@material-ui/core/Grid';
+import {useHistory} from "react-router";
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -87,11 +88,22 @@ const RoomCreateForm = () => {
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
     const [roomId, setRoomId] = React.useState('');
-    const [active, setActive ] = React.useState(true);
+    const [active, setActive] = React.useState(true);
     const classes = useStyles();
+    const history = useHistory();
 
     const handleChangeTexfield = (event) => {
         setName(event.target.value)
+    };
+
+    const handleKeyPress = (event) => {
+        if (active) {
+            if (event.key === 'Enter') {
+                createRoom()
+            }
+        } else {
+            history.push(`/room-lobby/${roomId}`)
+        }
     };
 
     const createRoom = () => {
@@ -117,7 +129,7 @@ const RoomCreateForm = () => {
                 setActive(false);
             });
         } else {
-            console.log('error')
+            console.log('please enter your name')
         }
     };
 
@@ -132,6 +144,8 @@ const RoomCreateForm = () => {
                 value={name}
                 onChange={handleChangeTexfield}
                 className={classes.textfield}
+                onKeyPress={handleKeyPress}
+                autoFocus
             />
             <div className={classes.alignButton}>
                 <Button
@@ -155,10 +169,11 @@ const RoomCreateForm = () => {
                 width={'100%'}
                 borderRadius='5px'
                 bgcolor='white'
+                onKeyPress={handleKeyPress}
             >
                 <Typography variant='h4' className={classes.titleStyle}>Room was created</Typography>
                 <div className={classes.copyLink}>
-                    <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink} minWidth={300}/>
+                    <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink} minWidth={300} autoFocus/>
                     <Button size="large" color="secondary" variant="contained" className={classes.myButton} onClick={() => {navigator.clipboard.writeText(link)}}>
                         copy
                     </Button>
