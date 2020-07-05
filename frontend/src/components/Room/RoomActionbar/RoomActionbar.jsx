@@ -1,19 +1,23 @@
 import React from 'react';
 import {Box} from "@material-ui/core";
+import HomeIcon from '@material-ui/icons/Home';
+import Button from '@material-ui/core/Button';
 import RoomSidebarMenu from "../RoomSidebarMenu/RoomSidebarMenu";
 import RoomSidebarChat from "../RoomSidebarChat/RoomSidebarChat";
 import {Link} from "react-router-dom";
 
+// TODO actionbar needs some rework.
 const RoomActionbar = () => {
     return (
-        <>
-            <Box bgcolor={'#f5deb3eb'} height={'10%'} display='flex' flexDirection='row' width={1} justifyContent={'center'} borderTop={'1px solid #0000003b'}>
-                {/* space for some easy access actions like mute, enable camera, chat etc. */}
-                <RoomSidebarMenu />
-                <RoomSidebarChat />
-                <Link to={'/'}>Home</Link>
-            </Box>
-        </>
+        <Box bgcolor={'#f5deb3eb'} height={'10%'} display='flex' justifyContent={'center'} borderTop={'1px solid #0000003b'} alignItems={'center'}>
+            <RoomSidebarMenu />
+            <Link to={'/'} style={{height: '100%'}}>
+                <Button style={{height: '100%'}}>
+                    <HomeIcon color='primary' fontSize='large'/>
+                </Button>
+            </Link>
+            <RoomSidebarChat />
+        </Box>
     );
 };
 
