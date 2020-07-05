@@ -1,1 +1,0 @@
-{"version":3,"sources":["index.scss"],"names":[],"mappings":"AACA,KAEI,YAAa,CAChB,WAFG,gBAMgB,CAJnB,MAIG,eAAgB","file":"main.22826922.chunk.css","sourcesContent":["// Put global styles in here only if there are no good alternatives using MUI\r\nbody {\r\n    min-height: 100vh;\r\n    display: flex;\r\n}\r\n\r\n#root {\r\n    min-height: 100vh;\r\n    min-width: 100vw;\r\n}\r\n"]}
