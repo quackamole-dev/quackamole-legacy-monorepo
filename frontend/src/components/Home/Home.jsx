@@ -113,7 +113,11 @@ const Home = () => {
         <ThemeProvider theme={theme}>
             {/* Header */}
             <Box height={63} bgcolor='#2E7D32' className={classes.header}>
-                <h1>🦆 Quackamole 🥑</h1>
+                <h1>
+                    <span role={'img'} aria-label={'a duck'}>🦆 </span>
+                    Quackamole
+                    <span role={'img'} aria-label={'an avocado'}> 🥑</span>
+                </h1>
             </Box>
 
             {/* Body */}
