@@ -9,6 +9,13 @@ import BulletPoint from "./BulletPoint/BulletPoint";
 import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
+    header: {
+        color: 'white',
+        textTransform: 'uppercase',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     box: {
         display: 'flex',
         width: '100%',
@@ -26,7 +33,7 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        width: '30%',
+        width: '40%',
         minWidth: 310,
     },
     titleStyle: {
@@ -36,7 +43,7 @@ const useStyles = makeStyles({
     },
     buttonStyle: {
         borderRadius: '5px',
-        width: '106px',
+        // width: '106px',
         fontWeight: 'bold',
         color: 'white',
         backgroundColor: '#FBC02D',
@@ -84,20 +91,20 @@ const Home = () => {
     const bulletPoints = [
         {
             title: 'Gaming',
-            icon: 'ToysOutlinedIcon',
-            image: 'https://image.freepik.com/free-vector/realistic-radiant-magic-portals-pink-vs-blue-with-light-effects-black-background-illustration_1284-31390.jpg',
+            icon: 'VideogameAssetIcon',
+            image: 'https://via.placeholder.com/400x300',
             text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec urna dolor. Maecenas vehicula dui ut quam imperdiet.',
         },
         {
             title: 'Working',
             icon: 'AssessmentOutlinedIcon',
-            image: 'https://image.freepik.com/free-vector/teamwork-concept-illustration_1284-20522.jpg',
+            image: 'https://via.placeholder.com/400x300',
             text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec urna dolor. Maecenas vehicula dui ut quam imperdiet.',
         },
         {
             title: 'Chatting',
             icon: 'CallOutlinedIcon',
-            image: 'https://image.freepik.com/free-vector/group-chat-concept-illustration_114360-1495.jpg',
+            image: 'https://via.placeholder.com/400x300',
             text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec urna dolor. Maecenas vehicula dui ut quam imperdiet.',
         }
     ];
@@ -105,21 +112,23 @@ const Home = () => {
     return (
         <ThemeProvider theme={theme}>
             {/* Header */}
-            <Box height={63} bgcolor='#2E7D32'> </Box>
+            <Box height={63} bgcolor='#2E7D32' className={classes.header}>
+                <h1>🦆 Quackamole 🥑</h1>
+            </Box>
 
             {/* Body */}
             <Box height={540} display='flex' zIndex={1}>
                 <Box className={smallScreen ? classes.smallScreenBox : classes.box} bgcolor= '#388E3C'>
                     <div className={classes.titleContainer}>
                     <Typography variant='h3' className={classes.titleStyle} gutterBottom align='center'>
-                        Create now a room and have fun
+                        Peer-to-peer video chat platform
                     </Typography>
                     <Link to="/create-room" style={{textDecoration: 'none'}}>
-                        <Button size="large" className={classes.buttonStyle}>Create</Button>
+                        <Button size="large" className={classes.buttonStyle}>Create a room</Button>
                     </Link>
                     </div>
                     <img
-                        src="https://www.zohowebstatic.com/sites/default/files/cliq-primetime-features.jpg"
+                        src='https://via.placeholder.com/400x300'
                         className={smallScreen ? classes.smallScreenMainImg : classes.mainImg}
                         alt={'quackamole room preview'}
                     />

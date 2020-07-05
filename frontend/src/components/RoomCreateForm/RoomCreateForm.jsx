@@ -158,13 +158,13 @@ const RoomCreateForm = () => {
             >
                 <Typography variant='h4' className={classes.titleStyle}>Room was created</Typography>
                 <div className={classes.copyLink}>
-                    <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink}/>
+                    <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink} minWidth={300}/>
                     <Button size="large" color="secondary" variant="contained" className={classes.myButton} onClick={() => {navigator.clipboard.writeText(link)}}>
                         copy
                     </Button>
                 </div>
                 <Typography variant='h6' align='center' className={classes.subtitle}>
-                    Share your link and invite someone to your room
+                    Share the link to invite someones to your room
                 </Typography>
 
                 <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none', width: '80%'}}>

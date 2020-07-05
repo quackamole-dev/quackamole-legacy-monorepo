@@ -2,7 +2,7 @@ import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 import CallOutlinedIcon from '@material-ui/icons/CallOutlined';
-import ToysOutlinedIcon from '@material-ui/icons/ToysOutlined';
+import VideogameAssetIcon from '@material-ui/icons/VideogameAsset';
 import Typography from '@material-ui/core/Typography';
 import {useMediaQuery} from '@material-ui/core';
 
@@ -49,8 +49,8 @@ const BulletPoint = (props) => {
     const smallScreen = useMediaQuery("(max-width: 950px)");
 
     const checkIcons = (icon) => {
-        if(icon === 'ToysOutlinedIcon') {
-            return <ToysOutlinedIcon fontSize='large' className={classes.customizeIcon}/>
+        if(icon === 'VideogameAssetIcon') {
+            return <VideogameAssetIcon fontSize='large' className={classes.customizeIcon}/>
         } else if(icon === 'AssessmentOutlinedIcon') {
             return <AssessmentOutlinedIcon fontSize='large' className={classes.customizeIcon}/>
         } else if(icon === 'CallOutlinedIcon') {
