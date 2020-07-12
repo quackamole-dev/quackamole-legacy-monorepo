@@ -34,7 +34,6 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
         });
 
         connection.on('data', data => {
-            console.log('on connection data', data);
             const type = data.type;
 
             if (data.textMessage) {
