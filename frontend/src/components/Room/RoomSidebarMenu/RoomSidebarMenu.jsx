@@ -28,6 +28,7 @@ const plugins = [
     {name: 'Random number', url: 'https://andreas-schoch.github.io/p2p-test-plugin/'},
     {name: 'Paint', url: 'https://andreas-schoch.github.io/quackamole-plugin-paint/'},
     {name: 'Gomoku', url: 'https://derpmasters.github.io/quackamole-plugin-gomoku/'},
+    {name: '2d Shooter (WIP)', url: 'https://andreas-schoch.github.io/quackamole-plugin-2d-topdown-shooter/'},
     {name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/'}
 ];
 
