@@ -1,7 +1,20 @@
-class QuackamoleEventManager {
+class Logger {
+    constructor(debugMode = false) {
+        this.debugMode = debugMode;
+    }
 
-    constructor() {
+    log(...messages) {
+        if (this.debugMode) {
+            console.log(...messages);
+        }
+    }
+}
+
+class QuackamoleEventManager {
+    constructor(debugMode = false) {
         this.syntheticEvents = new Map();
+        this.debugMode = debugMode;
+        this.logger = new Logger(this.debugMode);
     }
 
     on(eventType, callback, repeat = true) {
@@ -18,7 +31,7 @@ class QuackamoleEventManager {
         const eventListeners = this.__getEventListenersFor(eventType);
 
         for (const [callback, repeat] of eventListeners) {
-            console.log('emit callback', callback, eventType);
+            this.logger.log('QuackamoleEventManager.emit - triggered callback:', callback, 'eventType:', eventType);
             if (!repeat) {
                 eventListeners.delete(callback);
             }
@@ -34,18 +47,19 @@ class QuackamoleEventManager {
     }
 }
 
-const quackamoleEventManagerSingleton = new QuackamoleEventManager();
-
+const quackamoleEventManagerSingleton = new QuackamoleEventManager();  // TODO deprecate and potentially export the class
 
 class Quackamole {
-    constructor() {
-        this.eventManager = quackamoleEventManagerSingleton;
+    constructor(debugMode = false) {
+        this.debugMode = debugMode;
+        this.eventManager = new QuackamoleEventManager(this.debugMode);
+        this.logger = new Logger(this.debugMode);
         this.__init();
     }
 
     broadcastData(eventType, data, includeSelf = true) {
         const action = {type: 'PLUGIN_SEND_TO_ALL_PEERS', payload: {eventType, data}};
-        console.log('broadcastData', action);
+        this.logger.log('Quackamole.broadcastData - action:', action);
         window.top.postMessage(action, '*');
         this.eventManager.emit(eventType, data);
     }
@@ -70,17 +84,19 @@ class Quackamole {
     }
 
     __receiveMessage(event) {
-        console.log('__receive message', event);
+        this.logger.log('windows.onmessage - event:', event);
         switch (event.data.type) {
             case 'PLUGIN_DATA': {
                 // emit the event received from another peer.
                 const {eventType, data} = event.data.payload;
                 this.eventManager.emit(eventType, data);
+                break;
             }
-            // case 'RECEIVE_LOCAL_PEER': {
+            // case 'PLUGIN_REQUEST_LOCAL_PEER_GRANT': {
             //     // emit the event received from another peer.
             //     const {eventType, data} = event.data.payload;
             //     this.eventManager.emit(eventType, data);
+            //     break;
             // }
         }
     }
@@ -88,7 +104,7 @@ class Quackamole {
 
 try {
     module.exports = {
-        quackamoleEventManager: quackamoleEventManagerSingleton,
+        quackamoleEventManager: quackamoleEventManagerSingleton, // TODO deprecate and potentially export the class
         Quackamole: Quackamole
     };
 } catch(e) {}

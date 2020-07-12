@@ -1,6 +1,6 @@
 {
   "name": "quackamole-sdk",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "tools to develop plugins for the quackamole platform",
   "main": "index.js",
   "scripts": {
