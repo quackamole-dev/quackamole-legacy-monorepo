@@ -1,0 +1,12 @@
+{
+  "name": "quackamole-server-heroku",
+  "version": "0.1.0",
+  "description": "Only relevant when using the Heroku 1-click deploy button. Heroku requires a package.json at the root of the repository",
+  "main": "app.js",
+  "scripts": {
+    "heroku-prebuild": "cd backend && npm install && npm run build && cd .. && cd backend && npm install",
+    "start": "cd backend && npm start"
+  },
+  "author": "Andreas Schoch",
+  "license": "MIT"
+}
