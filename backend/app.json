@@ -2,7 +2,7 @@
   "name": "quackamole-server",
   "stack": "heroku-18",
   "website": "quackamole.io",
-  "repository": "https://github.com/quackamole-dev/quackamole",
+  "repository": "https://github.com/quackamole-dev/quackamole/tree/heroku-button/backend",
   "logo": "",
   "keywords": [],
   "description": "Peer-to-peer videochat platform"
