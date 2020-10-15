@@ -10,7 +10,8 @@ class roomManager {
                 password: 'dummy123',  // TODO hash pws once we start using them to secure rooms.
                 name: 'dummy room name',
                 maxUsers: 4,
-                activePluginId: 'gomoku'
+                activePluginId: 'gomoku',
+                joinedUsers: []
             }
         }
     }
@@ -44,8 +45,11 @@ class roomManager {
     };
 
     getAllRooms = () => {
-        // Note: passwords of the rooms are returned as well but right now it does not matter
-        return this.rooms;
+        // Note: passwords are NOT included within the returned room data
+        return Object.values(this.rooms).map(roomData => {
+            const {password, ...otherRoomProperties} = roomData;
+            return otherRoomProperties;
+        });
     };
 
     updateRoom = (roomId, data) => {

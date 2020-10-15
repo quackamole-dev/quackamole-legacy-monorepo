@@ -1,16 +1,25 @@
 import {ADD_NEW_MESSAGE} from '../actionTypes';
+import {sendDataToConnection} from './connections.actions';
 
 export const sendMessage = (text) => async (dispatch, getState) => {
     const connections = Object.values(getState().connections.data);
-    const localPeer = getState().localUser.peer;
+    const socket = getState().localUser.socket;
 
-    connections.forEach(connection => connection.send({textMessage: {
-        text: text,
-        peerId: localPeer.id
-    }}));
+    if (socket) {
+        connections.forEach(connection => {
+            // FIXME change to use separate data channel only for chat instead of identifying it by type or specific properties
+            const message = {
+                textMessage: { text: text, authorSocketId: socket.id }
+            };
 
-    dispatch({
-        type: ADD_NEW_MESSAGE,
-        payload: {text: text, peerId: localPeer.id}
-    });
+            dispatch(sendDataToConnection(connection.defaultDataChannel, message));
+        });
+
+        dispatch({
+            type: ADD_NEW_MESSAGE,
+            payload: {text: text, authorSocketId: socket.id}
+        });
+    } else {
+        console.error('socket not found');
+    }
 };

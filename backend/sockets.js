@@ -1,6 +1,8 @@
 const IOServer = require('socket.io');
 const roomManager = require('./rooms');
 const {SocketCustomError} = require('./errors');
+// const url = require('url')
+// const base64id = require('base64id')
 
 const util = {
     getSocketCustomData: (io, socketId) => {
@@ -18,14 +20,13 @@ const util = {
     },
     getSocketIdsInRoom: (io, roomId) => {
         const room = io.sockets.adapter.rooms[roomId];
-        return room ? Object.keys(room.sockets) : false;
+        return room ? Object.keys(room.sockets) : [];
     },
     socketAlreadyInRoom: (socket, roomId) => {
         return Object.keys(socket.rooms).includes(roomId);
     },
     getSocketCurrentRooms: (io, socket) => {
         return socket.rooms;
-
     }
 };
 
@@ -72,13 +73,46 @@ const initSocketActions = (io, socket) => {
         socket.to(roomId).emit('user-leave', socket.id);
         socket.leave(roomId);
         const {nickname, currentRoomId, peerId} = util.getSocketCustomData(io, socket.id);
-        console.log(`User ${nickname} with peerId: ${peerId} left roomId ${currentRoomId}`);
+        console.log(`User ${nickname} with socketId: ${socket.id} left roomId ${currentRoomId}`);
         util.addCustomSocketData(io, socket.id, {currentRoomId: null});
+
+        const roomRef = roomManager.getRoomById(currentRoomId);
+        roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
+        // TODO reduce code duplication. There is a "leave" and a in-built "disconnect" event-listener doing similar things
+    });
+
+    socket.on('offer', ({receiverSocketId, offer}) => {
+        const nickname = socket.handshake.query['nickname'];
+        console.log(`User ${nickname} with socketID: ${socket.id} send an offer to socketID: ${receiverSocketId}`);
+        io.to(receiverSocketId).emit('offer', {senderSocketId: socket.id, offer: offer});
+    });
+
+    socket.on('answer', ({receiverSocketId, answer}) => {
+        const nickname = socket.handshake.query['nickname'];
+        console.log(`User ${nickname} with socketID: ${socket.id} send an answer to socketID: ${receiverSocketId}`);
+        io.to(receiverSocketId).emit('answer', {senderSocketId: socket.id, answer: answer});
+    });
+
+    socket.on('ice-candidate', ({senderSocketId, receiverSocketId, iceCandidate}) => {
+        const nickname = socket.handshake.query['nickname'];
+        console.log(`User ${nickname} with socketID: ${socket.id} send an ICE Candidate to socketID: ${receiverSocketId}`);
+        io.to(receiverSocketId).emit('ice-candidate', {senderSocketId, iceCandidate});
     });
 };
 
 const initSocketIO = (server) => {
     const io = IOServer.listen(server);
+
+    // // Overwrite default ID generation. Based on this: https://stackoverflow.com/a/63176671 (experimental)
+    // io.engine.generateId = req => {
+    //     const parsedUrl = new url.parse(req.url)
+    //     const prevId = parsedUrl.searchParams.get('socketId')
+    //     // prevId is either a valid id or an empty string
+    //     if (prevId) {
+    //         return prevId
+    //     }
+    //     return base64id.generateId()
+    // }
 
     io.on('connection', function (socket) {
         // Send to connected client because on the clientside socket.id is sometimes undefined after connecting
@@ -95,12 +129,15 @@ const initSocketIO = (server) => {
         // Cleanup when client disconnects
         socket.on('disconnect', () => {
             const {nickname, currentRoomId, peerId} = socket.customData;
-            console.log(`User ${nickname} with peerId: ${peerId} disconnected completely`);
+            console.log(`DISCONNECT: User ${nickname} with socketId: ${socket.id} disconnected completely`);
             if (currentRoomId) {
                 socket.to(currentRoomId).emit('user-leave', socket.id);
                 socket.leave(currentRoomId);
                 util.addCustomSocketData(io, socket.id, {currentRoomId: null});
-                console.log(`User ${nickname} with peerId: ${peerId} left roomId ${currentRoomId}`);
+                console.log(`DISCONNECT: User ${nickname} with socketId: ${socket.id} left roomId ${currentRoomId}`);
+
+                const roomRef = roomManager.getRoomById(currentRoomId);
+                roomRef.joinedUsers = util.getSocketIdsInRoom(io, roomRef.id);
             }
         })
     });

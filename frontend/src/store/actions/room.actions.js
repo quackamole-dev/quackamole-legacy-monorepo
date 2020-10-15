@@ -22,6 +22,7 @@ export const roomExitCleanup = () => (dispatch, getState) => {
     const state = getState();
 
     const socket = state.localUser.socket;
+    const localSocketId = socket.id;
     if (socket) {
          const currentRoom = state.room.data;
          if (currentRoom.id) {
@@ -37,12 +38,9 @@ export const roomExitCleanup = () => (dispatch, getState) => {
         Object.values(connections).forEach(conn => conn.close());
     }
 
-    const localPeer = state.localUser.peer;
-    if (localPeer) {
-        const localStream = state.streams[localPeer.id];
-        if (localStream) {
-            window.localStream.getTracks().forEach(track => track.stop());
-        }
+    const localStream = state.streams[localSocketId];
+    if (localStream) {
+        window.localStream.getTracks().forEach(track => track.stop());
     }
     dispatch(clearAllStreams());
 };

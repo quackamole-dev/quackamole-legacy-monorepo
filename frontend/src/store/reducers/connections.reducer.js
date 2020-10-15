@@ -10,13 +10,13 @@ const connectionsReducer = produce((connectionsDraft, action) => {
     switch (action.type) {
         case ADD_CONNECTION: {
             const connection = action.payload.connection;
-            connectionsDraft.data[connection.peer] =  connection;
+            connectionsDraft.data[connection.remoteSocketId] =  connection;
             connectionsDraft.error = null;
             return;
         }
         case REMOVE_CONNECTION: {
             const connection = action.payload.connection;
-            delete connectionsDraft.data[connection.peer];
+            delete connectionsDraft.data[connection.remoteSocketId];
             connectionsDraft.error = null;
             return;
         }

@@ -12,8 +12,8 @@ const initialState = {
 const peersReducer = produce((peersDraft, action) => {
     switch (action.type) {
         case ADD_PEER: {
-            const {peerId, metadata} = action.payload;
-            peersDraft.data[peerId] = {metadata};
+            const {socketId, metadata} = action.payload;
+            peersDraft.data[socketId] = {metadata};
             peersDraft.error = null;
             return;
         }

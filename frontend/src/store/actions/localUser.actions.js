@@ -1,10 +1,8 @@
-import {INIT_LOCAL_USER_PEER, INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_LOADING, SET_LOCAL_USER_METADATA} from '../actionTypes';
-import Peer from "peerjs";
-import {API_BASE_URL, PORT_SIGNALING, PORT_SOCKET, SSL_ENABLED} from "../../constants";
+import {INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_LOADING, SET_LOCAL_USER_METADATA} from '../actionTypes';
+import {API_BASE_URL, PORT_SOCKET, SSL_ENABLED} from "../../constants";
 import io from "socket.io-client";
 import {getPersistedData, persistData, serializeQueryString} from '../../utils';
-import {addConnection, removeConnection} from "./connections.actions";
-import {addCall} from "./calls.actions";
+import {addConnection, initDataChannelListeners, removeConnection} from './connections.actions';
 import {startLocalStream} from "./streams.actions";
 import {setCurrentRoomError} from './room.actions';
 
@@ -40,45 +38,57 @@ const initLocalUserSocket = (metadata) => async (dispatch, getState) => {
 const initLocalUserSocketListeners = (socket) => async (dispatch, getState) => {
     socket.on('ready', (socketId) => {
         dispatch({type: INIT_LOCAL_USER_SOCKET, payload: {socket}});
-        dispatch(initLocalUserPeer(socketId));
-    });
 
-    socket.on('user-leave', (socketId) => {
-        const connection = getState().connections.data[socketId];
-        if (connection) {
-            dispatch(removeConnection(connection));
-        }
+        socket.on('user-leave', (socketId) => {
+            const connection = getState().connections.data[socketId];
+            if (connection) {
+                dispatch(removeConnection(connection));
+            }
+        });
+
+        socket.on('offer', async ({senderSocketId, offer}) => {
+            console.log('OFFER received - senderId:', senderSocketId, 'offer:', offer);
+
+            const connection = new RTCPeerConnection(); // TODO check first if one already exists
+            connection.socketId = socket.id; // FIXME temporary solution. store as es6 map. do "new Map(Array.from(m).reverse())" for reverse lookup
+            connection.remoteSocketId = senderSocketId;
+
+            connection.defaultDataChannel = connection.createDataChannel('default'); // FIXME temporary. create wrapper for RTCPeerConnection
+            console.log('--defaultDataChannel created', connection.defaultDataChannel);
+            dispatch(initDataChannelListeners(connection.defaultDataChannel));
+
+            const localStream = await getState().streams.data[socket.id] || dispatch(startLocalStream());
+            connection.addStream(localStream); // addStream needs to be called BEFORE attempting to create offer/answer
+            await dispatch(addConnection(connection));
+
+
+            await connection.setRemoteDescription(new RTCSessionDescription(offer));
+
+            const answer = await connection.createAnswer();
+            await connection.setLocalDescription(answer);
+            socket.emit('answer', {receiverSocketId: senderSocketId, answer: answer})
+
+        });
+
+        socket.on('answer', ({senderSocketId, answer}) => {
+            const connection = getState().connections.data[senderSocketId];
+
+            if (connection) {
+                console.log('ANSWER received - senderId:', senderSocketId, 'answer:', answer, 'connection:', connection);
+                connection.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+        });
+
+        socket.on('ice-candidate', ({senderSocketId, iceCandidate}) => {
+            const connection = getState().connections.data[senderSocketId];
+
+            if (connection) {
+                console.log('ICE Candidate received - senderId:', senderSocketId);
+                connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+            }
+        });
     });
 }
-
-const initLocalUserPeer = (customPeerId) => async (dispatch, getState) => {
-    // FIXME peer init can fail when socket.id start with an underscore. Rarely happens though, allow peerId to be different from socketId
-    const peer = await new Peer(customPeerId, {
-        host: API_BASE_URL,
-        port: PORT_SIGNALING,
-        path: '/peer/signal',
-        // debug: 3,
-        config: {iceServers: [{url: 'stun:stun.l.google.com:19302'}]}
-    });
-    await dispatch({type: INIT_LOCAL_USER_PEER, payload: {peer}});
-    await dispatch(initLocalUserPeerListeners(peer));
-    dispatch({type: SET_LOCAL_USER_LOADING, payload: {loading: false}});
-};
-
-const initLocalUserPeerListeners = (localPeer) => async (dispatch, getState) => {
-    localPeer.on('open', id => {
-    });
-
-    localPeer.on('connection', connection => {
-        dispatch(addConnection(connection));
-    });
-
-    localPeer.on('call', async call => {
-        const localStream = await getState().streams.data[localPeer.id] || dispatch(startLocalStream(localPeer));
-        call.answer(localStream);
-        dispatch(addCall(call));
-    })
-};
 
 export const setMetadata = (metadata) => (dispatch, getState) => {
     persistData('metadata', metadata);
