@@ -148,7 +148,7 @@ export const joinRoom = (roomId, password) => async (dispatch, getState) => { //
     const {socket} = getState().localUser;
 
     if (socket) {
-        socket.emit('join', {roomId, password, peerId: socket.id},
+        socket.emit('join', {roomId, password, socketId: socket.id},
             // callback: the joining user himself is responsible to establish connections with other users
             async (err, data) => {
                 if (!err) {

@@ -40,7 +40,7 @@ const initSocketActions = (io, socket) => {
     });
 
     // Join room.
-    socket.on('join', ({roomId, password, peerId}, callback) => {
+    socket.on('join', ({roomId, password}, callback) => {
         // TODO roomManager should be renamed into roomUtils if join room logic is outside of it.
         if (!roomManager.doesRoomExist(roomId)) {
             return callback(new SocketCustomError('RoomError', 'This room does not exist.'));
@@ -72,7 +72,7 @@ const initSocketActions = (io, socket) => {
     socket.on('leave', (roomId) => {
         socket.to(roomId).emit('user-leave', socket.id);
         socket.leave(roomId);
-        const {nickname, currentRoomId, peerId} = util.getSocketCustomData(io, socket.id);
+        const {nickname, currentRoomId} = util.getSocketCustomData(io, socket.id);
         console.log(`User ${nickname} with socketId: ${socket.id} left roomId ${currentRoomId}`);
         util.addCustomSocketData(io, socket.id, {currentRoomId: null});
 
@@ -120,15 +120,15 @@ const initSocketIO = (server) => {
 
         // Arbitrary data can be send from the frontend via query params.
         const nickname = socket.handshake.query['nickname'];
-        socket.customData = {nickname: nickname, peerId: socket.id}; // FIXME use custom peerId, socket.id leads to error when it starts with underscore
-        console.log('User with nickname:', nickname, 'connected. PeerId:', socket.customData.peerId);
+        socket.customData = {nickname: nickname};
+        console.log('User with nickname:', nickname, 'connected. socketId:', socket.id);
 
         // Init user triggered actions
         initSocketActions(io, socket);
 
         // Cleanup when client disconnects
         socket.on('disconnect', () => {
-            const {nickname, currentRoomId, peerId} = socket.customData;
+            const {nickname, currentRoomId} = socket.customData;
             console.log(`DISCONNECT: User ${nickname} with socketId: ${socket.id} disconnected completely`);
             if (currentRoomId) {
                 socket.to(currentRoomId).emit('user-leave', socket.id);

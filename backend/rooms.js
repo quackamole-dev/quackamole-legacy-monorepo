@@ -24,18 +24,6 @@ class roomManager {
         return this.getRoomById(sanitizedRoomData.id);
     };
 
-    // leaveRoom = (roomId, peerId) => {
-    //     const roomRef = this.rooms[roomId];
-    //
-    //     if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
-    //         roomRef.joinedUsers.filter(user => user !== peerId);
-    //         return roomRef;
-    //     } else {
-    //         console.log(`The user: ${peerId} is not in this room, therefore cannot leave`);
-    //         return false;
-    //     }
-    // };
-
     doesRoomExist = (roomId) => {
         return !!this.rooms[roomId];
     };
@@ -77,7 +65,7 @@ class roomManager {
             password: rawRoomData.password || '',
             name: rawRoomData.name || 'default room name',  // TODO use faker to generate some random default names
             maxUsers: rawRoomData.maxUsers || 4,
-            joinedUsers: ['not used, always empty for now'],
+            joinedUsers: [],
             activePluginId: rawRoomData.activePluginId || ''
         }
     };
