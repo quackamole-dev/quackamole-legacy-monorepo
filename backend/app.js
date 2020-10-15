@@ -16,22 +16,23 @@ const environment = process.env.NODE_ENV || 'development';
 
     let sslOptions = null;
     if (SSL_ENABLED) {
+        // FIXME specify certs in .env
         const sslKey = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/privkey.pem' : 'localhost.key';
         const sslCert = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/fullchain.pem' : 'localhost.crt';
         sslOptions = {key: fs.readFileSync(sslKey), cert: fs.readFileSync(sslCert)};
     }
 
-const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
-const corsOptions = {
-    credentials: true,
-    origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-};
+// const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
+// const corsOptions = {
+//     credentials: true,
+//     origin: function (origin, callback) {
+//         if (whitelist.indexOf(origin) !== -1) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+// };
 
 /////////////////
 // Init Server //
@@ -41,7 +42,7 @@ const server = SSL_ENABLED ? https.createServer(sslOptions, app) : http.createSe
 
 const io = initSocketIO(server);
 
-app.use(morgan("combined"));
+app.use(morgan('combined'));
 app.use(helmet());
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -50,4 +51,5 @@ app.use(bodyParser.json());
 const router = require('./router');
 app.use('/api', router);
 
-server.listen(5002, () => console.log('SocketIO server listening on port: ',  5002, 'ssl:', SSL_ENABLED));
+const port = process.env.PORT || 5000;
+server.listen(port, () => console.log('Server listening on port: ',  port, 'ssl:', SSL_ENABLED));
