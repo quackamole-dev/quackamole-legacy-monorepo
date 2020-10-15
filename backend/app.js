@@ -11,11 +11,11 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const initSocketIO = require('./sockets');
 
-const SSL_ENABLED = process.env.SSL_ENABLED === 'true';
+const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true';
 const environment = process.env.NODE_ENV || 'development';
 
     let sslOptions = null;
-    if (SSL_ENABLED) {
+    if (HTTPS_ENABLED) {
         // FIXME specify certs in .env
         const sslKey = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/privkey.pem' : 'localhost.key';
         const sslCert = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/fullchain.pem' : 'localhost.crt';
@@ -38,7 +38,7 @@ const environment = process.env.NODE_ENV || 'development';
 // Init Server //
 /////////////////
 const app = express();
-const server = SSL_ENABLED ? https.createServer(sslOptions, app) : http.createServer(app);
+const server = HTTPS_ENABLED ? https.createServer(sslOptions, app) : http.createServer(app);
 
 const io = initSocketIO(server);
 
@@ -52,4 +52,4 @@ const router = require('./router');
 app.use('/api', router);
 
 const port = process.env.PORT || 5000;
-server.listen(port, () => console.log('Server listening on port: ',  port, 'ssl:', SSL_ENABLED));
+server.listen(port, () => console.log('server listening on port: ',  port, 'https:', HTTPS_ENABLED));
