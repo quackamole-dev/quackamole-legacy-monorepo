@@ -49,7 +49,12 @@ const initLocalUserSocketListeners = (socket) => async (dispatch, getState) => {
         socket.on('offer', async ({senderSocketId, offer}) => {
             console.log('OFFER received - senderId:', senderSocketId, 'offer:', offer);
 
-            const connection = new RTCPeerConnection(); // TODO check first if one already exists
+            const configuration = {
+                iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
+                iceCandidatePoolSize: 1
+            };
+
+            const connection = new RTCPeerConnection(configuration); // TODO check first if one already exists
             connection.socketId = socket.id; // FIXME temporary solution. store as es6 map. do "new Map(Array.from(m).reverse())" for reverse lookup
             connection.remoteSocketId = senderSocketId;
 

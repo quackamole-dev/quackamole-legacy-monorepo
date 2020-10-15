@@ -112,8 +112,13 @@ export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
     const {socket} = getState().localUser;
 
     if (remoteSocketId !== socket.id) {
-        console.log('----- connectWithPeer() action, remoteSocketId', remoteSocketId, 'socket.id', socket.id, socket.id === remoteSocketId);
-        const connection = new RTCPeerConnection(); // TODO check first if one already exists
+
+        const configuration = {
+            iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
+            iceCandidatePoolSize: 1
+        };
+
+        const connection = new RTCPeerConnection(configuration); // TODO check first if one already exists
         connection.socketId = socket.id;
         connection.remoteSocketId = remoteSocketId;
 
