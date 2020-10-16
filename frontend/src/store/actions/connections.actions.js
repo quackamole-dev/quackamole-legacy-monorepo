@@ -182,7 +182,7 @@ export const joinRoom = (roomId, password) => async (dispatch, getState) => { //
                 if (!err) {
                     await dispatch(startLocalStream(socket));
                     await dispatch({type: SET_CURRENT_ROOM, payload: {room: data.room}});
-                    data.room.joinedUsers.forEach((remotePeerId) => dispatch(connectWithPeer(remotePeerId)));
+                    data.room.joinedUsers.forEach((remoteSocketId) => dispatch(connectWithPeer(remoteSocketId)));
                     console.log(`There are ${data.room.joinedUsers.length}x joinedUsers`);
                 } else {
                     dispatch(setCurrentRoomError(err));
