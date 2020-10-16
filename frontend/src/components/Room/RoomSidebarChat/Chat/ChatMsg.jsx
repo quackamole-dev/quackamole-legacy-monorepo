@@ -1,5 +1,5 @@
 import React from 'react';
-import cx from 'clsx';  // TODO This comes from some example code, it has some nice features but we need to discuss whether we want to use it
+import cx from 'clsx'; // TODO This comes from some example code, it has some nice features but we need to discuss whether we want to use it
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +15,7 @@ const ChatMsg = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {
     GridContainerProps,
     GridItemProps,
     AvatarProps,
-    getTypographyProps,
+    getTypographyProps
   } = props;
 
   const attachClass = index => {
@@ -57,7 +57,7 @@ ChatMsg.defaultProps = {
   GridContainerProps: {},
   GridItemProps: {},
   AvatarProps: {},
-  getTypographyProps: () => ({}),
+  getTypographyProps: () => ({})
 };
 
 export default ChatMsg;

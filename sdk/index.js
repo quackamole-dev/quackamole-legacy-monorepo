@@ -1,113 +1,113 @@
 class Logger {
-    constructor(debugMode = false) {
-        this.debugMode = debugMode;
-    }
+  constructor(debugMode = false) {
+    this.debugMode = debugMode;
+  }
 
-    log(...messages) {
-        if (this.debugMode) {
-            console.log(...messages);
-        }
+  log(...messages) {
+    if (this.debugMode) {
+      console.log(...messages);
     }
+  }
 }
 
 class QuackamoleEventManager {
-    constructor(debugMode = false) {
-        this.syntheticEvents = new Map();
-        this.debugMode = debugMode;
-        this.logger = new Logger(this.debugMode);
-    }
+  constructor(debugMode = false) {
+    this.syntheticEvents = new Map();
+    this.debugMode = debugMode;
+    this.logger = new Logger(this.debugMode);
+  }
 
-    on(eventType, callback, repeat = true) {
-        const eventListeners = this.__getEventListenersFor(eventType);
-        eventListeners.set(callback, repeat);
-    }
+  on(eventType, callback, repeat = true) {
+    const eventListeners = this.__getEventListenersFor(eventType);
+    eventListeners.set(callback, repeat);
+  }
 
-    off(eventType, callback) {
-        const eventListeners = this.__getEventListenersFor(eventType);
+  off(eventType, callback) {
+    const eventListeners = this.__getEventListenersFor(eventType);
+    eventListeners.delete(callback);
+  }
+
+  emit(eventType, payload, metadata) {
+    const eventListeners = this.__getEventListenersFor(eventType);
+
+    for (const [callback, repeat] of eventListeners) {
+      this.logger.log('QuackamoleEventManager.emit - triggered callback:', callback, 'eventType:', eventType);
+      if (!repeat) {
         eventListeners.delete(callback);
+      }
+      callback(payload, metadata);
     }
+  }
 
-    emit(eventType, payload, metadata) {
-        const eventListeners = this.__getEventListenersFor(eventType);
-
-        for (const [callback, repeat] of eventListeners) {
-            this.logger.log('QuackamoleEventManager.emit - triggered callback:', callback, 'eventType:', eventType);
-            if (!repeat) {
-                eventListeners.delete(callback);
-            }
-            callback(payload, metadata);
-        }
+  __getEventListenersFor(eventType) {
+    if (!this.syntheticEvents.get(eventType)) {
+      this.syntheticEvents.set(eventType, new Map());
     }
-
-    __getEventListenersFor(eventType) {
-        if (!this.syntheticEvents.get(eventType)) {
-            this.syntheticEvents.set(eventType, new Map());
-        }
-        return this.syntheticEvents.get(eventType);
-    }
+    return this.syntheticEvents.get(eventType);
+  }
 }
 
 const quackamoleEventManagerSingleton = new QuackamoleEventManager();  // TODO deprecate and potentially export the class
 
 class Quackamole {
-    constructor(debugMode = false) {
-        this.debugMode = debugMode;
-        this.eventManager = new QuackamoleEventManager(this.debugMode);
-        this.logger = new Logger(this.debugMode);
-        this.__init();
-    }
+  constructor(debugMode = false) {
+    this.debugMode = debugMode;
+    this.eventManager = new QuackamoleEventManager(this.debugMode);
+    this.logger = new Logger(this.debugMode);
+    this.__init();
+  }
 
-    broadcastData(eventType, data, includeSelf = true) {
-        const action = {type: 'PLUGIN_SEND_TO_ALL_PEERS', payload: {eventType, data}};
-        this.logger.log('Quackamole.broadcastData - action:', action);
-        window.top.postMessage(action, '*');
+  broadcastData(eventType, data, includeSelf = true) {
+    const action = { type: 'PLUGIN_SEND_TO_ALL_PEERS', payload: { eventType, data } };
+    this.logger.log('Quackamole.broadcastData - action:', action);
+    window.top.postMessage(action, '*');
+    this.eventManager.emit(eventType, data);
+  }
+
+  sendDataTo(peerIds, eventType, data) {
+    const action = { type: 'PLUGIN_SEND_TO_PEER', payload: { peerIds, eventType, data } };
+    window.top.postMessage(action, '*');
+  }
+
+  // requestConnectedPeers = () => {
+  //     const action = {type: 'PLUGIN_REQUEST_CONNECTED_PEER_IDS'};
+  //     window.top.postMessage(action, '*');
+  // };
+  //
+  // requestLocalPeer = () => {
+  //     const action = {type: 'PLUGIN_REQUEST_LOCAL_PEER'};
+  //     window.top.postMessage(action, '*');
+  // };
+
+  __init() {
+    window.addEventListener('message', this.__receiveMessage.bind(this));
+  }
+
+  __receiveMessage(event) {
+    this.logger.log('windows.onmessage - event:', event);
+    switch (event.data.type) {
+      case 'PLUGIN_DATA': {
+        // emit the event received from another peer.
+        const { eventType, data } = event.data.payload;
         this.eventManager.emit(eventType, data);
+        break;
+      }
+      // case 'PLUGIN_REQUEST_LOCAL_PEER_GRANT': {
+      //     // emit the event received from another peer.
+      //     const {eventType, data} = event.data.payload;
+      //     this.eventManager.emit(eventType, data);
+      //     break;
+      // }
     }
-
-    sendDataTo(peerIds, eventType, data) {
-        const action = {type: 'PLUGIN_SEND_TO_PEER', payload: {peerIds, eventType, data}};
-        window.top.postMessage(action, '*');
-    }
-
-    // requestConnectedPeers = () => {
-    //     const action = {type: 'PLUGIN_REQUEST_CONNECTED_PEER_IDS'};
-    //     window.top.postMessage(action, '*');
-    // };
-    //
-    // requestLocalPeer = () => {
-    //     const action = {type: 'PLUGIN_REQUEST_LOCAL_PEER'};
-    //     window.top.postMessage(action, '*');
-    // };
-
-    __init() {
-        window.addEventListener('message', this.__receiveMessage.bind(this));
-    }
-
-    __receiveMessage(event) {
-        this.logger.log('windows.onmessage - event:', event);
-        switch (event.data.type) {
-            case 'PLUGIN_DATA': {
-                // emit the event received from another peer.
-                const {eventType, data} = event.data.payload;
-                this.eventManager.emit(eventType, data);
-                break;
-            }
-            // case 'PLUGIN_REQUEST_LOCAL_PEER_GRANT': {
-            //     // emit the event received from another peer.
-            //     const {eventType, data} = event.data.payload;
-            //     this.eventManager.emit(eventType, data);
-            //     break;
-            // }
-        }
-    }
+  }
 }
 
 try {
-    module.exports = {
-        quackamoleEventManager: quackamoleEventManagerSingleton, // TODO deprecate and potentially export the class
-        Quackamole: Quackamole
-    };
-} catch(e) {}
+  module.exports = {
+    quackamoleEventManager: quackamoleEventManagerSingleton, // TODO deprecate and potentially export the class
+    Quackamole: Quackamole
+  };
+} catch (e) {}
 
 // TODO quackamole.requestConnectedPeers() and requestLocalPeer() should return a promise
 

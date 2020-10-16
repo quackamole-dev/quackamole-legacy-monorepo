@@ -7,20 +7,20 @@ import theme from '../../../style/theme/MainTheme';
 import Chat from './Chat/Chat';
 
 const RoomSidebarChat = () => {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-    const toggleDrawer = _ => setOpen(!open);
+  const toggleDrawer = _ => setOpen(!open);
 
-    return (
-        <ThemeProvider theme={theme}>
-            <Button onClick={toggleDrawer}>
-                <ChatIcon color='primary' fontSize='large' />
-            </Button>
-            <Drawer open={open} onClose={toggleDrawer} anchor={'right'}>
-                <Chat/>
-            </Drawer>
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider theme={theme}>
+      <Button onClick={toggleDrawer}>
+        <ChatIcon color='primary' fontSize='large'/>
+      </Button>
+      <Drawer open={open} onClose={toggleDrawer} anchor={'right'}>
+        <Chat/>
+      </Drawer>
+    </ThemeProvider>
+  );
 };
 
 export default RoomSidebarChat;
