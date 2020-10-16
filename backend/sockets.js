@@ -93,10 +93,10 @@ const initSocketActions = (io, socket) => {
         io.to(receiverSocketId).emit('answer', {senderSocketId: socket.id, answer: answer});
     });
 
-    socket.on('ice-candidate', ({senderSocketId, receiverSocketId, iceCandidate}) => {
+    socket.on('ice-candidates', ({senderSocketId, receiverSocketId, iceCandidates}) => {
         const nickname = socket.handshake.query['nickname'];
-        console.log(`User ${nickname} with socketID: ${socket.id} send an ICE Candidate to socketID: ${receiverSocketId}`);
-        io.to(receiverSocketId).emit('ice-candidate', {senderSocketId, iceCandidate});
+        console.log(`User ${nickname} with socketID: ${socket.id} send ${iceCandidates.length}x ICE Candidates to socketID: ${receiverSocketId}`);
+        io.to(receiverSocketId).emit('ice-candidates', {senderSocketId, iceCandidates});
     });
 };
 

@@ -84,12 +84,12 @@ const initLocalUserSocketListeners = (socket) => async (dispatch, getState) => {
             }
         });
 
-        socket.on('ice-candidate', ({senderSocketId, iceCandidate}) => {
+        socket.on('ice-candidates', ({senderSocketId, iceCandidates}) => {
             const connection = getState().connections.data[senderSocketId];
 
             if (connection) {
-                console.log('ICE Candidate received - senderId:', senderSocketId);
-                connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+                console.log('ICE Candidates received - senderId:', senderSocketId);
+                iceCandidates.forEach(candidate => connection.addIceCandidate(new RTCIceCandidate(candidate)));
             }
         });
     });

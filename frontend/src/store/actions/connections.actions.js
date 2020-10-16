@@ -23,7 +23,6 @@ export const removeConnection = connection => async (dispatch, getState) => {
 };
 
 export const initDataChannelListeners = dataChannel => (dispatch, getState) => {
-        console.log('initDataChannelListeners', dataChannel);
     if (dataChannel) {
         dataChannel.onmessage = evt => {
             console.log('received message: ', evt);
@@ -67,18 +66,47 @@ export const initDataChannelListeners = dataChannel => (dispatch, getState) => {
 
 export const initConnectionListeners = connection => (dispatch, getState) => {
     if (connection && connection.socketId) {
+        const delayMultiplier = 1.5;
+        const baseDelay = 450;
+        const maxIterations = 9;
+        let currentIteration = 0;
+        let iceCandidates = [];
+
+        // emits ice-candidates with an increasing delay until the onicecandidate null event
+        // Most of the candidates trickle in within the first 0-2seconds but the null event can happen much later
+        // The goal is to send all ice-candidates to remotePeer but without clogging up the event loop too much
+        // High likelihood to be changed/simplified as time goes by...
+        const timer = () => {
+            if (iceCandidates.length) {
+                const {socket} = getState().localUser;
+                socket.emit('ice-candidates', {
+                    senderSocketId: socket.id,
+                    receiverSocketId: connection.remoteSocketId,
+                    iceCandidates: iceCandidates
+                });
+                iceCandidates = [];
+            }
+
+            if (currentIteration <= maxIterations) {
+                const rawDelay = baseDelay * Math.pow(delayMultiplier, currentIteration);
+                const roundedDelay = Math.round(rawDelay / 100 * 2) * 100 / 2;
+
+                console.log('TIMER DELAY', roundedDelay);
+                setTimeout(timer, Math.round(roundedDelay));
+                currentIteration++;
+            }
+        }
+        timer();
+
         connection.onicecandidate = (evt) => {
             const iceCandidate = evt.candidate;
 
             if (iceCandidate) {
-                const {socket} = getState().localUser;
-                socket.emit('ice-candidate', {
-                    senderSocketId: socket.id,
-                    receiverSocketId: connection.remoteSocketId,
-                    iceCandidate: iceCandidate
-                });
+                iceCandidates.push(iceCandidate);
             } else {
                 console.log('no more ICE');
+                currentIteration = maxIterations + 1;
+                timer();
             }
         }
 
