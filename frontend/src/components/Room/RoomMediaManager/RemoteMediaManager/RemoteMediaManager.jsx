@@ -5,7 +5,7 @@ import RemoteMediaCard from "../RemoteMediaCard/RemoteMediaCard";
 const RemoteMediaManager = ({connections}) => {
     return (
         <>
-            {connections && connections.map(connection => <RemoteMediaCard key={connection.connectionId} connection={connection} />)}
+            {connections && connections.map((connection) => <RemoteMediaCard key={'conn' + connection.remoteSocketId} connection={connection} />)}
         </>
     );
 };

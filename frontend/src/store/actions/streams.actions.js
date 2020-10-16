@@ -1,20 +1,23 @@
 import {ADD_STREAM, CLEAR_ALL_STREAMS, REMOVE_STREAM} from "../actionTypes";
 
-export const addStream = (peerId, stream) => (dispatch, getState) => {
+export const addStream = (socketId, stream) => (dispatch, getState) => {
     if (stream) {
-        dispatch({type: ADD_STREAM, payload: {peerId, stream}});
+        dispatch({type: ADD_STREAM, payload: {socketId, stream}});
     }
 };
 
-export const removeStream = (peerId) => (dispatch, getState) => {
-    if (peerId) {
-        dispatch({type: REMOVE_STREAM, payload: {peerId}});
+export const removeStream = (socketId) => (dispatch, getState) => {
+    if (socketId) {
+        dispatch({type: REMOVE_STREAM, payload: {socketId}});
     }
 };
 
-export const startLocalStream = (peer, constraintsOverride) => async (dispatch, getState) => {
-    const localPeer = peer || getState().localUser.peer;
-    const localSteam = getState().streams.data[localPeer.id]
+export const startLocalStream = (socket, constraintsOverride) => async (dispatch, getState) => {
+    const localSocket = socket || getState().localUser.socket;
+
+    if (!socket) { return; }
+    const socketId = socket.id;
+    const localSteam = getState().streams.data[socketId];
     if (!localSteam) {
 
         try {
@@ -28,7 +31,7 @@ export const startLocalStream = (peer, constraintsOverride) => async (dispatch, 
             };
 
             let mediaStream = await navigator.mediaDevices.getUserMedia(constraintsOverride || constraints);
-            dispatch(addStream(localPeer.id, mediaStream));
+            dispatch(addStream(localSocket.id, mediaStream));
             return mediaStream;
         } catch (error) {
             console.error('local stream couldnt be started', error);

@@ -9,62 +9,47 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const initPeerServer = require('./peer.js');
 const initSocketIO = require('./sockets');
 
-const SSL_ENABLED = process.env.SSL_ENABLED === 'true';
+const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true';
 const environment = process.env.NODE_ENV || 'development';
 
     let sslOptions = null;
-    if (SSL_ENABLED) {
+    if (HTTPS_ENABLED) {
+        // FIXME specify certs in .env
         const sslKey = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/privkey.pem' : 'localhost.key';
         const sslCert = environment === 'production' ? '/etc/letsencrypt/live/derpmasters.online/fullchain.pem' : 'localhost.crt';
         sslOptions = {key: fs.readFileSync(sslKey), cert: fs.readFileSync(sslCert)};
     }
 
-const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
-const corsOptions = {
-    credentials: true,
-    origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-};
+// const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'null', 'none', 'http://localhost:63342', '', 'https://localhost:3000, https://localhost'];
+// const corsOptions = {
+//     credentials: true,
+//     origin: function (origin, callback) {
+//         if (whitelist.indexOf(origin) !== -1) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+// };
 
-///////////////////
-// PeerJS Server //
-///////////////////
-const app1 = express();
-const server1 = SSL_ENABLED ? https.createServer(sslOptions, app1) : http.createServer(app1);
+/////////////////
+// Init Server //
+/////////////////
+const app = express();
+const server = HTTPS_ENABLED ? https.createServer(sslOptions, app) : http.createServer(app);
 
-app1.get('/test', function (req, res) {
-    res.json({msg: 'peerjs server test route'})
-});
+const io = initSocketIO(server);
 
-app1.use('/peer', initPeerServer(server1));
-app1.use(morgan("combined"));
-app1.use(helmet());
-app1.use(cors());
-server1.listen(5001, () => console.log('PeerJS server listening on port: ', 5001, 'ssl:', SSL_ENABLED));
-
-//////////////////////
-// Socket IO Server //
-//////////////////////
-const app2 = express();
-const server2 = SSL_ENABLED ? https.createServer(sslOptions, app2) : http.createServer(app2);
-
-const io = initSocketIO(server2);
-
-app2.use(morgan("combined"));
-app2.use(helmet());
-app2.use(cors());
-app2.use(bodyParser.urlencoded({extended: false}));
-app2.use(bodyParser.json());
+app.use(morgan('combined'));
+app.use(helmet());
+app.use(cors());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 const router = require('./router');
-app2.use('/api', router);
+app.use('/api', router);
 
-server2.listen(5002, () => console.log('SocketIO server listening on port: ',  5002, 'ssl:', SSL_ENABLED));
+const port = process.env.PORT || 5000;
+server.listen(port, () => console.log('server listening on port: ',  port, 'https:', HTTPS_ENABLED));

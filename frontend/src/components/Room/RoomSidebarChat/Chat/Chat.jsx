@@ -45,7 +45,7 @@ const useStyles = makeStyles({
     }
 });
 
-const Chat = ({chatData, sendMessage, localPeer}) => {
+const Chat = ({chatData, sendMessage, socket}) => {
     const classes = useStyles('');
     const [newMessage, setNewMessage] = useState('');
     const feedRef = useRef(null);
@@ -89,7 +89,7 @@ const Chat = ({chatData, sendMessage, localPeer}) => {
       };
 
     //handle the chat feed to display all messages on the right position
-      const chatMessages = chatData.map((message, i) => message.peerId === localPeer.id
+      const chatMessages = chatData.map((message, i) => message.authorSocketId === socket.id
           ? <ChatMsg key={i} side={'right'} messages={[parseEmojis(message.text)]}/>
           : <ChatMsg key={i} avatar={''} messages={[parseEmojis(message.text)]}/>
       );
@@ -120,7 +120,7 @@ const Chat = ({chatData, sendMessage, localPeer}) => {
 
 const mapStateToProps = state => ({
     chatData: state.chat,
-    localPeer: state.localUser.peer,
+    socket: state.localUser.socket,
 });
 
 export default connect(mapStateToProps, {sendMessage})(Chat);

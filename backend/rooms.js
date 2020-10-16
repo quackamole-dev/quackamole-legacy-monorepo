@@ -10,7 +10,8 @@ class roomManager {
                 password: 'dummy123',  // TODO hash pws once we start using them to secure rooms.
                 name: 'dummy room name',
                 maxUsers: 4,
-                activePluginId: 'gomoku'
+                activePluginId: 'gomoku',
+                joinedUsers: []
             }
         }
     }
@@ -23,18 +24,6 @@ class roomManager {
         return this.getRoomById(sanitizedRoomData.id);
     };
 
-    // leaveRoom = (roomId, peerId) => {
-    //     const roomRef = this.rooms[roomId];
-    //
-    //     if (roomRef.joinedUsers.includes(user => user.peerId === peerId)) {
-    //         roomRef.joinedUsers.filter(user => user !== peerId);
-    //         return roomRef;
-    //     } else {
-    //         console.log(`The user: ${peerId} is not in this room, therefore cannot leave`);
-    //         return false;
-    //     }
-    // };
-
     doesRoomExist = (roomId) => {
         return !!this.rooms[roomId];
     };
@@ -44,8 +33,11 @@ class roomManager {
     };
 
     getAllRooms = () => {
-        // Note: passwords of the rooms are returned as well but right now it does not matter
-        return this.rooms;
+        // Note: passwords are NOT included within the returned room data
+        return Object.values(this.rooms).map(roomData => {
+            const {password, ...otherRoomProperties} = roomData;
+            return otherRoomProperties;
+        });
     };
 
     updateRoom = (roomId, data) => {
@@ -73,7 +65,7 @@ class roomManager {
             password: rawRoomData.password || '',
             name: rawRoomData.name || 'default room name',  // TODO use faker to generate some random default names
             maxUsers: rawRoomData.maxUsers || 4,
-            joinedUsers: ['not used, always empty for now'],
+            joinedUsers: [],
             activePluginId: rawRoomData.activePluginId || ''
         }
     };

@@ -12,7 +12,7 @@ const sendPluginMessageToAllConnections = (evt) => (dispatch, getState) => {
     const connections = Object.values(getState().connections.data);
     const data = {type: 'PLUGIN_DATA', payload: evt.data.payload};
     connections.forEach(connection => {
-         dispatch(sendDataToConnection(connection, data));
+         dispatch(sendDataToConnection(connection.defaultDataChannel, data)); // TODO seperate dataChannel exclusive for plugin data
      });
 };
 
@@ -20,7 +20,7 @@ const sendPluginMessageToConnection = (evt) => (dispatch, getState) => {
     const {peerId, payload} = evt.data;
     const connection = getState().connections.data[peerId];
     const data = {type: 'PLUGIN_DATA', payload: payload};
-    dispatch(sendDataToConnection(connection, data));
+    dispatch(sendDataToConnection(connection.defaultDataChannel, data));
 };
 
 // const handlePluginRequestLocalPeer = () => (dispatch, getState) => {

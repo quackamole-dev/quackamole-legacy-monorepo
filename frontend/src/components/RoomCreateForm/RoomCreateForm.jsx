@@ -7,10 +7,11 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import {API_BASE_URL, SSL_ENABLED, FRONTEND_URL, PORT_SOCKET, IS_LOCALHOST} from '../../constants';
+import {API_BASE_URL, HTTPS_ENABLED, FRONTEND_URL, PORT_SOCKET, IS_LOCALHOST} from '../../constants';
 import {isIpAddress} from "../../utils";
 import Grid from '@material-ui/core/Grid';
-import {useHistory} from "react-router";
+import {useHistory} from 'react-router-dom';
+
 
 const useStyles = makeStyles({
     containerStyle: {
@@ -114,7 +115,7 @@ const RoomCreateForm = () => {
         };
 
         if(name.length > 0) {
-            const protocol = SSL_ENABLED ? 'https':'http';
+            const protocol = HTTPS_ENABLED ? 'https':'http';
             fetch(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}/api/rooms`, {
                 method: 'post',
                 body: JSON.stringify(data),

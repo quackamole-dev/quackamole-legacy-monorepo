@@ -9,19 +9,21 @@ import RoomActionbar from "./RoomActionbar/RoomActionbar";
 import {roomExitCleanup} from '../../store/actions/room.actions';
 import {startLocalStream} from '../../store/actions/streams.actions';
 
-const Room = ({socket, localPeer, match, history, initLocalUser, joinRoom, roomError, currentRoom, localPeerLoading, roomExitCleanup, startLocalStream}) => {
+const Room = ({socket, match, history, initLocalUser, joinRoom, roomError, currentRoom, localPeerLoading, roomExitCleanup, startLocalStream}) => {
 
     useEffect(() => {
         if (roomError) {
             history.push(`/room-lobby/${match.params.roomId}`);
-        } else if (!localPeer && !localPeerLoading) {
+        } else if (!socket && !localPeerLoading) {
+            console.log('Room#useEffect before initLocalUser');
             initLocalUser();
-        } else if (localPeer && socket && !currentRoom.id) {
+        } else if (socket && socket.id && !currentRoom.id) {
+            console.log('Room#useEffect before joinRoom');
             startLocalStream();
             joinRoom(match.params.roomId, 'dummy123');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [localPeer, roomError, socket]);
+    }, [roomError, socket]);
 
     useEffect(() => {
         // unmount
@@ -43,10 +45,8 @@ const Room = ({socket, localPeer, match, history, initLocalUser, joinRoom, roomE
 };
 
 const mapStateToProps = (state) => {
-    const localPeer = state.localUser.peer;
     return {
         socket: state.localUser.socket,
-        localPeer: localPeer,
         localPeerLoading: state.localUser.loading,
         roomError: state.room.error,
         currentRoom: state.room.data

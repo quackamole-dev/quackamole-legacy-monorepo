@@ -3,7 +3,7 @@
 
 ## Steps
 ### Generate ssl certs for localhost
-This will create two files: **localhost.crt** and **localhost.key**. These are **only required on localhost when SSL_ENABLED=True**. On a real server we will use letsencrypt/certbot.
+This will create two files: **localhost.crt** and **localhost.key**. These are **only required on localhost when HTTPS_ENABLED=True**. On a real server we will use letsencrypt/certbot.
 ``` shell script
 $ cd backend
 $ openssl req -x509 -out localhost.crt -keyout localhost.key \
