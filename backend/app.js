@@ -10,6 +10,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const initSocketIO = require('./sockets');
+const path = require('path');
 
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true';
 const environment = process.env.NODE_ENV || 'development';
@@ -50,6 +51,13 @@ app.use(bodyParser.json());
 
 const router = require('./router');
 app.use('/api', router);
+
+// serve react frontend. Temporary simplified solution. Use a proxy in the future
+const frontendBuildPath = path.join(__dirname, '..', 'frontend/build');
+app.use(express.static(frontendBuildPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+});
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => console.log('server listening on port: ', port, 'https:', HTTPS_ENABLED));
