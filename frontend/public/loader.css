@@ -1,0 +1,40 @@
+/* styles for loading animation needed while react is preparing initial render */
+.initial-loading-animation {
+    background-color: rgb(56, 142, 60);
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+.initial-loading-animation .heartbeat {
+    color: white;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    animation: heartbeat 2000ms infinite;
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
