@@ -1,16 +1,12 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
-import theme from '../../style/theme/MainTheme';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import theme from '../../style/theme/MainTheme';
 import {resetLocalUser, setMetadata} from '../../store/actions/localUser.actions';
 import {connect} from 'react-redux';
 import {setCurrentRoomError} from '../../store/actions/room.actions';
-import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles({
   containerStyle: {

@@ -1,12 +1,9 @@
 import React from 'react';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import {Typography, Box, Button, useMediaQuery} from '@material-ui/core';
 import theme from '../../style/theme/MainTheme';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import {Link} from 'react-router-dom';
 import BulletPoint from './BulletPoint/BulletPoint';
-import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
   header: {

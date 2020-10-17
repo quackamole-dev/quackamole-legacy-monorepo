@@ -1,10 +1,9 @@
 import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
+import {Typography, useMediaQuery} from '@material-ui/core';
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 import CallOutlinedIcon from '@material-ui/icons/CallOutlined';
 import VideogameAssetIcon from '@material-ui/icons/VideogameAsset';
-import Typography from '@material-ui/core/Typography';
-import {useMediaQuery} from '@material-ui/core';
 
 const useStyles = makeStyles({
   container: {

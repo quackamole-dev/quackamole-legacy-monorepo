@@ -1,14 +1,8 @@
 import React, {useState} from 'react';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {List, ListItem, ListItemIcon, ListItemText, Divider, Button, Drawer} from '@material-ui/core';
 import LabelIcon from '@material-ui/icons/Label';
 import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import theme from '../../../style/theme/MainTheme';
 import {setPlugin} from '../../../store/actions/plugin.actions';

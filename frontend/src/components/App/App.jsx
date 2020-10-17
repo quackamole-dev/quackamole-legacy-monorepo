@@ -1,10 +1,10 @@
 import React from 'react';
 import {HashRouter as Router, Route, Switch} from 'react-router-dom';
+import {CssBaseline} from '@material-ui/core';
 import RoomLobby from '../RoomLobby/RoomLobby';
 import Room from '../Room/Room';
 import Home from '../Home/Home';
 import RoomCreateForm from '../RoomCreateForm/RoomCreateForm';
-import CssBaseline from '@material-ui/core/CssBaseline';
 
 const App = () => {
   return (

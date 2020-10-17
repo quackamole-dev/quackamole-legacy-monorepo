@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
-import {Box, Card, CircularProgress, makeStyles} from '@material-ui/core';
 import {setVideoSrc} from '../../../utils';
+import {makeStyles} from '@material-ui/core/styles';
+import {Card, CircularProgress, Box} from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {

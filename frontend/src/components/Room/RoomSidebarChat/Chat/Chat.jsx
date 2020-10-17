@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ChatMsg from './ChatMsg';
-import TextField from '@material-ui/core/TextField';
-import SendIcon from '@material-ui/icons/Send';
 import {makeStyles} from '@material-ui/core/styles';
+import {TextField} from '@material-ui/core';
+import SendIcon from '@material-ui/icons/Send';
 import {connect} from 'react-redux';
 import {sendMessage} from '../../../../store/actions/chat.actions';
-import {toArray} from 'react-emoji-render';
+// import {toArray} from 'react-emoji-render';
 
 const useStyles = makeStyles({
   chat: {
@@ -78,20 +78,20 @@ const Chat = ({ chatData, sendMessage, socket }) => {
     }
   };
 
-  const parseEmojis = value => {
-    // toArray outputs React elements for emojis and strings for other
-    return toArray(value).reduce((previous, current) => {
-      if (typeof current === 'string') {
-        return previous + current;
-      }
-      return previous + current.props.children;
-    }, '');
-  };
+  // const parseEmojis = value => {
+  //   // toArray outputs React elements for emojis and strings for other
+  //   return toArray(value).reduce((previous, current) => {
+  //     if (typeof current === 'string') {
+  //       return previous + current;
+  //     }
+  //     return previous + current.props.children;
+  //   }, '');
+  // };
 
   //handle the chat feed to display all messages on the right position
   const chatMessages = chatData.map((message, i) => message.authorSocketId === socket.id
-    ? <ChatMsg key={i} side={'right'} messages={[parseEmojis(message.text)]}/>
-    : <ChatMsg key={i} avatar={''} messages={[parseEmojis(message.text)]}/>
+    ? <ChatMsg key={i} side={'right'} messages={[message.text]}/>
+    : <ChatMsg key={i} avatar={''} messages={[message.text]}/>
   );
 
   return (

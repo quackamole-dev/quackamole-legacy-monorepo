@@ -1,15 +1,9 @@
 import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import theme from '../../style/theme/MainTheme';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import {API_BASE_URL, FRONTEND_URL, HTTPS_ENABLED, IS_LOCALHOST, PORT_SOCKET} from '../../constants';
-import {isIpAddress} from '../../utils';
-import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles({
   containerStyle: {
@@ -113,8 +107,7 @@ const RoomCreateForm = () => {
     };
 
     if (name.length > 0) {
-      const protocol = HTTPS_ENABLED ? 'https' : 'http';
-      fetch(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}/api/rooms`, {
+      fetch(`/api/rooms`, {
         method: 'post',
         body: JSON.stringify(data),
         headers: {
@@ -122,8 +115,7 @@ const RoomCreateForm = () => {
         }
       }).then(response => response.json()
       ).then(data => {
-        const port = isIpAddress(FRONTEND_URL) || IS_LOCALHOST ? ':3000' : '';
-        setLink(`${protocol}://${FRONTEND_URL}${port}/#/room-lobby/${data}`);
+        setLink(`/#/room-lobby/${data}`); // FIXME
         setRoomId(data);
         setActive(false);
       });

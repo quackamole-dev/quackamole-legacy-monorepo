@@ -1,9 +1,7 @@
 import React from 'react';
 import cx from 'clsx'; // TODO This comes from some example code, it has some nice features but we need to discuss whether we want to use it
-import Grid from '@material-ui/core/Grid';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
-import withStyles from '@material-ui/core/styles/withStyles';
+import {withStyles} from '@material-ui/core/styles';
+import {Avatar, Grid, Typography} from '@material-ui/core';
 import defaultChatMsgStyles from './ChatStyle';
 
 const ChatMsg = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {

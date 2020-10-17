@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {ThemeProvider} from '@material-ui/core/styles';
+import {Button, Drawer} from '@material-ui/core';
 import ChatIcon from '@material-ui/icons/Chat';
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
 import theme from '../../../style/theme/MainTheme';
 import Chat from './Chat/Chat';
 

@@ -1,5 +1,4 @@
 import {INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_LOADING, SET_LOCAL_USER_METADATA} from '../actionTypes';
-import {API_BASE_URL, HTTPS_ENABLED, PORT_SOCKET} from '../../constants';
 import io from 'socket.io-client';
 import {getPersistedData, persistData, serializeQueryString} from '../../utils';
 import {addConnection, initDataChannelListeners, removeConnection} from './connections.actions';
@@ -24,11 +23,11 @@ export const initLocalUser = () => async (dispatch, getState) => {
 };
 
 const initLocalUserSocket = (metadata) => async (dispatch, getState) => {
+
   dispatch({ type: SET_LOCAL_USER_LOADING, payload: { loading: true } });
-  const protocol = HTTPS_ENABLED ? 'https' : 'http';
-  const socket = io(`${protocol}://${API_BASE_URL}:${PORT_SOCKET}`, {
+  const socket = io(window.location.origin, {
     // transports: ['websocket'],
-    secure: HTTPS_ENABLED,
+    secure: window.location.protocol === 'https',
     query: serializeQueryString(metadata)
   });
 
