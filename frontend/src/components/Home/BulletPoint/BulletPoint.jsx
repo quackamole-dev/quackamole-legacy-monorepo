@@ -27,14 +27,17 @@ const useStyles = makeStyles({
   },
   alignTitle: {
     display: 'flex',
+    alignItems: 'center',
     margin: 24
   },
   customizeTitle: {
     fontWeight: 'bold',
+    fontSize: '25px',
     marginLeft: 4
   },
   customizeIcon: {
-    marginRight: 4
+    marginRight: 4,
+    color: 'rgb(46, 125, 50)'
   },
   customizeText: {
     paddingLeft: 16,
@@ -61,7 +64,7 @@ const BulletPoint = (props) => {
     <div className={smallScreen ? classes.smallScreenContainer : classes.container}>
       <div className={classes.alignTitle}>
         {checkIcons(props.content.icon)}
-        <Typography variant='h5' className={classes.customizeTitle}>{props.content.title}</Typography>
+        <Typography variant='h4' className={classes.customizeTitle}>{props.content.title}</Typography>
       </div>
       <Typography className={classes.customizeText} align='center'>{props.content.text}</Typography>
       <img src={props.content.image} height='181' width='275' alt='icon'/>
