@@ -16,8 +16,8 @@ export const roomExitCleanup = () => (dispatch, getState) => {
   const state = getState();
 
   const socket = state.localUser.socket;
-  const localSocketId = socket.id;
   if (socket) {
+    // disconnect from socketIO server
     const currentRoom = state.room.data;
     if (currentRoom.id) {
       socket.emit('leave', currentRoom.id);
@@ -25,16 +25,18 @@ export const roomExitCleanup = () => (dispatch, getState) => {
     }
     socket.disconnect();
     dispatch(resetLocalUser());
+
+    // clear local media stream
+    const localStream = state.streams[socket.id];
+    if (localStream) {
+      window.localStream.getTracks().forEach(track => track.stop());
+    }
+    dispatch(clearAllStreams());
   }
 
+  // close all RTCPeerConnections
   const connections = state.connections.data;
   if (connections) {
     Object.values(connections).forEach(conn => conn.close());
   }
-
-  const localStream = state.streams[localSocketId];
-  if (localStream) {
-    window.localStream.getTracks().forEach(track => track.stop());
-  }
-  dispatch(clearAllStreams());
 };
