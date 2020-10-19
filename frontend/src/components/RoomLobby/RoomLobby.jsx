@@ -84,7 +84,6 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
             <Typography variant='h4' className={classes.titleStyle}>Enter the room</Typography>
             <TextField
               required
-              id="outlined-required"
               label="Nickname"
               variant="outlined"
               value={newNickname}
@@ -95,7 +94,6 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
             />
             <TextField
               required
-              id="outlined-required"
               label="Room ID"
               variant="outlined"
               value={link}

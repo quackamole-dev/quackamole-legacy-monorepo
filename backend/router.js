@@ -13,7 +13,8 @@ router.post('/rooms', (request, response) => {
   const roomRef = roomManager.createRoom(roomData);
 
   if (roomRef) {
-    response.status(201).json(roomRef.id); // FIXME return all room data
+    const { password, ...otherRoomProperties } = roomRef;
+    response.status(201).json(otherRoomProperties);
   } else {
     response.sendStatus(400);
   }

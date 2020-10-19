@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import theme from '../../style/theme/MainTheme';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles({
   containerStyle: {
@@ -46,12 +47,27 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'flex-end',
     width: '100%',
-    margin: '16px'
+    padding: '16px'
   },
-  myButton: {
+  btnCreateWrapper: {
+    position: 'relative'
+  },
+  btnCreate: {
     color: 'white',
     boxShadow: 'none',
-    margin: '16px'
+  },
+  fabProgress: {
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
+  btnCreateProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
   },
   paper: {
     padding: theme.spacing(2),
@@ -78,10 +94,11 @@ const useStyles = makeStyles({
 });
 
 const RoomCreateForm = () => {
-  const [name, setName] = React.useState('');
-  const [link, setLink] = React.useState('');
-  const [roomId, setRoomId] = React.useState('');
-  const [active, setActive] = React.useState(true);
+  const [name, setName] = useState('');
+  const [link, setLink] = useState('');
+  const [roomId, setRoomId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const classes = useStyles();
   const history = useHistory();
 
@@ -89,49 +106,63 @@ const RoomCreateForm = () => {
     setName(event.target.value);
   };
 
-  const handleKeyPress = (event) => {
-    if (active) {
-      if (event.key === 'Enter') {
-        createRoom();
+  const handleKeyPress = async (evt) => {
+    if (!loading && evt.key === 'Enter') {
+        if (!roomId) {
+          const room = await createRoom();
+
+          if (room) {
+            setError(null);
+            setRoomId(room.id);
+            setLink(`${window.location.origin}/#/room-lobby/${room.id}`);
+          }
+      } else if (!error && roomId) {
+        history.push(`/room-lobby/${roomId}`);
       }
-    } else {
-      history.push(`/room-lobby/${roomId}`);
+
+
     }
   };
 
-  const createRoom = () => {
-    let data = {
-      name: name,
-      password: 'Test123.',
-      maxUsers: 4
-    };
+  const createRoom = async () => {
+    try {
+      let data = {
+        name: name,
+        password: 'Test123.',
+        maxUsers: 4
+      };
 
-    if (name.length > 0) {
-      fetch(`/api/rooms`, {
+      if (data.name.length === 0) {
+        setError(new Error('The room needs a name'));
+        return;
+      }
+
+      setLoading(true);
+      const res = await fetch(`/api/rooms`, {
         method: 'post',
         body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json()
-      ).then(data => {
-        setLink(`/#/room-lobby/${data}`); // FIXME
-        setRoomId(data);
-        setActive(false);
+        headers: { 'Content-Type': 'application/json' }
       });
-    } else {
-      console.log('please enter your name');
+      setLoading(false);
+
+      if (res.status >= 400) {
+        setError(new Error(`Something went wrong. Try again`));
+        return;
+      }
+
+      return await res.json();
+    } catch (err) {
+      setError(err);
     }
   };
 
-  const createRoomComponent =
+  const createRoomJSX =
     <Box display='flex' flexDirection='column' alignItems='center' width={'100%'} borderRadius='5px' bgcolor='white'>
       <Typography variant='h4' className={classes.titleStyle}>Create a new room</Typography>
       <TextField
         required
-        id="outlined-required"
-        label="Room name"
-        variant="outlined"
+        label='Room name'
+        variant='outlined'
         value={name}
         onChange={handleChangeTexfield}
         className={classes.textfield}
@@ -139,19 +170,23 @@ const RoomCreateForm = () => {
         autoFocus
       />
       <div className={classes.alignButton}>
-        <Button
-          size="large"
-          color="secondary"
-          variant="contained"
-          className={classes.myButton}
-          onClick={createRoom}
-        >
-          create
-        </Button>
+        <div className={classes.btnCreateWrapper}>
+          <Button
+            size='large'
+            color='secondary'
+            variant='contained'
+            disabled={loading}
+            className={classes.btnCreate}
+            onClick={createRoom}
+          >
+            Create
+          </Button>
+            {loading && <CircularProgress size={24} className={classes.btnCreateProgress}/>}
+        </div>
       </div>
     </Box>;
 
-  const shareRoomComponent =
+  const shareRoomJSX =
     <Box
       display='flex'
       flexDirection='column'
@@ -163,8 +198,8 @@ const RoomCreateForm = () => {
     >
       <Typography variant='h4' className={classes.titleStyle}>Room was created</Typography>
       <div className={classes.copyLink}>
-        <TextField variant="outlined" value={link} onChange={handleChangeTexfield} className={classes.textfieldLink} minWidth={300} autoFocus/>
-        <Button size="large" color="secondary" variant="contained" className={classes.myButton} onClick={() => {
+        <TextField variant='outlined' value={link} onChange={handleChangeTexfield} className={classes.textfieldLink} minWidth={300} autoFocus/>
+        <Button size='large' color='secondary' variant='contained' className={classes.myButton} onClick={() => {
           navigator.clipboard.writeText(link);
         }}>
           copy
@@ -176,9 +211,9 @@ const RoomCreateForm = () => {
 
       <Link to={`/room-lobby/${roomId}`} style={{ textDecoration: 'none', width: '80%' }}>
         <Button
-          size="large"
-          color="secondary"
-          variant="contained"
+          size='large'
+          color='secondary'
+          variant='contained'
           className={classes.nextButton}
           to={`/room-lobby/${roomId}`}
         >
@@ -197,15 +232,16 @@ const RoomCreateForm = () => {
         alignItems='center'
         paddingLeft='36px'
       >
-        <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+        <Link to='/' style={{ textDecoration: 'none', color: 'white' }}>
           <ArrowBackIosIcon/>
         </Link>
       </Box>
 
       {/* Body */}
       <Grid container className={classes.containerStyle}>
-        <Grid item xs={11} md={6} lg={5}>
-          {active ? createRoomComponent : shareRoomComponent}
+        <Grid item xs={11} md={6} lg={6}>
+        {roomId ? shareRoomJSX : createRoomJSX}
+          {error && <Box color={'red'} textAlign={'center'}>{error.message}</Box>}
         </Grid>
       </Grid>
     </ThemeProvider>
