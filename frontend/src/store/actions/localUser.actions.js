@@ -4,6 +4,7 @@ import {getPersistedData, persistData, serializeQueryString} from '../../utils';
 import {addConnection, initDataChannelListeners, removeConnection} from './connections.actions';
 import {startLocalStream} from './streams.actions';
 import {setCurrentRoomError} from './room.actions';
+import {BACKEND_URL} from '../../constants';
 
 export const resetLocalUser = () => ({ type: RESET_LOCAL_USER });
 
@@ -25,7 +26,7 @@ export const initLocalUser = () => async (dispatch, getState) => {
 const initLocalUserSocket = (metadata) => async (dispatch, getState) => {
 
   dispatch({ type: SET_LOCAL_USER_LOADING, payload: { loading: true } });
-  const socket = io(window.location.origin, {
+  const socket = io(BACKEND_URL, {
     // transports: ['websocket'],
     secure: window.location.protocol === 'https',
     query: serializeQueryString(metadata)

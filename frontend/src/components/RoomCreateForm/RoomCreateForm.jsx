@@ -5,6 +5,7 @@ import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import theme from '../../style/theme/MainTheme';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {BACKEND_URL} from '../../constants';
 
 const useStyles = makeStyles({
   containerStyle: {
@@ -138,7 +139,7 @@ const RoomCreateForm = () => {
       }
 
       setLoading(true);
-      const res = await fetch(`/api/rooms`, {
+      const res = await fetch(`${BACKEND_URL}/api/rooms`, {
         method: 'post',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }
