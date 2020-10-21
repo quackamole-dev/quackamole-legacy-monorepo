@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {setVideoSrc} from '../../../utils';
 import {makeStyles} from '@material-ui/core/styles';
 import {Card, CircularProgress, Box} from '@material-ui/core';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -11,9 +12,17 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     display: 'flex',
     flexFlow: 'column nowrap',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: '5px',
     width: '100%',
     height: '130px'
+  },
+  videoOffIcon: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
   },
   media: {
     width: '100%',
@@ -47,6 +56,8 @@ const GenericMediaCard = ({ stream, muted = false, user }) => {
         ? <video ref={videoRef} className={classes.media}/>
         : <CircularProgress color="inherit"/>
       }
+
+      {stream && !stream.getVideoTracks()[0] && <VideocamOffIcon className={classes.videoOffIcon} color='primary' fontSize='large'/>}
       <Box className={classes.displayName}>{nickname}</Box>
     </Card>
   );

@@ -22,9 +22,11 @@ export const serializeQueryString = object => {
 export const setVideoSrc = (videoRef, stream, muted = true) => {
   if (videoRef.current && stream) {
     videoRef.current.srcObject = stream;
-    videoRef.current.oncanplay = () => {
-      videoRef.current.play();
-      videoRef.current.muted = muted;
+    videoRef.current.oncanplay = () => { // FIXME rarely does not get fired for all peers, so remote stream can appear white
+      if (videoRef.current) {
+        videoRef.current.play();
+        videoRef.current.muted = muted;
+      }
     };
   }
 };

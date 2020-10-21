@@ -11,15 +11,17 @@ const streamsReducer = produce((streamsDraft, action) => {
   switch (action.type) {
     case ADD_STREAM: {
       const { socketId, stream } = action.payload;
-      streamsDraft.data[socketId] = stream;
+      streamsDraft.data[socketId] = { stream };
       streamsDraft.error = null;
       return;
     }
     case REMOVE_STREAM: {
       const { socketId } = action.payload;
-      const stream = streamsDraft.data[socketId];
-      clearStreamTracks(stream);
-      delete streamsDraft.data[socketId];
+      const streamWrapper = streamsDraft.data[socketId];
+      if (streamWrapper) {
+        clearStreamTracks(streamWrapper.stream);
+        delete streamsDraft.data[socketId];
+      }
       return;
     }
     case SET_STREAMS_ERROR: {

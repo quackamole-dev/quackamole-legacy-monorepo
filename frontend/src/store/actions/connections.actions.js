@@ -154,7 +154,8 @@ export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
     console.log('--defaultDataChannel created', connection.defaultDataChannel);
     await dispatch(initDataChannelListeners(connection.defaultDataChannel));
 
-    const localStream = await getState().streams.data[socket.id] || dispatch(startLocalStream());
+    const localStreamWrapper = await getState().streams.data[socket.id];
+    let localStream = await localStreamWrapper ? localStreamWrapper.stream : dispatch(startLocalStream());
     connection.addStream(localStream); // addStream needs to be called BEFORE attempting to create offer/answer
     await dispatch(addConnection(connection));
 
