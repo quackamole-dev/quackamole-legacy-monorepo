@@ -6,7 +6,7 @@ const RemoteMediaCard = ({ remoteStream, remoteNickname }) => <GenericMediaCard 
 
 const mapStateToProps = (state, ownProps) => {
   const remoteSocketId = ownProps.connection.remoteSocketId;
-  const remoteStreamWrapper = remoteSocketId ? state.streams.data[remoteSocketId] : null;
+  const remoteStreamWrapper = remoteSocketId ? state.remoteStreams.data[remoteSocketId] : null;
   const remoteStream = remoteStreamWrapper ? remoteStreamWrapper.stream : null;
   const remoteMetadata = state.peers.data[remoteSocketId] ? state.peers.data[remoteSocketId].metadata : {};
   console.log('-----------------remote stream', remoteStream);

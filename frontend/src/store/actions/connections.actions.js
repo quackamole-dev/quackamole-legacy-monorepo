@@ -1,6 +1,7 @@
 import {ADD_CONNECTION, ADD_NEW_MESSAGE, ADD_PEER, REMOVE_CONNECTION, SET_CURRENT_ROOM} from '../actionTypes';
-import {addStream, removeStream, startLocalStream} from './streams.actions';
+import {addStream, removeStream} from './remoteStreams.actions';
 import {setCurrentRoomError} from './room.actions';
+import {startLocalStream} from './localStream.actions';
 
 export const addConnection = (connection) => async (dispatch, getState) => {
   if (connection && connection.socketId) {
@@ -13,7 +14,7 @@ export const addConnection = (connection) => async (dispatch, getState) => {
 export const removeConnection = connection => async (dispatch, getState) => {
   if (connection && connection.remoteSocketId && connection.socketId) {
 
-    const stream = getState().streams.data[connection.remoteSocketId];
+    const stream = getState().remoteStreams.data[connection.remoteSocketId];
     if (stream) {
       await dispatch(removeStream(connection.remoteSocketId));
     }

@@ -7,7 +7,7 @@ const initialState = {
   error: null
 };
 
-const streamsReducer = produce((streamsDraft, action) => {
+const remoteStreamsReducer = produce((streamsDraft, action) => {
   switch (action.type) {
     case ADD_STREAM: {
       const { socketId, stream } = action.payload;
@@ -39,4 +39,4 @@ const streamsReducer = produce((streamsDraft, action) => {
   }
 }, initialState);
 
-export default streamsReducer;
+export default remoteStreamsReducer;

@@ -1,5 +1,5 @@
 import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR} from '../actionTypes';
-import {clearAllStreams} from './streams.actions';
+import {clearAllStreams} from './remoteStreams.actions';
 import {resetLocalUser} from './localUser.actions';
 
 export const setCurrentRoom = room => ({

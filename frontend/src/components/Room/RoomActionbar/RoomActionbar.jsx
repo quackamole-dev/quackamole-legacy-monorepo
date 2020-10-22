@@ -10,7 +10,7 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import RoomSidebarChat from '../RoomSidebarChat/RoomSidebarChat';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {toggleLocalAudio, toggleLocalVideo} from '../../../store/actions/streams.actions';
+import {toggleLocalAudio, toggleLocalVideo} from '../../../store/actions/localStream.actions';
 
 // TODO actionbar needs some rework.
 const RoomActionbar = ({ localStreamWrapper, dispatch }) => {

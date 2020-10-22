@@ -3,12 +3,11 @@ import {makeStyles} from '@material-ui/core/styles';
 import {Box, Button, Input, DialogActions, FormControl, InputLabel, Select, Dialog, DialogTitle, DialogContent} from '@material-ui/core';
 import {connect} from 'react-redux';
 import GenericMediaCard from '../../Room/GenericMediaCard/GenericMediaCard';
-import {startLocalStream, stopLocalStream} from '../../../store/actions/streams.actions';
-import {setMediaStreamConstraints, toggleCameraEnabled, toggleMicrophoneEnabled} from '../../../store/actions/localUser.actions';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
+import {setMediaStreamConstraints, startLocalStream, stopLocalStream, toggleCameraEnabled, toggleMicrophoneEnabled} from '../../../store/actions/localStream.actions';
 
 const useStyles = makeStyles({
   containerForm: {

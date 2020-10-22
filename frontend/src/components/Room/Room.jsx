@@ -7,7 +7,7 @@ import {joinRoom} from '../../store/actions/connections.actions';
 import {initLocalUser} from '../../store/actions/localUser.actions';
 import RoomActionbar from './RoomActionbar/RoomActionbar';
 import {roomExitCleanup} from '../../store/actions/room.actions';
-import {startLocalStream} from '../../store/actions/streams.actions';
+import {startLocalStream} from '../../store/actions/localStream.actions';
 
 const Room = ({ socket, match, history, initLocalUser, joinRoom, roomError, currentRoom, localPeerLoading, roomExitCleanup, startLocalStream }) => {
 
