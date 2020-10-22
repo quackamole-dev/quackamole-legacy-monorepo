@@ -7,6 +7,7 @@ import theme from '../../style/theme/MainTheme';
 import {resetLocalUser, setMetadata} from '../../store/actions/localUser.actions';
 import {connect} from 'react-redux';
 import {setCurrentRoomError} from '../../store/actions/room.actions';
+import MediaPreview from './MediaPreview/MediaPreview';
 
 const useStyles = makeStyles({
   containerStyle: {
@@ -69,7 +70,7 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
   const handleJoin = (e) => {
     setMetadata({ nickname: newNickname });
     setCurrentRoomError(null);
-    resetLocalUser();
+    // resetLocalUser(); // FIXME verify that removing it doesn't break enter room error handling
     history.push(`/rooms/${match.params.roomId}`);
   };
 
@@ -107,6 +108,7 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
             </div>
             {roomError && <Box color={'red'} textAlign={'center'}>{roomError.error.message}</Box>}
           </Box>
+          <MediaPreview/>
         </Grid>
       </Grid>
     </ThemeProvider>

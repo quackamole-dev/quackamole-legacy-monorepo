@@ -27,9 +27,9 @@ export const roomExitCleanup = () => (dispatch, getState) => {
     dispatch(resetLocalUser());
 
     // clear local media stream
-    const localStream = state.streams[socket.id];
-    if (localStream) {
-      window.localStream.getTracks().forEach(track => track.stop());
+    const localStreamWrapper = state.localUser.mediaStream;
+    if (localStreamWrapper) {
+      localStreamWrapper.stream.getTracks().forEach(track => track.stop());
     }
     dispatch(clearAllStreams());
   }

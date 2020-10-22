@@ -73,10 +73,8 @@ const RoomActionbar = ({ localStreamWrapper, dispatch }) => {
 };
 
 const mapStateToProps = (state) => {
-  const socket = state.localUser.socket;
-  const localStreamWrapper = socket ? state.streams.data[socket.id] : null;
   return {
-    localStreamWrapper: localStreamWrapper
+    localStreamWrapper: state.localUser.mediaStream
   };
 };
 

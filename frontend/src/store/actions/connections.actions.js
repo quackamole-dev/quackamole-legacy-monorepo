@@ -154,7 +154,7 @@ export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
     console.log('--defaultDataChannel created', connection.defaultDataChannel);
     await dispatch(initDataChannelListeners(connection.defaultDataChannel));
 
-    const localStreamWrapper = await getState().streams.data[socket.id];
+    const localStreamWrapper = await getState().localUser.mediaStream;
     let localStream = await localStreamWrapper ? localStreamWrapper.stream : dispatch(startLocalStream());
     connection.addStream(localStream); // addStream needs to be called BEFORE attempting to create offer/answer
     await dispatch(addConnection(connection));
@@ -181,7 +181,7 @@ export const joinRoom = (roomId, password) => async (dispatch, getState) => { //
       // callback: the joining user himself is responsible to establish connections with other users
       async (err, data) => {
         if (!err) {
-          await dispatch(startLocalStream(socket));
+          await dispatch(startLocalStream());
           await dispatch({ type: SET_CURRENT_ROOM, payload: { room: data.room } });
           data.room.joinedUsers.forEach((remoteSocketId) => dispatch(connectWithPeer(remoteSocketId)));
           console.log(`There are ${data.room.joinedUsers.length}x joinedUsers`);

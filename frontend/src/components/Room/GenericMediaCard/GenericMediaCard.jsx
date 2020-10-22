@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 const GenericMediaCard = ({ stream, muted = false, user }) => {
   const classes = useStyles();
   const videoRef = useRef(null);
-  const { nickname } = user;
 
   useEffect(() => {
     setVideoSrc(videoRef, stream, muted);
@@ -58,7 +57,7 @@ const GenericMediaCard = ({ stream, muted = false, user }) => {
       }
 
       {stream && !stream.getVideoTracks()[0] && <VideocamOffIcon className={classes.videoOffIcon} color='primary' fontSize='large'/>}
-      <Box className={classes.displayName}>{nickname}</Box>
+      {user && user.nickname && <Box className={classes.displayName}>{user.nickname}</Box>}
     </Card>
   );
 };

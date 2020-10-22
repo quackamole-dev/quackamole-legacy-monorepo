@@ -1,4 +1,5 @@
-import {ADD_STREAM, CLEAR_ALL_STREAMS, REMOVE_STREAM} from '../actionTypes';
+import {ADD_STREAM, CLEAR_ALL_STREAMS, REMOVE_STREAM, SET_LOCAL_USER_MEDIA_STREAM} from '../actionTypes';
+import {clearStreamTracks} from '../../utils';
 
 export const addStream = (socketId, stream) => (dispatch, getState) => { // TODO no need for a thunk, rename to setStream & SET_STREAM
   if (stream) {
@@ -16,42 +17,40 @@ export const clearAllStreams = () => async (dispatch, getState) => {
   dispatch({ type: CLEAR_ALL_STREAMS });
 };
 
-export const startLocalStream = (socket, constraintsOverride) => async (dispatch, getState) => {
-  const localSocket = socket || getState().localUser.socket;
+export const startLocalStream = () => async (dispatch, getState) => { // TODO move to localUser.actions and rename streamsReducer to remoteStreams.reducer
+  const { mediaConstraints, micEnabled, camEnabled } = getState().localUser;
 
-  if (!socket) {
+  if (!micEnabled && !camEnabled) {
+    dispatch(stopLocalStream());
     return;
   }
-  const socketId = socket.id;
-  const localSteam = getState().streams.data[socketId];
-  if (!localSteam) {
 
-    try {
-      const constraints = {
-        audio: true,
-        // video: false
-        video: {
-          frameRate: { ideal: 20, max: 25 },
-          width: { ideal: 128 },
-          height: { ideal: 72 }
-        }
-      };
+  const actualConstraints = { ...mediaConstraints };
+  actualConstraints.audio = micEnabled ? actualConstraints.audio : false;
+  actualConstraints.video = camEnabled ? actualConstraints.video : false;
 
-      let mediaStream = await navigator.mediaDevices.getUserMedia(constraintsOverride || constraints);
-      dispatch(addStream(localSocket.id, mediaStream));
-      return mediaStream;
-    } catch (error) {
-      console.error('local stream couldn\'t be started', error);
-    }
-  } else {
-    console.log('local stream already active');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(actualConstraints);
+    dispatch({ type: SET_LOCAL_USER_MEDIA_STREAM, payload: { mediaStream: { stream } } });
+    return stream;
+  } catch (error) {
+    console.error('local stream couldn\'t be started', error);
+  }
+};
+
+export const stopLocalStream = () => async (dispatch, getState) => {
+  const { mediaStream } = getState().localUser;
+
+  if (mediaStream) {
+    clearStreamTracks(mediaStream.stream);
+    dispatch({ type: SET_LOCAL_USER_MEDIA_STREAM, payload: { mediaStream: false } });
   }
 };
 
 export const toggleLocalAudio = () => (dispatch, getState) => {
   const socket = getState().localUser.socket;
   if (socket) {
-    const localStreamWrapper = getState().streams.data[socket.id];
+    const localStreamWrapper = getState().localUser.mediaStream;
     if (localStreamWrapper) {
       const localStream = localStreamWrapper.stream;
       console.log('toggleLocalAudio');
@@ -64,7 +63,7 @@ export const toggleLocalAudio = () => (dispatch, getState) => {
 export const toggleLocalVideo = () => (dispatch, getState) => {
   const socket = getState().localUser.socket;
   if (socket) {
-    const localStreamWrapper = getState().streams.data[socket.id];
+    const localStreamWrapper = getState().localUser.mediaStream;
     if (localStreamWrapper) {
       const localStream = localStreamWrapper.stream;
       console.log('toggleLocalVideo');

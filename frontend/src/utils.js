@@ -51,6 +51,11 @@ export const setVideoSrc = (videoRef, stream, muted = true) => {
 
 export const clearStreamTracks = stream => {
   if (stream) {
+    if (!stream.getTracks) {
+      console.error('something wrong with the stream:', stream);
+      return;
+    }
+
     stream.getTracks().forEach(track => track.stop());
   }
 };
