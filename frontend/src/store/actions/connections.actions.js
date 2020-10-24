@@ -75,16 +75,12 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
 
     // emits ice-candidates with an increasing delay until the onicecandidate null event
     // Most of the candidates trickle in within the first 0-2seconds but the null event can happen much later
-    // The goal is to send all ice-candidates to remotePeer but without clogging up the event loop too much
+    // The goal is to send ice-candidates out quickly with the least amount of signaling until the null event
     // High likelihood to be changed/simplified as time goes by...
     const timer = () => {
       if (iceCandidates.length) {
         const { socket } = getState().localUser;
-        socket.emit('ice-candidates', {
-          senderSocketId: socket.id,
-          receiverSocketId: connection.remoteSocketId,
-          iceCandidates: iceCandidates
-        });
+        socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: iceCandidates });
         iceCandidates = [];
       }
 
@@ -111,8 +107,34 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
       }
     };
 
-    connection.onaddstream = evt => {
-      dispatch(addStream(connection.remoteSocketId, evt.stream));
+    connection.ontrack = ({ track, streams }) => {
+      if (streams[0]) {
+        dispatch(addStream(connection.remoteSocketId, streams[0]));
+      } else {
+        console.error('ontrack - this should not happen... streams[0] is empty!');
+      }
+    };
+
+    connection.onnegotiationneeded = async evt => {
+      if (connection.signalingState !== 'stable') return;
+
+      try {
+        connection.makingOffer = true;
+        await connection.setLocalDescription(); // newer syntax that implicitly knows whether to create offer or answer
+
+        const { socket } = getState().localUser;
+        socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        connection.makingOffer = false;
+      }
+    };
+
+    connection.oniceconnectionstatechange = () => {
+      if (connection.iceConnectionState === 'failed') {
+        connection.restartIce();
+      }
     };
 
     connection.onsignalingstatechange = evt => {
@@ -123,10 +145,9 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
 
     connection.ondatachannel = async evt => {
       console.log('ondatachannel', evt);
-      connection.defaultDataChannel = evt.channel; // FIXME temporary. create wrapper for RTCPeerConnection
+      connection.defaultDataChannel = evt.channel;
       await dispatch(initDataChannelListeners(connection.defaultDataChannel));
-      // setTimeout(() => dispatch(introduceYourself(connection.defaultDataChannel), 500)); // TODO temporary delay for experimentation
-      dispatch(introduceYourself(connection.defaultDataChannel)); // FIXME test whether it works without timeout now
+      dispatch(introduceYourself(connection.defaultDataChannel));
 
     };
 
@@ -141,29 +162,8 @@ export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
   const { socket } = getState().localUser;
 
   if (remoteSocketId !== socket.id) {
-
-    const configuration = {
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-      iceCandidatePoolSize: 1
-    };
-
-    const connection = new RTCPeerConnection(configuration); // TODO check first if one already exists
-    connection.socketId = socket.id;
-    connection.remoteSocketId = remoteSocketId;
-
-    connection.defaultDataChannel = connection.createDataChannel('default'); // FIXME temporary. create wrapper for RTCPeerConnection
-    console.log('--defaultDataChannel created', connection.defaultDataChannel);
-    await dispatch(initDataChannelListeners(connection.defaultDataChannel));
-
-    const localStreamWrapper = await getState().localUser.mediaStream;
-    let localStream = await localStreamWrapper ? localStreamWrapper.stream : dispatch(startLocalStream());
-    connection.addStream(localStream); // addStream needs to be called BEFORE attempting to create offer/answer
-    await dispatch(addConnection(connection));
-
-    const offer = await connection.createOffer();
-    console.log('offer created', offer);
-    await connection.setLocalDescription(offer);
-    socket.emit('offer', { receiverSocketId: remoteSocketId, offer: offer });
+    const existingConnection = getState().connections.data[remoteSocketId];
+    return existingConnection ? existingConnection : dispatch(initNewRTCPeerConnection(remoteSocketId));
   }
 };
 
@@ -201,4 +201,28 @@ export const introduceYourself = (dataChannel) => async (dispatch, getState) => 
   } else {
     console.error('socket and/or metadata not available!');
   }
+};
+
+export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, getState) => {
+  const { socket } = getState().localUser;
+
+  const configuration = {
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+    iceCandidatePoolSize: 1
+  };
+
+  const newConnection = new RTCPeerConnection(configuration);
+  newConnection.socketId = socket.id;
+  newConnection.remoteSocketId = remoteSocketId;
+
+  newConnection.defaultDataChannel = newConnection.createDataChannel('default');
+  dispatch(initDataChannelListeners(newConnection.defaultDataChannel));
+
+  const localStreamWrapper = await getState().localUser.mediaStream;
+  if (localStreamWrapper) {
+    localStreamWrapper.stream.getTracks().forEach(track => newConnection.addTrack(track, localStreamWrapper.stream));
+  }
+
+  await dispatch(addConnection(newConnection));
+  return newConnection;
 };
