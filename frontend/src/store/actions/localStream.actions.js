@@ -1,6 +1,7 @@
 import {addStream} from './remoteStreams.actions';
 import {clearStreamTracks} from '../../utils';
 import {SET_LOCAL_USER_CAMERA_ENABLED, SET_LOCAL_USER_MEDIA_CONSTRAINTS, SET_LOCAL_USER_MEDIA_STREAM, SET_LOCAL_USER_MICROPHONE_ENABLED} from '../actionTypes';
+import {updateStreamForConnections} from './connections.actions';
 
 export const startLocalStream = () => async (dispatch, getState) => {
   const { mediaConstraints, micEnabled, camEnabled } = getState().localUser;
@@ -15,9 +16,10 @@ export const startLocalStream = () => async (dispatch, getState) => {
   actualConstraints.video = camEnabled ? actualConstraints.video : false;
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(actualConstraints);
-    dispatch({ type: SET_LOCAL_USER_MEDIA_STREAM, payload: { mediaStream: { stream } } });
-    return stream;
+    const newStream = await navigator.mediaDevices.getUserMedia(actualConstraints);
+    await dispatch(updateStreamForConnections(newStream));
+    await dispatch({ type: SET_LOCAL_USER_MEDIA_STREAM, payload: { mediaStream: { stream: newStream } } });
+    return newStream;
   } catch (error) {
     console.error('local stream couldn\'t be started', error);
   }
@@ -38,7 +40,6 @@ export const toggleLocalAudio = () => (dispatch, getState) => {
     const localStreamWrapper = getState().localUser.mediaStream;
     if (localStreamWrapper) {
       const localStream = localStreamWrapper.stream;
-      console.log('toggleLocalAudio');
       localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled;
       dispatch(addStream(socket.id, localStream));
     }
@@ -51,7 +52,6 @@ export const toggleLocalVideo = () => (dispatch, getState) => {
     const localStreamWrapper = getState().localUser.mediaStream;
     if (localStreamWrapper) {
       const localStream = localStreamWrapper.stream;
-      console.log('toggleLocalVideo');
       localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled;
       dispatch(addStream(socket.id, localStream));
     }

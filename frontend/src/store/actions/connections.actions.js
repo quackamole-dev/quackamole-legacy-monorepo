@@ -19,6 +19,7 @@ export const removeConnection = connection => async (dispatch, getState) => {
       await dispatch(removeStream(connection.remoteSocketId));
     }
 
+    connection.close();
     await dispatch({ type: REMOVE_CONNECTION, payload: { connection } });
   }
 };
@@ -225,4 +226,17 @@ export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, get
 
   await dispatch(addConnection(newConnection));
   return newConnection;
+};
+
+export const updateStreamForConnections = (newStream) => async (dispatch, getState) => {
+  const connections = Object.values(getState().connections.data);
+
+  connections.forEach(connection => {
+    const senders = connection.getSenders();
+    senders.forEach((sender) => connection.removeTrack(sender));
+
+    if (newStream) {
+      newStream.getTracks().forEach(track => connection.addTrack(track, newStream));
+    }
+  });
 };

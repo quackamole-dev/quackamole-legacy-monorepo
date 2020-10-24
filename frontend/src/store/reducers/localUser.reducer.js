@@ -5,7 +5,7 @@ import produce from 'immer';
 const defaultMediaConstraints = {
   audio: {},
   video: {
-    frameRate: { ideal: 20, max: 25 },
+    // frameRate: { ideal: 20, max: 25 }, // FIXME check supported constraints first to prevent errors
     width: { ideal: 128 },
     height: { ideal: 72 }
   }

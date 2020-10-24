@@ -1,6 +1,7 @@
 import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR} from '../actionTypes';
 import {clearAllStreams} from './remoteStreams.actions';
 import {resetLocalUser} from './localUser.actions';
+import {removeConnection} from './connections.actions';
 
 export const setCurrentRoom = room => ({
   type: SET_CURRENT_ROOM,
@@ -37,6 +38,6 @@ export const roomExitCleanup = () => (dispatch, getState) => {
   // close all RTCPeerConnections
   const connections = state.connections.data;
   if (connections) {
-    Object.values(connections).forEach(conn => conn.close());
+    Object.values(connections).forEach(conn => dispatch(removeConnection(conn)));
   }
 };
