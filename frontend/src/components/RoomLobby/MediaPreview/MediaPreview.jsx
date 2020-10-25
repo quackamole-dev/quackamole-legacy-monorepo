@@ -14,8 +14,7 @@ const useStyles = makeStyles({
     textAlign: 'center'
   },
   containerForm: {
-    width: '400px',
-    maxWidth: '90vw'
+    maxWidth: '95vw'
   },
   formControl: {
     display: 'block'
