@@ -81,22 +81,10 @@ const initSocketActions = (io, socket) => {
     // TODO reduce code duplication. There is a "leave" and a in-built "disconnect" event-listener doing similar things
   });
 
-  socket.on('offer', ({ receiverSocketId, offer }) => {
+  socket.on('signaling', ({ receiverSocketId, description, iceCandidates }) => {
     const nickname = socket.handshake.query['nickname'];
-    console.log(`User ${nickname} with socketID: ${socket.id} send an offer to socketID: ${receiverSocketId}`);
-    io.to(receiverSocketId).emit('offer', { senderSocketId: socket.id, offer: offer });
-  });
-
-  socket.on('answer', ({ receiverSocketId, answer }) => {
-    const nickname = socket.handshake.query['nickname'];
-    console.log(`User ${nickname} with socketID: ${socket.id} send an answer to socketID: ${receiverSocketId}`);
-    io.to(receiverSocketId).emit('answer', { senderSocketId: socket.id, answer: answer });
-  });
-
-  socket.on('ice-candidates', ({ senderSocketId, receiverSocketId, iceCandidates }) => {
-    const nickname = socket.handshake.query['nickname'];
-    console.log(`User ${nickname} with socketID: ${socket.id} send ${iceCandidates.length}x ICE Candidates to socketID: ${receiverSocketId}`);
-    io.to(receiverSocketId).emit('ice-candidates', { senderSocketId, iceCandidates });
+    console.log(`User ${nickname} with socketID: ${socket.id} is signaling socketID: ${receiverSocketId}`);
+    io.to(receiverSocketId).emit('signaling', { senderSocketId: socket.id, description, iceCandidates });
   });
 };
 

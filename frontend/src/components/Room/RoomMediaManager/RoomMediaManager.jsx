@@ -25,12 +25,12 @@ const RoomMediaManager = ({ localStream, localPeerMetadata }) => {
 };
 
 const mapStateToProps = (state) => {
-  const socket = state.localUser.socket;
-  const localStream = socket ? state.streams.data[socket.id] : null;
+  const localStreamWrapper = state.localUser.mediaStream;
+  const localStream = localStreamWrapper ? localStreamWrapper.stream : null;
   return {
     localPeerMetadata: state.localUser.metadata,
     localStream: localStream
   };
 };
 
-export default connect(mapStateToProps, {})(RoomMediaManager);
+export default connect(mapStateToProps)(RoomMediaManager);

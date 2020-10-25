@@ -1,6 +1,7 @@
-import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR} from '../actionTypes';
-import {clearAllStreams} from './streams.actions';
+import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR, SET_VISITED_LOBBY} from '../actionTypes';
+import {clearAllStreams} from './remoteStreams.actions';
 import {resetLocalUser} from './localUser.actions';
+import {removeConnection} from './connections.actions';
 
 export const setCurrentRoom = room => ({
   type: SET_CURRENT_ROOM,
@@ -12,8 +13,15 @@ export const setCurrentRoomError = error => ({
   payload: { error }
 });
 
+export const setVisitedLobby = visitedLobby => ({
+  type: SET_VISITED_LOBBY,
+  payload: { visitedLobby }
+});
+
 export const roomExitCleanup = () => (dispatch, getState) => {
   const state = getState();
+
+  dispatch(setVisitedLobby(false));
 
   const socket = state.localUser.socket;
   if (socket) {
@@ -27,9 +35,9 @@ export const roomExitCleanup = () => (dispatch, getState) => {
     dispatch(resetLocalUser());
 
     // clear local media stream
-    const localStream = state.streams[socket.id];
-    if (localStream) {
-      window.localStream.getTracks().forEach(track => track.stop());
+    const localStreamWrapper = state.localUser.mediaStream;
+    if (localStreamWrapper) {
+      localStreamWrapper.stream.getTracks().forEach(track => track.stop());
     }
     dispatch(clearAllStreams());
   }
@@ -37,6 +45,6 @@ export const roomExitCleanup = () => (dispatch, getState) => {
   // close all RTCPeerConnections
   const connections = state.connections.data;
   if (connections) {
-    Object.values(connections).forEach(conn => conn.close());
+    Object.values(connections).forEach(conn => dispatch(removeConnection(conn)));
   }
 };

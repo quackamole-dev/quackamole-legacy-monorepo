@@ -21,12 +21,12 @@ const useStyles = makeStyles({
 const plugins = [
   { name: 'Random number', url: 'https://andreas-schoch.github.io/p2p-test-plugin/' },
   { name: 'Paint', url: 'https://andreas-schoch.github.io/quackamole-plugin-paint/' },
-  { name: 'Gomoku', url: 'https://derpmasters.github.io/quackamole-plugin-gomoku/' },
+  { name: 'Gomoku', url: 'https://quackamole-dev.github.io/quackamole-plugin-gomoku/' },
   { name: '2d Shooter (WIP)', url: 'https://andreas-schoch.github.io/quackamole-plugin-2d-topdown-shooter/' },
   { name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/' }
 ];
 
-const RoomSidebarMenu = ({ plugin, setPlugin }) => {
+const RoomSidebarMenu = ({ dispatch, plugin }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
@@ -39,7 +39,7 @@ const RoomSidebarMenu = ({ plugin, setPlugin }) => {
 
   const handleSelectPlugin = (evt) => {
     const index = evt.currentTarget.dataset.index;
-    setPlugin(plugin ? { ...plugin, ...plugins[index] } : plugins[index]);
+    dispatch(setPlugin(plugin ? { ...plugin, ...plugins[index] } : plugins[index]));
   };
 
   const list = () => (
@@ -78,4 +78,4 @@ const mapStateToProps = (state) => ({
   plugin: state.plugin
 });
 
-export default connect(mapStateToProps, { setPlugin })(RoomSidebarMenu);
+export default connect(mapStateToProps)(RoomSidebarMenu);

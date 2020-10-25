@@ -4,9 +4,10 @@ import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import theme from '../../style/theme/MainTheme';
-import {resetLocalUser, setMetadata} from '../../store/actions/localUser.actions';
+import {setMetadata} from '../../store/actions/localUser.actions';
 import {connect} from 'react-redux';
-import {setCurrentRoomError} from '../../store/actions/room.actions';
+import {setCurrentRoomError, setVisitedLobby} from '../../store/actions/room.actions';
+import MediaPreview from './MediaPreview/MediaPreview';
 
 const useStyles = makeStyles({
   containerStyle: {
@@ -47,7 +48,7 @@ const useStyles = makeStyles({
   }
 });
 
-const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurrentRoomError, resetLocalUser }) => {
+const RoomLobby = ({ dispatch, history, match, nickname, roomError }) => {
   const [newNickname, setNewNickname] = useState(nickname);
   const [link, setLink] = useState(match.params.roomId);
   const classes = useStyles();
@@ -66,10 +67,10 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
     }
   };
 
-  const handleJoin = (e) => {
-    setMetadata({ nickname: newNickname });
-    setCurrentRoomError(null);
-    resetLocalUser();
+  const handleJoin = async (e) => {
+    dispatch(setMetadata({ nickname: newNickname }));
+    dispatch(setVisitedLobby(true));
+    dispatch(setCurrentRoomError(null));
     history.push(`/rooms/${match.params.roomId}`);
   };
 
@@ -107,6 +108,7 @@ const RoomLobby = ({ history, match, setMetadata, nickname, roomError, setCurren
             </div>
             {roomError && <Box color={'red'} textAlign={'center'}>{roomError.error.message}</Box>}
           </Box>
+          <MediaPreview/>
         </Grid>
       </Grid>
     </ThemeProvider>
@@ -118,4 +120,4 @@ const mapStateToProps = (state) => ({
   roomError: state.room.error
 });
 
-export default connect(mapStateToProps, { setMetadata, setCurrentRoomError, resetLocalUser })(RoomLobby);
+export default connect(mapStateToProps)(RoomLobby);
