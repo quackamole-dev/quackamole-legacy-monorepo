@@ -5,7 +5,6 @@ import {TextField} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import {connect} from 'react-redux';
 import {sendMessage} from '../../../../store/actions/chat.actions';
-// import {toArray} from 'react-emoji-render';
 
 const useStyles = makeStyles({
   chat: {
@@ -45,7 +44,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Chat = ({ chatData, sendMessage, socket }) => {
+const Chat = ({ dispatch, chatData, socket }) => {
   const classes = useStyles('');
   const [newMessage, setNewMessage] = useState('');
   const feedRef = useRef(null);
@@ -73,20 +72,10 @@ const Chat = ({ chatData, sendMessage, socket }) => {
   const send = (e) => {
     e.preventDefault();
     if (newMessage.replace(/\n/g, '').length) {
-      sendMessage(newMessage);
+      dispatch(sendMessage(newMessage));
       setNewMessage('');
     }
   };
-
-  // const parseEmojis = value => {
-  //   // toArray outputs React elements for emojis and strings for other
-  //   return toArray(value).reduce((previous, current) => {
-  //     if (typeof current === 'string') {
-  //       return previous + current;
-  //     }
-  //     return previous + current.props.children;
-  //   }, '');
-  // };
 
   //handle the chat feed to display all messages on the right position
   const chatMessages = chatData.map((message, i) => message.authorSocketId === socket.id
@@ -123,4 +112,4 @@ const mapStateToProps = state => ({
   socket: state.localUser.socket
 });
 
-export default connect(mapStateToProps, { sendMessage })(Chat);
+export default connect(mapStateToProps)(Chat);

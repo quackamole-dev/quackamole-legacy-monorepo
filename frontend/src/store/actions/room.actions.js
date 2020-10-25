@@ -1,4 +1,4 @@
-import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR} from '../actionTypes';
+import {SET_CURRENT_ROOM, SET_CURRENT_ROOM_ERROR, SET_VISITED_LOBBY} from '../actionTypes';
 import {clearAllStreams} from './remoteStreams.actions';
 import {resetLocalUser} from './localUser.actions';
 import {removeConnection} from './connections.actions';
@@ -13,8 +13,15 @@ export const setCurrentRoomError = error => ({
   payload: { error }
 });
 
+export const setVisitedLobby = visitedLobby => ({
+  type: SET_VISITED_LOBBY,
+  payload: { visitedLobby }
+});
+
 export const roomExitCleanup = () => (dispatch, getState) => {
   const state = getState();
+
+  dispatch(setVisitedLobby(false));
 
   const socket = state.localUser.socket;
   if (socket) {

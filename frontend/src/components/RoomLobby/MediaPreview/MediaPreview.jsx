@@ -10,6 +10,9 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import {setMediaStreamConstraints, startLocalStream, stopLocalStream, toggleCameraEnabled, toggleMicrophoneEnabled} from '../../../store/actions/localStream.actions';
 
 const useStyles = makeStyles({
+  wrapper: {
+    textAlign: 'center'
+  },
   containerForm: {
     width: '400px',
     maxWidth: '90vw'
@@ -23,7 +26,7 @@ const useStyles = makeStyles({
   }
 });
 
-const MediaPreview = ({ dispatch, socket, localStreamWrapper, mediaConstraints }) => {
+const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
   const classes = useStyles();
 
   const [audioInputDevices, setAudioInputDevices] = useState(null);
@@ -136,7 +139,7 @@ const MediaPreview = ({ dispatch, socket, localStreamWrapper, mediaConstraints }
   };
 
   return (
-    <Box>
+    <Box className={classes.wrapper}>
       <Button onClick={handleClickOpen}>Preview Audio & Video Settings</Button>
 
       <div>
@@ -186,18 +189,15 @@ const MediaPreview = ({ dispatch, socket, localStreamWrapper, mediaConstraints }
             <Button onClick={handleClose} color="primary">Close</Button>
             {/*<Button onClick={handleSaveSettings} color="primary">Save</Button>*/}
           </DialogActions>
+
         </Dialog>
       </div>
-
-
     </Box>
   );
 };
 
 const mapStateToProps = (state) => {
-  const socket = state.localUser.socket;
   return {
-    socket: socket,
     localStreamWrapper: state.localUser.mediaStream,
     mediaConstraints: state.localUser.mediaConstraints
   };

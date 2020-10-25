@@ -26,7 +26,7 @@ const plugins = [
   { name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/' }
 ];
 
-const RoomSidebarMenu = ({ plugin, setPlugin }) => {
+const RoomSidebarMenu = ({ dispatch, plugin }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
@@ -39,7 +39,7 @@ const RoomSidebarMenu = ({ plugin, setPlugin }) => {
 
   const handleSelectPlugin = (evt) => {
     const index = evt.currentTarget.dataset.index;
-    setPlugin(plugin ? { ...plugin, ...plugins[index] } : plugins[index]);
+    dispatch(setPlugin(plugin ? { ...plugin, ...plugins[index] } : plugins[index]));
   };
 
   const list = () => (
@@ -78,4 +78,4 @@ const mapStateToProps = (state) => ({
   plugin: state.plugin
 });
 
-export default connect(mapStateToProps, { setPlugin })(RoomSidebarMenu);
+export default connect(mapStateToProps)(RoomSidebarMenu);

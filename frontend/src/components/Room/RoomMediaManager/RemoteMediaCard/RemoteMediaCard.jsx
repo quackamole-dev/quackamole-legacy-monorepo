@@ -9,7 +9,6 @@ const mapStateToProps = (state, ownProps) => {
   const remoteStreamWrapper = remoteSocketId ? state.remoteStreams.data[remoteSocketId] : null;
   const remoteStream = remoteStreamWrapper ? remoteStreamWrapper.stream : null;
   const remoteMetadata = state.peers.data[remoteSocketId] ? state.peers.data[remoteSocketId].metadata : {};
-  console.log('-----------------remote stream', remoteStream);
   return {
     remoteStream: remoteStream,
     remoteNickname: remoteMetadata.nickname || 'missing Nickname'

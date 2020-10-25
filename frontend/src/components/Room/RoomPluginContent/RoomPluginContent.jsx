@@ -3,12 +3,12 @@ import {Box} from '@material-ui/core';
 import {connect} from 'react-redux';
 import {handlePluginMessage, setPlugin} from '../../../store/actions/plugin.actions';
 
-const RoomPluginContent = ({ plugin, handlePluginMessage, setPlugin }) => {
+const RoomPluginContent = ({ dispatch, plugin }) => {
   const iframeRef = useRef();
 
   useEffect(() => {
     const handleMessage = (evt) => {
-      handlePluginMessage(evt);
+      dispatch(handlePluginMessage(evt));
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
@@ -17,7 +17,7 @@ const RoomPluginContent = ({ plugin, handlePluginMessage, setPlugin }) => {
 
   useEffect(() => {
     if (iframeRef && iframeRef.current) {
-      setPlugin({ ...plugin, iframe: iframeRef.current });
+      dispatch(setPlugin({ ...plugin, iframe: iframeRef.current }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [iframeRef, plugin.url]);
@@ -33,4 +33,4 @@ const mapStateToProps = (state) => ({
   plugin: state.plugin
 });
 
-export default connect(mapStateToProps, { handlePluginMessage, setPlugin })(RoomPluginContent);
+export default connect(mapStateToProps)(RoomPluginContent);

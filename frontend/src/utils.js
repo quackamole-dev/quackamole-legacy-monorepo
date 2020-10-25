@@ -31,24 +31,6 @@ export const setVideoSrc = (videoRef, stream, muted = true) => {
   }
 };
 
-// untested prototype for a hook that might replace setVideoSrc(). Right now there is no benefit of using it. Rethink design
-// export const useStream = (muted = false) => {
-//     const videoRef = useRef(null);
-//     const [stream, setStream] = useState(null);
-//
-//     useEffect(() => {
-//         if (videoRef.current && stream) {
-//             videoRef.current.srcObject = stream;
-//             videoRef.current.oncanplay = () => {
-//                 videoRef.current.play();
-//                 videoRef.current.muted = muted;
-//             };
-//         }
-//     }, [stream, videoRef, muted]);
-//
-//     return [videoRef, setStream];
-// };
-
 export const clearStreamTracks = stream => {
   if (stream) {
     if (!stream.getTracks) {

@@ -40,7 +40,6 @@ const useStyles = makeStyles({
   },
   buttonStyle: {
     borderRadius: '5px',
-    // width: '106px',
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#FBC02D',
