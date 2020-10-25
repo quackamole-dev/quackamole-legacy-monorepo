@@ -1,7 +1,7 @@
 import {INIT_LOCAL_USER_SOCKET, RESET_LOCAL_USER, SET_LOCAL_USER_LOADING, SET_LOCAL_USER_METADATA} from '../actionTypes';
 import io from 'socket.io-client';
 import {getPersistedData, persistData, serializeQueryString} from '../../utils';
-import {addConnection, initNewRTCPeerConnection, removeConnection} from './connections.actions';
+import {addConnection, addLocalStreamTracksToConnection, initNewRTCPeerConnection, removeConnection} from './connections.actions';
 import {setCurrentRoomError} from './room.actions';
 import {BACKEND_URL} from '../../constants';
 import {addStream} from './remoteStreams.actions';
@@ -47,76 +47,82 @@ const initLocalUserSocketListeners = (socket) => async (dispatch, getState) => {
     });
 
     socket.on('signaling', async ({ senderSocketId, description, iceCandidates }) => {
-      console.log('---on signaling description type =', description ? description.type : '-');
-      // For reference: https://w3c.github.io/webrtc-pc/#perfect-negotiation-example
-      try {
-        let connection = getState().connections.data[senderSocketId];
-        let wasNew = false;
-        if (!connection) {
-          wasNew = true;
-          console.log('very first offer received. Connection does not exist yet! creating one -  I am the polite peer');
-          // If connection does not already exists, the senderSocketId was sending the very first offer
-          connection = await (dispatch(initNewRTCPeerConnection(senderSocketId)));
-          connection.polite = true; // the peer receiving very first offer is initially the polite one
-          connection.makingOffer = false;
-          connection.ignoringOffer = false;
-          connection.isSettingRemoteAnswerPending = false;
-
-          // FIXME temp
-          // await dispatch(addConnection(connection)); // NOTE cannote be done before setting remote description, but if not done now the receiving peer doesnt get stream. If done now the receiving peers onnegotiationneeded event gets fired errorously
-
-          connection.ontrack = ({ track, streams }) => {
-            console.log('ontrack - remote stream track received');
-            if (streams && streams[0]) {
-              console.log('ontrack - adding remote stream track');
-              dispatch(addStream(connection.remoteSocketId, streams[0]));
-            } else {
-              console.error('ontrack - this should not happen... streams[0] is empty!');
-            }
-          };
-        }
-
-        if (description) {
-          // const readyForOffer = !connection.makingOffer && (connection.signalingState === 'stable' || connection.isSettingRemoteAnswerPending);
-          const offerCollision = description.type === 'offer' && (connection.makingOffer || connection.signalingState !== 'stable');
-
-          // While impolite peer is making an offer he will ignore incoming offers
-          connection.ignoreOffer = !connection.polite && offerCollision;
-          if (connection.ignoreOffer) {
-            console.log('I am impolite and will IGNORE the offer from socketID', connection.remoteSocketId);
-            return;
-          }
-
-          // connection.isSettingRemoteAnswerPending = description.type === 'answer';
-          await connection.setRemoteDescription(new RTCSessionDescription(description)); // with implicit rollback
-          if (wasNew) {
-            console.log('WASNEW - adding connection');
-            await dispatch(addConnection(connection));
-          }
-          // connection.isSettingRemoteAnswerPending = false;
-
-          if (description.type === 'offer') {
-            console.log('I received an offer and will create an answer');
-            const answer = await connection.createAnswer();
-            await connection.setLocalDescription(answer);
-            socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
-          }
-        } else if (iceCandidates) {
-          try {
-            console.log('--receiving ice candidates', iceCandidates.length, 'x');
-            for (const candidate of iceCandidates) {
-              // await connection.addIceCandidate(new RTCIceCandidate(candidate));
-              await connection.addIceCandidate(candidate);
-            }
-          } catch (err) {
-            if (!connection.ignoreOffer) {
-              throw err;
-            }
-          }
-        }
-      } catch (err) {
-        console.error(err);
+      let connection = getState().connections.data[senderSocketId];
+      let initialOffer = false;
+      if (!connection) {
+        initialOffer = true;
+        connection = await (dispatch(initNewRTCPeerConnection(senderSocketId)));
       }
+
+      // RECEIVING OFFER
+      if (description && description.type === 'offer') {
+        console.log(`You received an OFFER from "${senderSocketId}"...`);
+        if (initialOffer) {
+          console.log('This appears to be the very first offer...');
+        } else {
+          console.log('This appears to be a re-negotiation offer...');
+        }
+        await connection.setRemoteDescription(new RTCSessionDescription(description));
+        const answer = await connection.createAnswer();
+        await connection.setLocalDescription(answer);
+        console.log('Sending answer to remote peer...');
+        socket.emit('signaling', { receiverSocketId: senderSocketId, description: answer });
+
+        // RECEIVING ANSWER
+      } else if (description && description.type) {
+        console.log(`You received an ANSWER from "${senderSocketId}"...`);
+        if (!connection) {
+          console.error('No offer was ever made for the received answer. Investigate!');
+        }
+        await connection.setRemoteDescription(new RTCSessionDescription(description));
+
+        // RECEIVING ICE CANDIDATES
+      } else if (iceCandidates) {
+        console.log(`You received ICE CANDIDATES from "${senderSocketId}"...`);
+        for (const candidate of iceCandidates) {
+          await connection.addIceCandidate(candidate);
+        }
+      }
+
+      //       if (description) {
+      //         // const readyForOffer = !connection.makingOffer && (connection.signalingState === 'stable' || connection.isSettingRemoteAnswerPending);
+      //         const offerCollision = description.type === 'offer' && (connection.makingOffer || connection.signalingState !== 'stable');
+      //
+      //         // While impolite peer is making an offer he will ignore incoming offers
+      //         connection.ignoreOffer = !connection.polite && offerCollision;
+      //         if (connection.ignoreOffer) {
+      //           console.log('I am impolite and will IGNORE the offer from socketID', connection.remoteSocketId);
+      //           return;
+      //         }
+      //
+      //         // connection.isSettingRemoteAnswerPending = description.type === 'answer';
+      //         await connection.setRemoteDescription(new RTCSessionDescription(description)); // with implicit rollback
+      //
+      //         // connection.isSettingRemoteAnswerPending = false;
+      //
+      //         if (description.type === 'offer') {
+      //           console.log('I received an offer and will create an answer');
+      //           const answer = await connection.createAnswer();
+      //           await connection.setLocalDescription(answer);
+      //           socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
+      //         }
+      //       } else if (iceCandidates) {
+      //         try {
+      //           console.log('--receiving ice candidates', iceCandidates.length, 'x');
+      //           for (const candidate of iceCandidates) {
+      //             // await connection.addIceCandidate(new RTCIceCandidate(candidate));
+      //             await connection.addIceCandidate(candidate);
+      //           }
+      //         } catch (err) {
+      //           if (!connection.ignoreOffer) {
+      //             throw err;
+      //           }
+      //         }
+      //       }
+      //     } catch (err) {
+      //       console.error(err);
+      //     }
+
     });
   });
 };

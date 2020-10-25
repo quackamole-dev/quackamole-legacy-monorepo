@@ -3,13 +3,13 @@ import {addStream, removeStream} from './remoteStreams.actions';
 import {setCurrentRoomError} from './room.actions';
 import {startLocalStream} from './localStream.actions';
 
-export const addConnection = (connection) => async (dispatch, getState) => {
-  if (connection && connection.socketId) {
-    console.log('addConnection', connection);
-    await dispatch({ type: ADD_CONNECTION, payload: { connection } });
-    await dispatch(initConnectionListeners(connection));
-  }
-};
+// export const addConnection = (connection) => async (dispatch, getState) => {
+//   if (connection && connection.socketId) {
+//     console.log('addConnection', connection);
+//     await dispatch({ type: ADD_CONNECTION, payload: { connection } });
+//     await dispatch(initConnectionListeners(connection));
+//   }
+// };
 
 export const removeConnection = connection => async (dispatch, getState) => {
   if (connection && connection.remoteSocketId && connection.socketId) {
@@ -26,8 +26,8 @@ export const removeConnection = connection => async (dispatch, getState) => {
 
 export const initDataChannelListeners = dataChannel => (dispatch, getState) => {
   if (dataChannel) {
+    console.log(`Initializing data channel listeners...`);
     dataChannel.onmessage = evt => {
-      console.log('received message: ', evt);
       const data = JSON.parse(evt.data);
       const type = data.type;
 
@@ -57,7 +57,7 @@ export const initDataChannelListeners = dataChannel => (dispatch, getState) => {
     };
 
     dataChannel.onopen = () => {
-      console.log('datachannel open', dataChannel);
+      console.log('datachannel open...');
     };
 
     dataChannel.onclose = () => {
@@ -68,6 +68,7 @@ export const initDataChannelListeners = dataChannel => (dispatch, getState) => {
 
 export const initConnectionListeners = connection => (dispatch, getState) => {
   if (connection && connection.socketId) {
+    console.log(`Initializing RTCPeerConnection listeners...`);
     const delayMultiplier = 1.5;
     const baseDelay = 450;
     const maxIterations = 9;
@@ -78,44 +79,40 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     // Most of the candidates trickle in within the first 0-2seconds but the null event can happen much later
     // The goal is to send ice-candidates out quickly with the least amount of signaling until the null event
     // High likelihood to be changed/simplified as time goes by...
-    // const timer = () => {
-    //   if (iceCandidates.length) {
-    //     const { socket } = getState().localUser;
-    //     socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: iceCandidates });
-    //     iceCandidates = [];
-    //   }
-    //
-    //   if (currentIteration <= maxIterations) {
-    //     const rawDelay = baseDelay * Math.pow(delayMultiplier, currentIteration);
-    //     const roundedDelay = Math.round(rawDelay / 100 * 2) * 100 / 2;
-    //
-    //     console.log('TIMER DELAY', roundedDelay);
-    //     setTimeout(timer, Math.round(roundedDelay));
-    //     currentIteration++;
-    //   }
-    // };
-    // timer();
+    const timer = () => {
+      if (iceCandidates.length) {
+        const { socket } = getState().localUser;
+        console.log(`Sending ${iceCandidates.length}x ICE CANDIDATES to peer...`);
+        socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: iceCandidates });
+        iceCandidates = [];
+      }
+
+      if (currentIteration <= maxIterations) {
+        const rawDelay = baseDelay * Math.pow(delayMultiplier, currentIteration);
+        const roundedDelay = Math.round(rawDelay / 100 * 2) * 100 / 2;
+
+        // console.log('TIMER DELAY', roundedDelay);
+        setTimeout(timer, Math.round(roundedDelay));
+        currentIteration++;
+      }
+    };
+    timer();
 
     connection.onicecandidate = (evt) => {
 
       const iceCandidate = evt.candidate;
-      //
-      // if (iceCandidate) {
-      const { socket } = getState().localUser;
-      socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: [iceCandidate] });
-
-      //   iceCandidates.push(iceCandidate);
-      // } else {
-      //   console.log('no more ICE');
-      //   currentIteration = maxIterations + 1;
-      //   timer();
-      // }
+      if (iceCandidate) {
+        iceCandidates.push(iceCandidate);
+      } else {
+        console.log('no more ICE');
+        currentIteration = maxIterations + 1;
+        timer();
+      }
     };
 
     connection.ontrack = ({ track, streams }) => {
-      console.log('ontrack - remote stream track received');
       if (streams && streams[0]) {
-        console.log('ontrack - adding remote stream track');
+        console.log(`A remote stream track was received from ${connection.remoteSocketId}...`);
         dispatch(addStream(connection.remoteSocketId, streams[0]));
       } else {
         console.error('ontrack - this should not happen... streams[0] is empty!');
@@ -123,22 +120,33 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     };
 
     connection.onnegotiationneeded = async evt => {
+      // if (connection.called) {
+      //   console.log('(negotiation needed ignored because I am the called...)')
+      //   return;
+      // }
+      // console.log('You need to send an offer to the remote peer', connection.connectionState);
+      // const offer = await connection.createOffer();
+      // connection.setLocalDescription(offer);
+      //
+      // const { socket } = getState().localUser;
+      // console.log('Sending offer to remote peer...');
+      // socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
 
-      try {
-        connection.makingOffer = true;
-        const offer = await connection.createOffer();
-        if (connection.signalingState !== 'stable') return;
-        console.trace('creating offer implicitly');
-        // console.trace('Why am I "onnegotiationneeded" fired?');
-        await connection.setLocalDescription(offer); // newer syntax that implicitly knows whether to create offer or answer
-
-        const { socket } = getState().localUser;
-        socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        connection.makingOffer = false;
-      }
+      // try {
+      //   connection.makingOffer = true;
+      //   const offer = await connection.createOffer();
+      //   if (connection.signalingState !== 'stable') return;
+      //   console.trace('creating offer implicitly');
+      //   // console.trace('Why am I "onnegotiationneeded" fired?');
+      //   await connection.setLocalDescription(offer); // newer syntax that implicitly knows whether to create offer or answer
+      //
+      //   const { socket } = getState().localUser;
+      //   socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
+      // } catch (err) {
+      //   console.error(err);
+      // } finally {
+      //   connection.makingOffer = false;
+      // }
     };
 
     connection.oniceconnectionstatechange = () => {
@@ -155,30 +163,36 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     };
 
     connection.ondatachannel = async evt => {
-      console.log('ondatachannel');
+      console.log('Remote peer opened a data channel with you...');
       connection.defaultDataChannel = evt.channel;
       await dispatch(initDataChannelListeners(connection.defaultDataChannel));
       dispatch(introduceYourself(connection.defaultDataChannel));
-
     };
   }
 };
 
+/**
+ * Establishes the initial connection between two peers.
+ * @param remoteSocketId - The socketId of the peer you want to connect with
+ */
 export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
   const { socket } = getState().localUser;
-
   if (remoteSocketId === socket.id) return;
-  console.log('connectWithPeer');
 
   const existingConnection = getState().connections.data[remoteSocketId];
 
   if (existingConnection) {
-    console.log('connectWithPeer() returning existing connection!');
-    return existingConnection;
+    console.error(`You already established a connection with ${remoteSocketId}`);
   } else {
-    console.log('connectWithPeer - no existing connection found');
+    console.log(`Preparing to connect with "${remoteSocketId}" ...`);
     const newConnection = await dispatch(initNewRTCPeerConnection(remoteSocketId));
-    await dispatch(addConnection(newConnection));
+
+    await dispatch(sendNewOfferToConnection(newConnection));
+    // const offer = await newConnection.createOffer();
+    // await newConnection.setLocalDescription(offer);
+    // console.log('Sending initial offer to remote peer...');
+    // socket.emit('signaling', { receiverSocketId: newConnection.remoteSocketId, description: newConnection.localDescription });
+
     return newConnection;
   }
 };
@@ -220,7 +234,7 @@ export const introduceYourself = (dataChannel) => async (dispatch, getState) => 
 };
 
 export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, getState) => {
-  console.log('dispatch initNewRTCPeerConnection() - remoteSocketId', remoteSocketId);
+  console.log(`Creating new RTCPeerConnection with "${remoteSocketId}" ...`);
   const { socket } = getState().localUser;
 
   const configuration = {
@@ -231,32 +245,69 @@ export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, get
   const newConnection = new RTCPeerConnection(configuration);
   newConnection.socketId = socket.id;
   newConnection.remoteSocketId = remoteSocketId;
-
   newConnection.defaultDataChannel = newConnection.createDataChannel('default');
-  dispatch(initDataChannelListeners(newConnection.defaultDataChannel));
+
+  await dispatch(initDataChannelListeners(newConnection.defaultDataChannel));
+  await dispatch(initConnectionListeners(newConnection));
 
   const localStreamWrapper = await getState().localUser.mediaStream;
   if (localStreamWrapper) {
-    console.log('--adding local stream tracks to new connection -', localStreamWrapper.stream.getTracks().length, 'x tracks');
-    localStreamWrapper.stream.getTracks().forEach(track => newConnection.addTrack(track, localStreamWrapper.stream));
+    const tracks = localStreamWrapper.stream.getTracks();
+    console.log(`Adding ${tracks.length}x stream tracks to the new RTCPeerConnection with "${remoteSocketId}"...`);
+    for (const track of tracks) {
+      await newConnection.addTrack(track, localStreamWrapper.stream);
+    }
   }
 
-  // await dispatch(addConnection(newConnection)); // TODO DA cannot be added here since remote description isnt added yet
+  await dispatch({ type: ADD_CONNECTION, payload: { connection: newConnection } });
   return newConnection;
 };
 
 export const updateStreamForConnections = (newStream) => async (dispatch, getState) => {
   const connections = Object.values(getState().connections.data);
 
-  connections.forEach(connection => {
-    const senders = connection.getSenders();
+  for (const connection of connections) {
+    console.log(`Updating localStream for RTCPeerConnection with "${connection.remoteSocketId}"...`);
 
-    console.log('removing existing stream tracks');
-    senders.forEach((sender) => connection.removeTrack(sender));
+    for (const sender of connection.getSenders()) {
+      await connection.removeTrack(sender);
+    }
 
     if (newStream) {
-      console.log('adding updated stream tracks to all connections');
-      newStream.getTracks().forEach(track => connection.addTrack(track, newStream));
+      for (const track of newStream.getTracks()) {
+        await connection.addTrack(track, newStream);
+      }
     }
-  });
+
+    dispatch(sendNewOfferToConnection(connection));
+  }
+};
+
+// // TODO move to util
+// export const addLocalStreamTracksToConnection = (connection) => async (dispatch, getState) => {
+//   const localStreamWrapper = getState().localUser.mediaStream;
+//
+//   if (localStreamWrapper) {
+//     console.log(`LocalStream is active, adding tracks to RTCPeerConnection with "${connection.remoteSocketId}"...`);
+//     const localStream = localStreamWrapper.stream;
+//     for (const sender of connection.getSenders()) {
+//       await connection.removeTrack(sender);
+//     }
+//
+//     if (localStream) {
+//       for (const track of localStream.getTracks()) {
+//         await connection.addTrack(track, localStream);
+//       }
+//     }
+//   } else {
+//     console.log(`No LocalStream active...`);
+//   }
+// };
+
+export const sendNewOfferToConnection = (connection) => async (dispatch, getState) => {
+  const socket = getState().localUser.socket;
+  const offer = await connection.createOffer();
+  await connection.setLocalDescription(offer);
+  console.log('Sending offer to remote peer...');
+  socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
 };
