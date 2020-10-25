@@ -4,6 +4,7 @@ import {SET_LOCAL_USER_CAMERA_ENABLED, SET_LOCAL_USER_MEDIA_CONSTRAINTS, SET_LOC
 import {updateStreamForConnections} from './connections.actions';
 
 export const startLocalStream = () => async (dispatch, getState) => {
+  console.log('startLocalStream dispatched');
   const { mediaConstraints, micEnabled, camEnabled } = getState().localUser;
 
   if (!micEnabled && !camEnabled) {

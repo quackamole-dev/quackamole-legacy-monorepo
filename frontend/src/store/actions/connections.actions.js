@@ -78,38 +78,44 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     // Most of the candidates trickle in within the first 0-2seconds but the null event can happen much later
     // The goal is to send ice-candidates out quickly with the least amount of signaling until the null event
     // High likelihood to be changed/simplified as time goes by...
-    const timer = () => {
-      if (iceCandidates.length) {
-        const { socket } = getState().localUser;
-        socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: iceCandidates });
-        iceCandidates = [];
-      }
-
-      if (currentIteration <= maxIterations) {
-        const rawDelay = baseDelay * Math.pow(delayMultiplier, currentIteration);
-        const roundedDelay = Math.round(rawDelay / 100 * 2) * 100 / 2;
-
-        console.log('TIMER DELAY', roundedDelay);
-        setTimeout(timer, Math.round(roundedDelay));
-        currentIteration++;
-      }
-    };
-    timer();
+    // const timer = () => {
+    //   if (iceCandidates.length) {
+    //     const { socket } = getState().localUser;
+    //     socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: iceCandidates });
+    //     iceCandidates = [];
+    //   }
+    //
+    //   if (currentIteration <= maxIterations) {
+    //     const rawDelay = baseDelay * Math.pow(delayMultiplier, currentIteration);
+    //     const roundedDelay = Math.round(rawDelay / 100 * 2) * 100 / 2;
+    //
+    //     console.log('TIMER DELAY', roundedDelay);
+    //     setTimeout(timer, Math.round(roundedDelay));
+    //     currentIteration++;
+    //   }
+    // };
+    // timer();
 
     connection.onicecandidate = (evt) => {
-      const iceCandidate = evt.candidate;
 
-      if (iceCandidate) {
-        iceCandidates.push(iceCandidate);
-      } else {
-        console.log('no more ICE');
-        currentIteration = maxIterations + 1;
-        timer();
-      }
+      const iceCandidate = evt.candidate;
+      //
+      // if (iceCandidate) {
+      const { socket } = getState().localUser;
+      socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, iceCandidates: [iceCandidate] });
+
+      //   iceCandidates.push(iceCandidate);
+      // } else {
+      //   console.log('no more ICE');
+      //   currentIteration = maxIterations + 1;
+      //   timer();
+      // }
     };
 
     connection.ontrack = ({ track, streams }) => {
-      if (streams[0]) {
+      console.log('ontrack - remote stream track received');
+      if (streams && streams[0]) {
+        console.log('ontrack - adding remote stream track');
         dispatch(addStream(connection.remoteSocketId, streams[0]));
       } else {
         console.error('ontrack - this should not happen... streams[0] is empty!');
@@ -117,11 +123,14 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
     };
 
     connection.onnegotiationneeded = async evt => {
-      if (connection.signalingState !== 'stable') return;
 
       try {
         connection.makingOffer = true;
-        await connection.setLocalDescription(); // newer syntax that implicitly knows whether to create offer or answer
+        const offer = await connection.createOffer();
+        if (connection.signalingState !== 'stable') return;
+        console.trace('creating offer implicitly');
+        // console.trace('Why am I "onnegotiationneeded" fired?');
+        await connection.setLocalDescription(offer); // newer syntax that implicitly knows whether to create offer or answer
 
         const { socket } = getState().localUser;
         socket.emit('signaling', { receiverSocketId: connection.remoteSocketId, description: connection.localDescription });
@@ -134,27 +143,23 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
 
     connection.oniceconnectionstatechange = () => {
       if (connection.iceConnectionState === 'failed') {
+        console.error('oniceconnectionstatechange - restarting ICE');
         connection.restartIce();
       }
     };
 
     connection.onsignalingstatechange = evt => {
-      if (connection.signalingState && connection.localDescription && connection.remoteDescription) {
-        console.log('CONNECTION ESTABLISHED!!');
+      if (connection.signalingState === 'stable' && connection.localDescription && connection.remoteDescription) {
+        console.log('CONNECTION ESTABLISHED!! signaling state:', connection.signalingState);
       }
     };
 
     connection.ondatachannel = async evt => {
-      console.log('ondatachannel', evt);
+      console.log('ondatachannel');
       connection.defaultDataChannel = evt.channel;
       await dispatch(initDataChannelListeners(connection.defaultDataChannel));
       dispatch(introduceYourself(connection.defaultDataChannel));
 
-    };
-
-    connection.onmessage = evt => {
-      console.log('---------connection.onmessage', evt);
-      // Now handled by dataChannels without wrapper of peerjs
     };
   }
 };
@@ -162,9 +167,19 @@ export const initConnectionListeners = connection => (dispatch, getState) => {
 export const connectWithPeer = remoteSocketId => async (dispatch, getState) => {
   const { socket } = getState().localUser;
 
-  if (remoteSocketId !== socket.id) {
-    const existingConnection = getState().connections.data[remoteSocketId];
-    return existingConnection ? existingConnection : dispatch(initNewRTCPeerConnection(remoteSocketId));
+  if (remoteSocketId === socket.id) return;
+  console.log('connectWithPeer');
+
+  const existingConnection = getState().connections.data[remoteSocketId];
+
+  if (existingConnection) {
+    console.log('connectWithPeer() returning existing connection!');
+    return existingConnection;
+  } else {
+    console.log('connectWithPeer - no existing connection found');
+    const newConnection = await dispatch(initNewRTCPeerConnection(remoteSocketId));
+    await dispatch(addConnection(newConnection));
+    return newConnection;
   }
 };
 
@@ -205,6 +220,7 @@ export const introduceYourself = (dataChannel) => async (dispatch, getState) => 
 };
 
 export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, getState) => {
+  console.log('dispatch initNewRTCPeerConnection() - remoteSocketId', remoteSocketId);
   const { socket } = getState().localUser;
 
   const configuration = {
@@ -221,10 +237,11 @@ export const initNewRTCPeerConnection = (remoteSocketId) => async (dispatch, get
 
   const localStreamWrapper = await getState().localUser.mediaStream;
   if (localStreamWrapper) {
+    console.log('--adding local stream tracks to new connection -', localStreamWrapper.stream.getTracks().length, 'x tracks');
     localStreamWrapper.stream.getTracks().forEach(track => newConnection.addTrack(track, localStreamWrapper.stream));
   }
 
-  await dispatch(addConnection(newConnection));
+  // await dispatch(addConnection(newConnection)); // TODO DA cannot be added here since remote description isnt added yet
   return newConnection;
 };
 
@@ -233,9 +250,12 @@ export const updateStreamForConnections = (newStream) => async (dispatch, getSta
 
   connections.forEach(connection => {
     const senders = connection.getSenders();
+
+    console.log('removing existing stream tracks');
     senders.forEach((sender) => connection.removeTrack(sender));
 
     if (newStream) {
+      console.log('adding updated stream tracks to all connections');
       newStream.getTracks().forEach(track => connection.addTrack(track, newStream));
     }
   });

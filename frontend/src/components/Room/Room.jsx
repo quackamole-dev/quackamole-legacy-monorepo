@@ -19,7 +19,7 @@ const Room = ({ socket, match, history, initLocalUser, joinRoom, roomError, curr
       initLocalUser();
     } else if (socket && socket.id && !currentRoom.id) {
       console.log('Room#useEffect before joinRoom');
-      startLocalStream();
+      // startLocalStream();
       joinRoom(match.params.roomId, 'dummy123');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
