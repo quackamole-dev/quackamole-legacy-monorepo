@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import theme from '../../style/theme/MainTheme';
 import {setMetadata} from '../../store/actions/localUser.actions';
 import {connect} from 'react-redux';
 import {setCurrentRoomError, setVisitedLobby} from '../../store/actions/room.actions';
@@ -75,7 +74,7 @@ const RoomLobby = ({ dispatch, history, match, nickname, roomError }) => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       <Box display='flex' height={63} bgcolor='#2E7D32' alignItems='center' paddingLeft='36px'>
         <Link to="/" style={{ textDecoration: 'none', color: 'white' }}><ArrowBackIosIcon/></Link>
       </Box>
@@ -111,7 +110,7 @@ const RoomLobby = ({ dispatch, history, match, nickname, roomError }) => {
           <MediaPreview/>
         </Grid>
       </Grid>
-    </ThemeProvider>
+    </div>
   );
 };
 

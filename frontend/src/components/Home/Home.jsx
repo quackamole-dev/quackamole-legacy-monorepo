@@ -1,7 +1,6 @@
 import React from 'react';
-import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {Typography, Box, Button, useMediaQuery} from '@material-ui/core';
-import theme from '../../style/theme/MainTheme';
 import {Link} from 'react-router-dom';
 import BulletPoint from './BulletPoint/BulletPoint';
 
@@ -106,7 +105,7 @@ const Home = () => {
   ];
 
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       {/* Header */}
       <Box height={63} bgcolor='#2E7D32' className={classes.header}>
         <h1>
@@ -142,7 +141,7 @@ const Home = () => {
 
       {/*Temporary for debugging purposes*/}
       <Link to={'/rooms/dummy-room-id'}>Test room</Link>
-    </ThemeProvider>
+    </div>
   );
 };
 

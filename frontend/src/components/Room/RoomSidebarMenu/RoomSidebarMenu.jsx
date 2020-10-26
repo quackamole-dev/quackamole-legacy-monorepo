@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
-import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {List, ListItem, ListItemIcon, ListItemText, Divider, Button, Drawer} from '@material-ui/core';
 import LabelIcon from '@material-ui/icons/Label';
 import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
 import MenuIcon from '@material-ui/icons/Menu';
-import theme from '../../../style/theme/MainTheme';
 import {setPlugin} from '../../../store/actions/plugin.actions';
 import {connect} from 'react-redux';
 
@@ -63,14 +62,12 @@ const RoomSidebarMenu = ({ dispatch, plugin }) => {
   );
 
   return (
-    <ThemeProvider theme={theme}>
       <Button>
         <MenuIcon onClick={toggleDrawer} color='primary' fontSize='large' className={classes.menuIcon}/>
         <Drawer open={open} onClose={toggleDrawer} anchor={'left'}>
           {list()}
         </Drawer>
       </Button>
-    </ThemeProvider>
   );
 };
 

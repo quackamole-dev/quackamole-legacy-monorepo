@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
-import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {Box, Button, Grid, TextField, Typography} from '@material-ui/core';
 import theme from '../../style/theme/MainTheme';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
@@ -222,7 +222,7 @@ const RoomCreateForm = () => {
     </Box>;
 
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       {/* Header */}
       <Box
         display='flex'
@@ -243,7 +243,7 @@ const RoomCreateForm = () => {
           {error && <Box color={'red'} textAlign={'center'}>{error.message}</Box>}
         </Grid>
       </Grid>
-    </ThemeProvider>
+    </div>
   );
 };
 
