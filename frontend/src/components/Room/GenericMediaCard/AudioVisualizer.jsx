@@ -4,7 +4,7 @@ import {Card} from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   visualizer: {
-    transition: 'box-shadow 0.3s ease-out'
+    transition: 'box-shadow 0.2s'
   }
 }));
 
@@ -27,7 +27,7 @@ const AudioVisualizer = ({ stream, children, styles }) => {
       analyser.maxDecibels = -10;
       analyser.smoothingTimeConstant = 0.25;
 
-      analyser.fftSize = 64;
+      analyser.fftSize = 512;
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Float32Array(analyser.fftSize);
 
@@ -47,7 +47,7 @@ const AudioVisualizer = ({ stream, children, styles }) => {
         if (avgPowerDecibels === -Infinity) return;
         // Add box shadow when speaking (attention: this is circumventing react rendering)
         // FIXME not happy with how it looks yet. Experiment with different ways to visualize audio
-        if (avgPowerDecibels >= -50) {
+        if (avgPowerDecibels >= -40) {
           audioIndicatorRef.current.style.boxShadow = `0px 0px 0px 2px rgb(46, 125, 50)`;
         } else {
           audioIndicatorRef.current.style.boxShadow = 'none';
@@ -55,7 +55,7 @@ const AudioVisualizer = ({ stream, children, styles }) => {
       };
 
       if (!handler) {
-        handler = setInterval(checkIfUserIsSpeaking, 1000 / 20);
+        handler = setInterval(checkIfUserIsSpeaking, 1000 / 15);
       }
     }
 
