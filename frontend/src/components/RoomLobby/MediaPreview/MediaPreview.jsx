@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import {Box, Button, Input, DialogActions, FormControl, InputLabel, Select, Dialog, DialogTitle, DialogContent} from '@material-ui/core';
+import {Box, Button, Input, DialogActions, FormControl, InputLabel, Select, Dialog, DialogTitle, DialogContent, MenuItem} from '@material-ui/core';
 import {connect} from 'react-redux';
 import GenericMediaCard from '../../Room/GenericMediaCard/GenericMediaCard';
 import VideocamIcon from '@material-ui/icons/Videocam';
@@ -28,11 +28,11 @@ const useStyles = makeStyles({
 const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
   const classes = useStyles();
 
-  const [audioInputDevices, setAudioInputDevices] = useState(null);
-  const [videoInputDevices, setVideoInputDevices] = useState(null);
+  const [microphones, setMicrophones] = useState(null);
+  const [cameras, setCameras] = useState(null);
 
-  const [currentAudioDevice, setCurrentAudioDevice] = useState(null);
-  const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
+  const [currentMicrophone, setCurrentMicrophone] = useState(null);
+  const [currentCamera, setCurrentCamera] = useState(null);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -44,7 +44,7 @@ const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
     handleSaveSettings();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentVideoDevice, currentAudioDevice]);
+  }, [currentCamera, currentMicrophone]);
 
   useEffect(() => {
     if (settingsOpen) {
@@ -59,17 +59,17 @@ const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
   useEffect(() => {
     if (localStreamWrapper) {
       const audioTrack = localStreamWrapper.stream.getAudioTracks()[0];
-      if (audioTrack && audioInputDevices) {
-        const audioDevice = audioInputDevices.find(d => d.label === audioTrack.label);
+      if (audioTrack && microphones) {
+        const audioDevice = microphones.find(d => d.label === audioTrack.label);
         if (audioDevice) {
-          setCurrentAudioDevice(audioDevice);
+          setCurrentMicrophone(audioDevice);
         }
       }
       const videoTrack = localStreamWrapper.stream.getVideoTracks()[0];
-      if (videoTrack && videoInputDevices) {
-        const videoDevice = videoInputDevices.find(d => d.label === videoTrack.label);
+      if (videoTrack && cameras) {
+        const videoDevice = cameras.find(d => d.label === videoTrack.label);
         if (videoDevice) {
-          setCurrentVideoDevice(videoDevice);
+          setCurrentCamera(videoDevice);
         }
       }
     }
@@ -98,20 +98,20 @@ const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
 
   const initListOfDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    setAudioInputDevices(devices.filter((device) => device.kind === 'audioinput'));
-    setVideoInputDevices(devices.filter((device) => device.kind === 'videoinput'));
+    setMicrophones(devices.filter((device) => device.kind === 'audioinput'));
+    setCameras(devices.filter((device) => device.kind === 'videoinput'));
   };
 
   const handleChangeCurrentAudioDevice = evt => {
     const selectedLabel = evt.target.value;
-    const selectedDevice = audioInputDevices.find(d => d.label === selectedLabel);
-    setCurrentAudioDevice(selectedDevice || null);
+    const selectedDevice = microphones.find(d => d.label === selectedLabel);
+    setCurrentMicrophone(selectedDevice || null);
   };
 
   const handleChangeCurrentVideoDevice = evt => {
     const selectedLabel = evt.target.value;
-    const selectedDevice = videoInputDevices.find(d => d.label === selectedLabel);
-    setCurrentVideoDevice(selectedDevice || null);
+    const selectedDevice = cameras.find(d => d.label === selectedLabel);
+    setCurrentCamera(selectedDevice || null);
   };
 
   const handleClickOpen = async () => {
@@ -124,15 +124,15 @@ const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
 
   const handleSaveSettings = async () => {
     const newConstraints = { ...mediaConstraints };
-    if (currentAudioDevice) {
-      newConstraints.audio = { ...newConstraints.audio, deviceId: currentAudioDevice.deviceId };
+    if (currentMicrophone) {
+      newConstraints.audio = { ...newConstraints.audio, deviceId: currentMicrophone.deviceId };
     }
 
-    if (currentVideoDevice) {
-      newConstraints.video = { ...newConstraints.video, deviceId: currentVideoDevice.deviceId };
+    if (currentCamera) {
+      newConstraints.video = { ...newConstraints.video, deviceId: currentCamera.deviceId };
     }
 
-    if (currentAudioDevice && currentVideoDevice) {
+    if (currentMicrophone && currentCamera) {
       await dispatch(setMediaStreamConstraints(newConstraints));
     }
   };
@@ -161,24 +161,22 @@ const MediaPreview = ({ dispatch, localStreamWrapper, mediaConstraints }) => {
                 <InputLabel htmlFor="select-mic">Audio Input (Microphone)</InputLabel>
                 <Select
                   className={classes.select}
-                  native
-                  value={currentAudioDevice ? currentAudioDevice.label : ''}
+                  value={currentMicrophone ? currentMicrophone.label : ''}
                   onChange={handleChangeCurrentAudioDevice}
                   input={<Input id="select-mic"/>}
                 >
-                  {audioInputDevices && audioInputDevices.map((device, i) => <option key={device.groupId + i}>{device.label}</option>)}
+                  {microphones && microphones.map((mic, i) => <MenuItem key={mic.groupId + i} value={mic.label}>{mic.label}</MenuItem>)}
                 </Select>
               </FormControl>
               <FormControl className={classes.formControl}>
                 <InputLabel htmlFor="select-cam">Video Input (Camera)</InputLabel>
                 <Select
                   className={classes.select}
-                  native
-                  value={currentVideoDevice ? currentVideoDevice.label : ''}
+                  value={currentCamera ? currentCamera.label : ''}
                   onChange={handleChangeCurrentVideoDevice}
                   input={<Input id="select-cam"/>}
                 >
-                  {videoInputDevices && videoInputDevices.map((device, i) => <option key={device.groupId + i}>{device.label}</option>)}
+                  {cameras && cameras.map((cam, i) => <MenuItem key={cam.groupId + i} value={cam.label}>{cam.label}</MenuItem>)}
                 </Select>
               </FormControl>
             </form>
