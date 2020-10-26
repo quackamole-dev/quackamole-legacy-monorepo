@@ -3,6 +3,7 @@ import {setVideoSrc} from '../../../utils';
 import {makeStyles} from '@material-ui/core/styles';
 import {Card, CircularProgress, Box} from '@material-ui/core';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import AudioVisualizer from './AudioVisualizer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
     flexFlow: 'column nowrap',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: '5px',
     width: '100%',
     height: '130px'
   },
@@ -50,15 +50,16 @@ const GenericMediaCard = ({ stream, muted = false, user }) => {
   }, [stream]);
 
   return (
-    <Card className={classes.cardWrapper}>
-      {stream
-        ? <video ref={videoRef} className={classes.media}/>
-        : <CircularProgress color="inherit"/>
-      }
-
-      {stream && !stream.getVideoTracks()[0] && <VideocamOffIcon className={classes.videoOffIcon} color='primary' fontSize='large'/>}
-      {user && user.nickname && <Box className={classes.displayName}>{user.nickname}</Box>}
-    </Card>
+    <AudioVisualizer stream={stream} styles={{ marginBottom: '5px' }}>
+      <Card className={classes.cardWrapper}>
+        {stream
+          ? <video ref={videoRef} className={classes.media}/>
+          : <CircularProgress color="inherit"/>
+        }
+        {stream && !stream.getVideoTracks()[0] && <VideocamOffIcon className={classes.videoOffIcon} color='primary' fontSize='large'/>}
+        {user && user.nickname && <Box className={classes.displayName}>{user.nickname}</Box>}
+      </Card>
+    </AudioVisualizer>
   );
 };
 
