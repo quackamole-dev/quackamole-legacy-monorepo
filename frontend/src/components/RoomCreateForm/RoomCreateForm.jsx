@@ -55,20 +55,20 @@ const useStyles = makeStyles({
   },
   btnCreate: {
     color: 'white',
-    boxShadow: 'none',
+    boxShadow: 'none'
   },
   fabProgress: {
     position: 'absolute',
     top: -6,
     left: -6,
-    zIndex: 1,
+    zIndex: 1
   },
   btnCreateProgress: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     marginTop: -12,
-    marginLeft: -12,
+    marginLeft: -12
   },
   paper: {
     padding: theme.spacing(2),
@@ -109,18 +109,11 @@ const RoomCreateForm = () => {
 
   const handleKeyPress = async (evt) => {
     if (!loading && evt.key === 'Enter') {
-        if (!roomId) {
-          const room = await createRoom();
-
-          if (room) {
-            setError(null);
-            setRoomId(room.id);
-            setLink(`${window.location.origin}/#/room-lobby/${room.id}`);
-          }
+      if (!roomId) {
+        await createRoom();
       } else if (!error && roomId) {
         history.push(`/room-lobby/${roomId}`);
       }
-
 
     }
   };
@@ -151,7 +144,12 @@ const RoomCreateForm = () => {
         return;
       }
 
-      return await res.json();
+      const room = await res.json();
+      if (room) {
+        setError(null);
+        setRoomId(room.id);
+        setLink(`${window.location.origin}/#/room-lobby/${room.id}`);
+      }
     } catch (err) {
       setError(err);
     }
@@ -182,7 +180,7 @@ const RoomCreateForm = () => {
           >
             Create
           </Button>
-            {loading && <CircularProgress size={24} className={classes.btnCreateProgress}/>}
+          {loading && <CircularProgress size={24} className={classes.btnCreateProgress}/>}
         </div>
       </div>
     </Box>;
@@ -241,7 +239,7 @@ const RoomCreateForm = () => {
       {/* Body */}
       <Grid container className={classes.containerStyle}>
         <Grid item xs={11} md={6} lg={6}>
-        {roomId ? shareRoomJSX : createRoomJSX}
+          {roomId ? shareRoomJSX : createRoomJSX}
           {error && <Box color={'red'} textAlign={'center'}>{error.message}</Box>}
         </Grid>
       </Grid>
