@@ -1,0 +1,21 @@
+version: 'version 3'
+services:
+  nginx:
+    build:
+      context: .
+      args:
+        - REACT_APP_BACKEND_URL=https://quackamole.io
+    restart: always
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.conf # to retain syntax highlighting
+      - NGINX_SERVER_NAME=quackamole.io
+      - NGINX_SSL_CERT=/etc/letsencrypt/live/quackamole.io/fullchain.pem
+      - NGINX_SSL_KEY=/etc/letsencrypt/live/quackamole.io/privkey.pem
+  backend:
+    build: ./quackamole-rtc-server
