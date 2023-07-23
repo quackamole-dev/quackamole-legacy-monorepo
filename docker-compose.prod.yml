@@ -18,4 +18,4 @@ services:
       - NGINX_SSL_CERT=/etc/letsencrypt/live/quackamole.io/fullchain.pem
       - NGINX_SSL_KEY=/etc/letsencrypt/live/quackamole.io/privkey.pem
   backend:
-    build: ./quackamole-rtc-server
+    build: ./backend
